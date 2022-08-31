@@ -1,0 +1,34 @@
+type LendingStrategy @entity {
+  id: ID!
+  createdAt: BigInt!
+  name: String!
+  symbol: String!
+  poolAddress: Bytes!
+  underlying: Bytes!
+  collateral: Bytes!
+  normFactor: BigInt!
+  vaults: [Vault!] @derivedFrom(field: "strategy")
+  normFactorUpdates: [NormFactorUpdate!] @derivedFrom(field: "strategy")
+}
+
+type Account @entity {
+  id: ID!
+  vaults: [Vault!] @derivedFrom(field: "owner")
+}
+
+type Vault @entity {
+  id: ID!
+  strategy: LendingStrategy!
+  owner: Account!
+  tokenId: BigInt!
+  debt: BigInt!
+  open: Boolean!
+}
+
+type NormFactorUpdate @entity {
+  id: ID!
+  timestamp: BigInt!
+  strategy: LendingStrategy!
+  oldNorm: BigInt!
+  newNorm: BigInt!
+}
