@@ -23,7 +23,7 @@ export class LendingStrategy extends Entity {
     this.set("underlying", Value.fromBytes(Bytes.empty()));
     this.set("allowedCollateralRoot", Value.fromBytes(Bytes.empty()));
     this.set("strategyURI", Value.fromString(""));
-    this.set("normFactor", Value.fromBigInt(BigInt.zero()));
+    this.set("norm", Value.fromBigInt(BigInt.zero()));
   }
 
   save(): void {
@@ -115,13 +115,13 @@ export class LendingStrategy extends Entity {
     this.set("strategyURI", Value.fromString(value));
   }
 
-  get normFactor(): BigInt {
-    let value = this.get("normFactor");
+  get norm(): BigInt {
+    let value = this.get("norm");
     return value!.toBigInt();
   }
 
-  set normFactor(value: BigInt) {
-    this.set("normFactor", Value.fromBigInt(value));
+  set norm(value: BigInt) {
+    this.set("norm", Value.fromBigInt(value));
   }
 
   get vaults(): Array<string> | null {
@@ -141,8 +141,8 @@ export class LendingStrategy extends Entity {
     }
   }
 
-  get normFactorUpdates(): Array<string> | null {
-    let value = this.get("normFactorUpdates");
+  get normUpdates(): Array<string> | null {
+    let value = this.get("normUpdates");
     if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -150,14 +150,11 @@ export class LendingStrategy extends Entity {
     }
   }
 
-  set normFactorUpdates(value: Array<string> | null) {
+  set normUpdates(value: Array<string> | null) {
     if (!value) {
-      this.unset("normFactorUpdates");
+      this.unset("normUpdates");
     } else {
-      this.set(
-        "normFactorUpdates",
-        Value.fromStringArray(<Array<string>>value)
-      );
+      this.set("normUpdates", Value.fromStringArray(<Array<string>>value));
     }
   }
 }

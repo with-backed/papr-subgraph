@@ -7,9 +7,9 @@ type LendingStrategy @entity {
   underlying: Bytes!
   allowedCollateralRoot: Bytes!
   strategyURI: String!
-  normFactor: BigInt!
+  norm: BigInt!
   vaults: [Vault!] @derivedFrom(field: "strategy")
-  normFactorUpdates: [NormalizationUpdate!] @derivedFrom(field: "strategy")
+  normUpdates: [NormalizationUpdate!] @derivedFrom(field: "strategy")
 }
 
 type Account @entity {

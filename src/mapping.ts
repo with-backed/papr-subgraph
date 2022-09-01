@@ -37,9 +37,17 @@ export function handleCreateLendingStrategy(
 
   lendingStrategy.name = event.params.name;
   lendingStrategy.symbol = event.params.symbol;
-  lendingStrategy.normFactor = BigInt.fromI32(1);
+  lendingStrategy.norm = BigInt.fromI32(1);
 
   lendingStrategy.save();
+
+  const normUpdate = new NormalizationUpdate(
+    event.transaction.hash.toHexString()
+  );
+  normUpdate.oldNorm = BigInt.fromI32(1);
+  normUpdate.newNorm = BigInt.fromI32(1);
+  normUpdate.strategy = event.params.strategyAddress.toHexString();
+  normUpdate.save();
 }
 
 export function handleOpenVault(event: OpenVault): void {
@@ -103,17 +111,17 @@ export function handleUpdateNormalization(event: UpdateNormalization): void {
     return;
   }
 
-  strategy.normFactor = event.params.newNorm;
+  strategy.norm = event.params.newNorm;
 
   const normUpdate = new NormalizationUpdate(
-    `${strategy.id}-${event.transaction.hash.toHexString()}`
+    event.transaction.hash.toHexString()
   );
 
-  if (strategy.normFactorUpdates != null) {
-    if (strategy.normFactorUpdates!.length > 0) {
+  if (strategy.normUpdates != null) {
+    if (strategy.normUpdates!.length > 0) {
       let mostRecentNormUpdateId: string = "";
 
-      mostRecentNormUpdateId = strategy.normFactorUpdates!.sort(
+      mostRecentNormUpdateId = strategy.normUpdates!.sort(
         (a: string, b: string) => {
           return (
             NormalizationUpdate.load(b)!.timestamp.toI32() -
