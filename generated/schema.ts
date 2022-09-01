@@ -21,7 +21,8 @@ export class LendingStrategy extends Entity {
     this.set("symbol", Value.fromString(""));
     this.set("poolAddress", Value.fromBytes(Bytes.empty()));
     this.set("underlying", Value.fromBytes(Bytes.empty()));
-    this.set("collateral", Value.fromBytes(Bytes.empty()));
+    this.set("allowedCollateralRoot", Value.fromBytes(Bytes.empty()));
+    this.set("strategyURI", Value.fromString(""));
     this.set("normFactor", Value.fromBigInt(BigInt.zero()));
   }
 
@@ -96,13 +97,22 @@ export class LendingStrategy extends Entity {
     this.set("underlying", Value.fromBytes(value));
   }
 
-  get collateral(): Bytes {
-    let value = this.get("collateral");
+  get allowedCollateralRoot(): Bytes {
+    let value = this.get("allowedCollateralRoot");
     return value!.toBytes();
   }
 
-  set collateral(value: Bytes) {
-    this.set("collateral", Value.fromBytes(value));
+  set allowedCollateralRoot(value: Bytes) {
+    this.set("allowedCollateralRoot", Value.fromBytes(value));
+  }
+
+  get strategyURI(): string {
+    let value = this.get("strategyURI");
+    return value!.toString();
+  }
+
+  set strategyURI(value: string) {
+    this.set("strategyURI", Value.fromString(value));
   }
 
   get normFactor(): BigInt {
@@ -286,7 +296,7 @@ export class Vault extends Entity {
   }
 }
 
-export class NormFactorUpdate extends Entity {
+export class NormalizationUpdate extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
@@ -299,20 +309,20 @@ export class NormFactorUpdate extends Entity {
 
   save(): void {
     let id = this.get("id");
-    assert(id != null, "Cannot save NormFactorUpdate entity without an ID");
+    assert(id != null, "Cannot save NormalizationUpdate entity without an ID");
     if (id) {
       assert(
         id.kind == ValueKind.STRING,
-        "Cannot save NormFactorUpdate entity with non-string ID. " +
+        "Cannot save NormalizationUpdate entity with non-string ID. " +
           'Considering using .toHex() to convert the "id" to a string.'
       );
-      store.set("NormFactorUpdate", id.toString(), this);
+      store.set("NormalizationUpdate", id.toString(), this);
     }
   }
 
-  static load(id: string): NormFactorUpdate | null {
-    return changetype<NormFactorUpdate | null>(
-      store.get("NormFactorUpdate", id)
+  static load(id: string): NormalizationUpdate | null {
+    return changetype<NormalizationUpdate | null>(
+      store.get("NormalizationUpdate", id)
     );
   }
 
