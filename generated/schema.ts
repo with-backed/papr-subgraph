@@ -300,7 +300,6 @@ export class NormalizationUpdate extends Entity {
 
     this.set("timestamp", Value.fromBigInt(BigInt.zero()));
     this.set("strategy", Value.fromString(""));
-    this.set("oldNorm", Value.fromBigInt(BigInt.zero()));
     this.set("newNorm", Value.fromBigInt(BigInt.zero()));
   }
 
@@ -348,15 +347,6 @@ export class NormalizationUpdate extends Entity {
 
   set strategy(value: string) {
     this.set("strategy", Value.fromString(value));
-  }
-
-  get oldNorm(): BigInt {
-    let value = this.get("oldNorm");
-    return value!.toBigInt();
-  }
-
-  set oldNorm(value: BigInt) {
-    this.set("oldNorm", Value.fromBigInt(value));
   }
 
   get newNorm(): BigInt {

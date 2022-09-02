@@ -44,7 +44,7 @@ export function handleCreateLendingStrategy(
   const normUpdate = new NormalizationUpdate(
     event.transaction.hash.toHexString()
   );
-  normUpdate.newNorm = BigInt.fromI32(1e18);
+
   normUpdate.strategy = event.params.strategyAddress.toHexString();
   normUpdate.save();
 }

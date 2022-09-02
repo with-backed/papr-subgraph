@@ -6,7 +6,7 @@ dataSources:
     name: MamaSlyFox
     network: rinkeby
     source:
-      address: "0x718b0dc7e4d6ac383402c7b908e93738be4e560a"
+      address: "0x3bc887e124bec628476c2548e51c32ad04637b9f"
       abi: StrategyFactory
       startBlock: 11220253
     mapping:

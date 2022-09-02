@@ -30,6 +30,5 @@ type NormalizationUpdate @entity {
   id: ID!
   timestamp: BigInt!
   strategy: LendingStrategy!
-  oldNorm: BigInt!
   newNorm: BigInt!
 }
