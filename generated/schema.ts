@@ -21,8 +21,9 @@ export class LendingStrategy extends Entity {
     this.set("symbol", Value.fromString(""));
     this.set("poolAddress", Value.fromBytes(Bytes.empty()));
     this.set("underlying", Value.fromBytes(Bytes.empty()));
-    this.set("collateral", Value.fromBytes(Bytes.empty()));
-    this.set("normFactor", Value.fromBigInt(BigInt.zero()));
+    this.set("allowedCollateralRoot", Value.fromBytes(Bytes.empty()));
+    this.set("strategyURI", Value.fromString(""));
+    this.set("norm", Value.fromBigInt(BigInt.zero()));
   }
 
   save(): void {
@@ -96,22 +97,31 @@ export class LendingStrategy extends Entity {
     this.set("underlying", Value.fromBytes(value));
   }
 
-  get collateral(): Bytes {
-    let value = this.get("collateral");
+  get allowedCollateralRoot(): Bytes {
+    let value = this.get("allowedCollateralRoot");
     return value!.toBytes();
   }
 
-  set collateral(value: Bytes) {
-    this.set("collateral", Value.fromBytes(value));
+  set allowedCollateralRoot(value: Bytes) {
+    this.set("allowedCollateralRoot", Value.fromBytes(value));
   }
 
-  get normFactor(): BigInt {
-    let value = this.get("normFactor");
+  get strategyURI(): string {
+    let value = this.get("strategyURI");
+    return value!.toString();
+  }
+
+  set strategyURI(value: string) {
+    this.set("strategyURI", Value.fromString(value));
+  }
+
+  get norm(): BigInt {
+    let value = this.get("norm");
     return value!.toBigInt();
   }
 
-  set normFactor(value: BigInt) {
-    this.set("normFactor", Value.fromBigInt(value));
+  set norm(value: BigInt) {
+    this.set("norm", Value.fromBigInt(value));
   }
 
   get vaults(): Array<string> | null {
@@ -131,8 +141,8 @@ export class LendingStrategy extends Entity {
     }
   }
 
-  get normFactorUpdates(): Array<string> | null {
-    let value = this.get("normFactorUpdates");
+  get normUpdates(): Array<string> | null {
+    let value = this.get("normUpdates");
     if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -140,14 +150,11 @@ export class LendingStrategy extends Entity {
     }
   }
 
-  set normFactorUpdates(value: Array<string> | null) {
+  set normUpdates(value: Array<string> | null) {
     if (!value) {
-      this.unset("normFactorUpdates");
+      this.unset("normUpdates");
     } else {
-      this.set(
-        "normFactorUpdates",
-        Value.fromStringArray(<Array<string>>value)
-      );
+      this.set("normUpdates", Value.fromStringArray(<Array<string>>value));
     }
   }
 }
@@ -286,33 +293,32 @@ export class Vault extends Entity {
   }
 }
 
-export class NormFactorUpdate extends Entity {
+export class NormalizationUpdate extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
 
     this.set("timestamp", Value.fromBigInt(BigInt.zero()));
     this.set("strategy", Value.fromString(""));
-    this.set("oldNorm", Value.fromBigInt(BigInt.zero()));
     this.set("newNorm", Value.fromBigInt(BigInt.zero()));
   }
 
   save(): void {
     let id = this.get("id");
-    assert(id != null, "Cannot save NormFactorUpdate entity without an ID");
+    assert(id != null, "Cannot save NormalizationUpdate entity without an ID");
     if (id) {
       assert(
         id.kind == ValueKind.STRING,
-        "Cannot save NormFactorUpdate entity with non-string ID. " +
+        "Cannot save NormalizationUpdate entity with non-string ID. " +
           'Considering using .toHex() to convert the "id" to a string.'
       );
-      store.set("NormFactorUpdate", id.toString(), this);
+      store.set("NormalizationUpdate", id.toString(), this);
     }
   }
 
-  static load(id: string): NormFactorUpdate | null {
-    return changetype<NormFactorUpdate | null>(
-      store.get("NormFactorUpdate", id)
+  static load(id: string): NormalizationUpdate | null {
+    return changetype<NormalizationUpdate | null>(
+      store.get("NormalizationUpdate", id)
     );
   }
 
@@ -341,15 +347,6 @@ export class NormFactorUpdate extends Entity {
 
   set strategy(value: string) {
     this.set("strategy", Value.fromString(value));
-  }
-
-  get oldNorm(): BigInt {
-    let value = this.get("oldNorm");
-    return value!.toBigInt();
-  }
-
-  set oldNorm(value: BigInt) {
-    this.set("oldNorm", Value.fromBigInt(value));
   }
 
   get newNorm(): BigInt {

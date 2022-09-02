@@ -1,31 +1,34 @@
 import { BigInt, log } from "@graphprotocol/graph-ts";
 
 import {
-  DebtAdded,
-  DebtReduced,
-  NormalizationFactorUpdated,
-  VaultClosed,
-  VaultCreated,
+  IncreaseDebt,
+  ReduceDebt,
+  UpdateNormalization,
+  CloseVault,
+  OpenVault,
 } from "../generated/SlyFox/LendingStrategy";
 
-import { LendingStrategyCreated } from "../generated/MamaSlyFox/StrategyFactory";
+import { CreateLendingStrategy } from "../generated/MamaSlyFox/StrategyFactory";
 
 import {
   Account,
   LendingStrategy,
-  NormFactorUpdate,
+  NormalizationUpdate,
   Vault,
 } from "../generated/schema";
 
 import { LendingStrategy as LendingStrategyABI } from "../generated/SlyFox/LendingStrategy";
 
-export function handleStrategyCreated(event: LendingStrategyCreated): void {
+export function handleCreateLendingStrategy(
+  event: CreateLendingStrategy
+): void {
   const lendingStrategy = new LendingStrategy(
     event.params.strategyAddress.toHexString()
   );
 
   lendingStrategy.createdAt = event.block.timestamp;
-  lendingStrategy.collateral = event.params.collateral;
+  lendingStrategy.allowedCollateralRoot = event.params.allowedCollateralRoot;
+  lendingStrategy.strategyURI = event.params.allowedCollateralURI;
   lendingStrategy.underlying = event.params.underlying;
 
   lendingStrategy.poolAddress = LendingStrategyABI.bind(
@@ -34,17 +37,16 @@ export function handleStrategyCreated(event: LendingStrategyCreated): void {
 
   lendingStrategy.name = event.params.name;
   lendingStrategy.symbol = event.params.symbol;
-  lendingStrategy.normFactor = BigInt.fromI32(1);
 
   lendingStrategy.save();
 }
 
-export function handleVaultCreated(event: VaultCreated): void {
-  const vault = new Vault(event.params.vaultKey.toHexString());
+export function handleOpenVault(event: OpenVault): void {
+  const vault = new Vault(event.params.vaultId.toString());
 
-  let account = Account.load(event.params.mintTo.toHexString());
+  let account = Account.load(event.params.owner.toHexString());
   if (!account) {
-    account = new Account(event.params.mintTo.toHexString());
+    account = new Account(event.params.owner.toHexString());
   }
 
   const strategy = LendingStrategy.load(
@@ -56,15 +58,14 @@ export function handleVaultCreated(event: VaultCreated): void {
 
   vault.strategy = strategy.id;
   vault.owner = account.id;
-  vault.debt = event.params.amount;
-  vault.tokenId = event.params.tokenId;
+  vault.debt = BigInt.fromI32(0);
   vault.open = true;
   vault.save();
   account.save();
 }
 
-export function handleDebtAdded(event: DebtAdded): void {
-  const vault = Vault.load(event.params.vaultKey.toHexString());
+export function handleIncreaseDebt(event: IncreaseDebt): void {
+  const vault = Vault.load(event.params.vaultId.toString());
   if (!vault) {
     return;
   }
@@ -73,8 +74,8 @@ export function handleDebtAdded(event: DebtAdded): void {
   vault.save();
 }
 
-export function handleDebtReduced(event: DebtReduced): void {
-  const vault = Vault.load(event.params.vaultKey.toHexString());
+export function handleReduceDebt(event: ReduceDebt): void {
+  const vault = Vault.load(event.params.vaultId.toHexString());
   if (!vault) {
     return;
   }
@@ -83,8 +84,8 @@ export function handleDebtReduced(event: DebtReduced): void {
   vault.save();
 }
 
-export function handleVaultClosed(event: VaultClosed): void {
-  const vault = Vault.load(event.params.vaultKey.toHexString());
+export function handleCloseVault(event: CloseVault): void {
+  const vault = Vault.load(event.params.vaultId.toHexString());
   if (!vault) {
     return;
   }
@@ -93,9 +94,7 @@ export function handleVaultClosed(event: VaultClosed): void {
   vault.save();
 }
 
-export function handleNormFactorUpdated(
-  event: NormalizationFactorUpdated
-): void {
+export function handleUpdateNormalization(event: UpdateNormalization): void {
   const strategy = LendingStrategy.load(
     event.params._event.address.toHexString()
   );
@@ -103,16 +102,16 @@ export function handleNormFactorUpdated(
     return;
   }
 
-  strategy.normFactor = event.params.newNorm;
+  strategy.norm = event.params.newNorm;
 
-  const normFactorUpdate = new NormFactorUpdate(
-    `${strategy.id}-${event.transaction.hash.toHexString()}`
+  const normUpdate = new NormalizationUpdate(
+    event.transaction.hash.toHexString()
   );
-  normFactorUpdate.strategy = strategy.id;
-  normFactorUpdate.oldNorm = event.params.oldNorm;
-  normFactorUpdate.newNorm = event.params.newNorm;
-  normFactorUpdate.timestamp = event.block.timestamp;
+
+  normUpdate.strategy = strategy.id;
+  normUpdate.newNorm = event.params.newNorm;
+  normUpdate.timestamp = event.block.timestamp;
 
   strategy.save();
-  normFactorUpdate.save();
+  normUpdate.save();
 }

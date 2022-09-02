@@ -1,27 +1,22 @@
 [
   {
-    "inputs": [],
-    "stateMutability": "nonpayable",
-    "type": "constructor"
-  },
-  {
     "anonymous": false,
     "inputs": [
       {
         "indexed": true,
-        "internalType": "address",
+        "internalType": "contract LendingStrategy",
         "name": "strategyAddress",
         "type": "address"
       },
       {
         "indexed": true,
-        "internalType": "address",
-        "name": "collateral",
-        "type": "address"
+        "internalType": "bytes32",
+        "name": "allowedCollateralRoot",
+        "type": "bytes32"
       },
       {
         "indexed": true,
-        "internalType": "address",
+        "internalType": "contract ERC20",
         "name": "underlying",
         "type": "address"
       },
@@ -36,9 +31,15 @@
         "internalType": "string",
         "name": "symbol",
         "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "allowedCollateralURI",
+        "type": "string"
       }
     ],
-    "name": "LendingStrategyCreated",
+    "name": "CreateLendingStrategy",
     "type": "event"
   },
   {
@@ -54,9 +55,24 @@
         "type": "string"
       },
       {
-        "internalType": "contract ERC721",
-        "name": "collateral",
-        "type": "address"
+        "internalType": "string",
+        "name": "strategyURI",
+        "type": "string"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "allowedCollateralRoot",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "uint256",
+        "name": "targetAPR",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "maxLTV",
+        "type": "uint256"
       },
       {
         "internalType": "contract ERC20",
@@ -77,11 +93,41 @@
   },
   {
     "inputs": [],
-    "name": "oracle",
+    "name": "parameters",
     "outputs": [
       {
-        "internalType": "contract Oracle",
-        "name": "",
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "symbol",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "strategyURI",
+        "type": "string"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "allowedCollateralRoot",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "uint256",
+        "name": "targetAPR",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "maxLTV",
+        "type": "uint256"
+      },
+      {
+        "internalType": "contract ERC20",
+        "name": "underlying",
         "type": "address"
       }
     ],

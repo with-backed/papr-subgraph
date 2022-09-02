@@ -5,10 +5,11 @@ type LendingStrategy @entity {
   symbol: String!
   poolAddress: Bytes!
   underlying: Bytes!
-  collateral: Bytes!
-  normFactor: BigInt!
+  allowedCollateralRoot: Bytes!
+  strategyURI: String!
+  norm: BigInt!
   vaults: [Vault!] @derivedFrom(field: "strategy")
-  normFactorUpdates: [NormFactorUpdate!] @derivedFrom(field: "strategy")
+  normUpdates: [NormalizationUpdate!] @derivedFrom(field: "strategy")
 }
 
 type Account @entity {
@@ -25,10 +26,9 @@ type Vault @entity {
   open: Boolean!
 }
 
-type NormFactorUpdate @entity {
+type NormalizationUpdate @entity {
   id: ID!
   timestamp: BigInt!
   strategy: LendingStrategy!
-  oldNorm: BigInt!
   newNorm: BigInt!
 }
