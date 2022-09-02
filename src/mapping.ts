@@ -44,7 +44,6 @@ export function handleCreateLendingStrategy(
   const normUpdate = new NormalizationUpdate(
     event.transaction.hash.toHexString()
   );
-  normUpdate.oldNorm = BigInt.fromI32(1);
   normUpdate.newNorm = BigInt.fromI32(1);
   normUpdate.strategy = event.params.strategyAddress.toHexString();
   normUpdate.save();
@@ -116,29 +115,6 @@ export function handleUpdateNormalization(event: UpdateNormalization): void {
   const normUpdate = new NormalizationUpdate(
     event.transaction.hash.toHexString()
   );
-
-  if (strategy.normUpdates != null) {
-    if (strategy.normUpdates!.length > 0) {
-      let mostRecentNormUpdateId: string = "";
-
-      mostRecentNormUpdateId = strategy.normUpdates!.sort(
-        (a: string, b: string) => {
-          return (
-            NormalizationUpdate.load(b)!.timestamp.toI32() -
-            NormalizationUpdate.load(a)!.timestamp.toI32()
-          );
-        }
-      )[0];
-
-      normUpdate.oldNorm = NormalizationUpdate.load(
-        mostRecentNormUpdateId
-      )!.newNorm;
-    } else {
-      normUpdate.oldNorm = BigInt.fromI32(1);
-    }
-  } else {
-    normUpdate.oldNorm = BigInt.fromI32(1);
-  }
 
   normUpdate.strategy = strategy.id;
   normUpdate.newNorm = event.params.newNorm;
