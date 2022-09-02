@@ -37,16 +37,8 @@ export function handleCreateLendingStrategy(
 
   lendingStrategy.name = event.params.name;
   lendingStrategy.symbol = event.params.symbol;
-  lendingStrategy.norm = BigInt.fromI32(1);
 
   lendingStrategy.save();
-
-  const normUpdate = new NormalizationUpdate(
-    event.transaction.hash.toHexString()
-  );
-
-  normUpdate.strategy = event.params.strategyAddress.toHexString();
-  normUpdate.save();
 }
 
 export function handleOpenVault(event: OpenVault): void {
