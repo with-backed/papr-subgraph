@@ -14,6 +14,8 @@ import {
   Account,
   AddCollateralEvent,
   Collateral,
+  DebtDecreasedEvent,
+  DebtIncreasedEvent,
   LendingStrategy,
   NormalizationUpdate,
   RemoveCollateralEvent,
@@ -140,6 +142,14 @@ export function handleIncreaseDebt(event: IncreaseDebt): void {
 
   vault.debt = vault.debt.plus(event.params.amount);
   vault.save();
+
+  const debtIncreasedEvent = new DebtIncreasedEvent(
+    event.transaction.hash.toHexString()
+  );
+  debtIncreasedEvent.timestamp = event.block.timestamp;
+  debtIncreasedEvent.amount = event.params.amount;
+  debtIncreasedEvent.strategy = vault.strategy;
+  debtIncreasedEvent.vault = vault.id;
 }
 
 export function handleReduceDebt(event: ReduceDebt): void {
@@ -150,6 +160,14 @@ export function handleReduceDebt(event: ReduceDebt): void {
 
   vault.debt = vault.debt.minus(event.params.amount);
   vault.save();
+
+  const debtDecreasedEvent = new DebtDecreasedEvent(
+    event.transaction.hash.toHexString()
+  );
+  debtDecreasedEvent.timestamp = event.block.timestamp;
+  debtDecreasedEvent.amount = event.params.amount;
+  debtDecreasedEvent.strategy = vault.strategy;
+  debtDecreasedEvent.vault = vault.id;
 }
 
 export function handleUpdateNormalization(event: UpdateNormalization): void {

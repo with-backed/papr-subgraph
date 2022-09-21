@@ -59,3 +59,19 @@ type RemoveCollateralEvent @entity {
   strategy: LendingStrategy!
   collateral: Collateral!
 }
+
+type DebtIncreasedEvent @entity {
+  id: ID!
+  timestamp: BigInt!
+  vault: Vault!
+  strategy: LendingStrategy!
+  amount: BigInt!
+}
+
+type DebtDecreasedEvent @entity {
+  id: ID!
+  timestamp: BigInt!
+  vault: Vault!
+  strategy: LendingStrategy!
+  amount: BigInt!
+}
