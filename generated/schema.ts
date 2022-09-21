@@ -230,7 +230,6 @@ export class Vault extends Entity {
     this.set("tokenId", Value.fromBigInt(BigInt.zero()));
     this.set("debt", Value.fromBigInt(BigInt.zero()));
     this.set("totalCollateralValue", Value.fromBigInt(BigInt.zero()));
-    this.set("openedAt", Value.fromBigInt(BigInt.zero()));
   }
 
   save(): void {
@@ -311,15 +310,6 @@ export class Vault extends Entity {
 
   set totalCollateralValue(value: BigInt) {
     this.set("totalCollateralValue", Value.fromBigInt(value));
-  }
-
-  get openedAt(): BigInt {
-    let value = this.get("openedAt");
-    return value!.toBigInt();
-  }
-
-  set openedAt(value: BigInt) {
-    this.set("openedAt", Value.fromBigInt(value));
   }
 
   get collateral(): Array<string> {
@@ -485,6 +475,7 @@ export class AddCollateralEvent extends Entity {
     this.set("id", Value.fromString(id));
 
     this.set("timestamp", Value.fromBigInt(BigInt.zero()));
+    this.set("vault", Value.fromString(""));
     this.set("strategy", Value.fromString(""));
     this.set("collateral", Value.fromString(""));
   }
@@ -526,6 +517,15 @@ export class AddCollateralEvent extends Entity {
     this.set("timestamp", Value.fromBigInt(value));
   }
 
+  get vault(): string {
+    let value = this.get("vault");
+    return value!.toString();
+  }
+
+  set vault(value: string) {
+    this.set("vault", Value.fromString(value));
+  }
+
   get strategy(): string {
     let value = this.get("strategy");
     return value!.toString();
@@ -551,6 +551,7 @@ export class RemoveCollateralEvent extends Entity {
     this.set("id", Value.fromString(id));
 
     this.set("timestamp", Value.fromBigInt(BigInt.zero()));
+    this.set("vault", Value.fromString(""));
     this.set("strategy", Value.fromString(""));
     this.set("collateral", Value.fromString(""));
   }
@@ -593,6 +594,15 @@ export class RemoveCollateralEvent extends Entity {
 
   set timestamp(value: BigInt) {
     this.set("timestamp", Value.fromBigInt(value));
+  }
+
+  get vault(): string {
+    let value = this.get("vault");
+    return value!.toString();
+  }
+
+  set vault(value: string) {
+    this.set("vault", Value.fromString(value));
   }
 
   get strategy(): string {

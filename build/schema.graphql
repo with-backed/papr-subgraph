@@ -26,7 +26,6 @@ type Vault @entity {
   tokenId: BigInt!
   debt: BigInt!
   totalCollateralValue: BigInt!
-  openedAt: BigInt!
   collateral: [Collateral!]! @derivedFrom(field: "vault")
 }
 
@@ -48,6 +47,7 @@ type Collateral @entity {
 type AddCollateralEvent @entity {
   id: ID!
   timestamp: BigInt!
+  vault: Vault!
   strategy: LendingStrategy!
   collateral: Collateral!
 }
@@ -55,6 +55,7 @@ type AddCollateralEvent @entity {
 type RemoveCollateralEvent @entity {
   id: ID!
   timestamp: BigInt!
+  vault: Vault!
   strategy: LendingStrategy!
   collateral: Collateral!
 }

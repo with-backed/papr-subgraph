@@ -65,7 +65,6 @@ export function handleAddCollateral(event: AddCollateral): void {
 
   if (!vault) {
     vault = new Vault(event.params.vaultId.toString());
-    vault.openedAt = event.block.timestamp;
     vault.nonce = event.params.vaultNonce;
   }
 
@@ -99,6 +98,7 @@ export function handleAddCollateral(event: AddCollateral): void {
   addCollateralEvent.collateral = collateralAdded.id;
   addCollateralEvent.timestamp = event.block.timestamp;
   addCollateralEvent.strategy = strategy.id;
+  addCollateralEvent.vault = vault.id;
   addCollateralEvent.save();
 }
 
@@ -128,6 +128,7 @@ export function handleCollateralRemoved(event: RemoveCollateral): void {
   collateralRemovedEvent.collateral = collateralRemoved.id;
   collateralRemovedEvent.timestamp = event.block.timestamp;
   collateralRemovedEvent.strategy = vault.strategy;
+  collateralRemovedEvent.vault = vault.id;
   collateralRemovedEvent.save();
 }
 
