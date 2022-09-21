@@ -5,12 +5,39 @@
     "type": "constructor"
   },
   {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "vaultDebt",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "maxDebt",
+        "type": "uint256"
+      }
+    ],
+    "name": "ExceedsMaxDebt",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidCollateralVaultIDCombination",
+    "type": "error"
+  },
+  {
     "anonymous": false,
     "inputs": [
       {
         "indexed": true,
         "internalType": "uint256",
         "name": "vaultId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "vaultNonce",
         "type": "uint256"
       },
       {
@@ -61,19 +88,6 @@
         "internalType": "uint256",
         "name": "vaultId",
         "type": "uint256"
-      }
-    ],
-    "name": "CloseVault",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "vaultId",
-        "type": "uint256"
       },
       {
         "indexed": false,
@@ -95,19 +109,13 @@
         "type": "uint256"
       },
       {
-        "indexed": true,
-        "internalType": "address",
-        "name": "owner",
-        "type": "address"
-      },
-      {
         "indexed": false,
         "internalType": "uint256",
-        "name": "vaultNonce",
+        "name": "amount",
         "type": "uint256"
       }
     ],
-    "name": "OpenVault",
+    "name": "ReduceDebt",
     "type": "event"
   },
   {
@@ -120,13 +128,31 @@
         "type": "uint256"
       },
       {
+        "components": [
+          {
+            "internalType": "contract ERC721",
+            "name": "addr",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "id",
+            "type": "uint256"
+          }
+        ],
+        "indexed": false,
+        "internalType": "struct ILendingStrategy.Collateral",
+        "name": "collateral",
+        "type": "tuple"
+      },
+      {
         "indexed": false,
         "internalType": "uint256",
-        "name": "amount",
+        "name": "vaultCollateralValue",
         "type": "uint256"
       }
     ],
-    "name": "ReduceDebt",
+    "name": "RemoveCollateral",
     "type": "event"
   },
   {
@@ -159,8 +185,82 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "vaultId",
+        "name": "vaultNonce",
         "type": "uint256"
+      },
+      {
+        "components": [
+          {
+            "internalType": "contract ERC721",
+            "name": "addr",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "id",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct ILendingStrategy.Collateral",
+        "name": "collateral",
+        "type": "tuple"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint128",
+            "name": "price",
+            "type": "uint128"
+          },
+          {
+            "internalType": "enum ILendingStrategy.OracleInfoPeriod",
+            "name": "period",
+            "type": "uint8"
+          }
+        ],
+        "internalType": "struct ILendingStrategy.OracleInfo",
+        "name": "oracleInfo",
+        "type": "tuple"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint8",
+            "name": "v",
+            "type": "uint8"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "r",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "s",
+            "type": "bytes32"
+          }
+        ],
+        "internalType": "struct ILendingStrategy.Sig",
+        "name": "sig",
+        "type": "tuple"
+      }
+    ],
+    "name": "addCollateral",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "vaultNonce",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "vaultOwner",
+        "type": "address"
       },
       {
         "components": [
@@ -224,7 +324,7 @@
         "type": "bytes"
       }
     ],
-    "name": "addCollateral",
+    "name": "addCollateralWithCallback",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -245,19 +345,20 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "vaultId",
-        "type": "uint256"
-      },
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "name": "collateralFrozenOraclePrice",
+    "outputs": [
       {
         "internalType": "uint256",
-        "name": "vaultNonce",
+        "name": "",
         "type": "uint256"
       }
     ],
-    "name": "closeVault",
-    "outputs": [],
-    "stateMutability": "nonpayable",
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -278,6 +379,11 @@
         "internalType": "struct ILendingStrategy.Collateral",
         "name": "collateral",
         "type": "tuple"
+      },
+      {
+        "internalType": "uint256",
+        "name": "vaultId",
+        "type": "uint256"
       }
     ],
     "name": "collateralHash",
@@ -305,12 +411,20 @@
     "type": "function"
   },
   {
-    "inputs": [
+    "inputs": [],
+    "name": "factory",
+    "outputs": [
       {
-        "internalType": "uint256",
-        "name": "vaultId",
-        "type": "uint256"
-      },
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
       {
         "internalType": "uint256",
         "name": "vaultNonce",
@@ -343,6 +457,13 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "initialize",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -407,7 +528,7 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "assetPrice",
+        "name": "collateralValue",
         "type": "uint256"
       }
     ],
@@ -439,7 +560,7 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "vaultId",
+        "name": "vaultNonce",
         "type": "uint256"
       },
       {
@@ -561,25 +682,6 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "mintTo",
-        "type": "address"
-      }
-    ],
-    "name": "openVault",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "id",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
     "inputs": [],
     "name": "pool",
     "outputs": [
@@ -587,25 +689,6 @@
         "internalType": "contract IUniswapV3Pool",
         "name": "",
         "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bytes32",
-        "name": "",
-        "type": "bytes32"
-      }
-    ],
-    "name": "price",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -627,6 +710,54 @@
     "name": "reduceDebt",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "sendTo",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "vaultNonce",
+        "type": "uint256"
+      },
+      {
+        "components": [
+          {
+            "internalType": "contract ERC721",
+            "name": "addr",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "id",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct ILendingStrategy.Collateral",
+        "name": "collateral",
+        "type": "tuple"
+      }
+    ],
+    "name": "removeCollateral",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "start",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -765,7 +896,7 @@
       },
       {
         "internalType": "uint128",
-        "name": "price",
+        "name": "collateralValue",
         "type": "uint128"
       }
     ],

@@ -5,6 +5,7 @@ type LendingStrategy @entity {
   symbol: String!
   poolAddress: Bytes!
   underlying: Bytes!
+  targetAPR: BigInt!
   allowedCollateralRoot: Bytes!
   strategyURI: String!
   norm: BigInt!
@@ -19,11 +20,14 @@ type Account @entity {
 
 type Vault @entity {
   id: ID!
+  nonce: BigInt!
   strategy: LendingStrategy!
   owner: Account!
   tokenId: BigInt!
   debt: BigInt!
-  open: Boolean!
+  totalCollateralValue: BigInt!
+  openedAt: BigInt!
+  collateral: [Collateral!]! @derivedFrom(field: "vault")
 }
 
 type NormalizationUpdate @entity {
@@ -31,4 +35,26 @@ type NormalizationUpdate @entity {
   timestamp: BigInt!
   strategy: LendingStrategy!
   newNorm: BigInt!
+}
+
+type Collateral @entity {
+  id: ID!
+  contractAddress: Bytes!
+  tokenId: BigInt!
+  value: BigInt!
+  vault: Vault
+}
+
+type AddCollateralEvent @entity {
+  id: ID!
+  timestamp: BigInt!
+  strategy: LendingStrategy!
+  collateral: Collateral!
+}
+
+type RemoveCollateralEvent @entity {
+  id: ID!
+  timestamp: BigInt!
+  strategy: LendingStrategy!
+  collateral: Collateral!
 }

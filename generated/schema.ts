@@ -21,6 +21,7 @@ export class LendingStrategy extends Entity {
     this.set("symbol", Value.fromString(""));
     this.set("poolAddress", Value.fromBytes(Bytes.empty()));
     this.set("underlying", Value.fromBytes(Bytes.empty()));
+    this.set("targetAPR", Value.fromBigInt(BigInt.zero()));
     this.set("allowedCollateralRoot", Value.fromBytes(Bytes.empty()));
     this.set("strategyURI", Value.fromString(""));
     this.set("norm", Value.fromBigInt(BigInt.zero()));
@@ -95,6 +96,15 @@ export class LendingStrategy extends Entity {
 
   set underlying(value: Bytes) {
     this.set("underlying", Value.fromBytes(value));
+  }
+
+  get targetAPR(): BigInt {
+    let value = this.get("targetAPR");
+    return value!.toBigInt();
+  }
+
+  set targetAPR(value: BigInt) {
+    this.set("targetAPR", Value.fromBigInt(value));
   }
 
   get allowedCollateralRoot(): Bytes {
@@ -214,11 +224,13 @@ export class Vault extends Entity {
     super();
     this.set("id", Value.fromString(id));
 
+    this.set("nonce", Value.fromBigInt(BigInt.zero()));
     this.set("strategy", Value.fromString(""));
     this.set("owner", Value.fromString(""));
     this.set("tokenId", Value.fromBigInt(BigInt.zero()));
     this.set("debt", Value.fromBigInt(BigInt.zero()));
-    this.set("open", Value.fromBoolean(false));
+    this.set("totalCollateralValue", Value.fromBigInt(BigInt.zero()));
+    this.set("openedAt", Value.fromBigInt(BigInt.zero()));
   }
 
   save(): void {
@@ -245,6 +257,15 @@ export class Vault extends Entity {
 
   set id(value: string) {
     this.set("id", Value.fromString(value));
+  }
+
+  get nonce(): BigInt {
+    let value = this.get("nonce");
+    return value!.toBigInt();
+  }
+
+  set nonce(value: BigInt) {
+    this.set("nonce", Value.fromBigInt(value));
   }
 
   get strategy(): string {
@@ -283,13 +304,31 @@ export class Vault extends Entity {
     this.set("debt", Value.fromBigInt(value));
   }
 
-  get open(): boolean {
-    let value = this.get("open");
-    return value!.toBoolean();
+  get totalCollateralValue(): BigInt {
+    let value = this.get("totalCollateralValue");
+    return value!.toBigInt();
   }
 
-  set open(value: boolean) {
-    this.set("open", Value.fromBoolean(value));
+  set totalCollateralValue(value: BigInt) {
+    this.set("totalCollateralValue", Value.fromBigInt(value));
+  }
+
+  get openedAt(): BigInt {
+    let value = this.get("openedAt");
+    return value!.toBigInt();
+  }
+
+  set openedAt(value: BigInt) {
+    this.set("openedAt", Value.fromBigInt(value));
+  }
+
+  get collateral(): Array<string> {
+    let value = this.get("collateral");
+    return value!.toStringArray();
+  }
+
+  set collateral(value: Array<string>) {
+    this.set("collateral", Value.fromStringArray(value));
   }
 }
 
@@ -356,5 +395,221 @@ export class NormalizationUpdate extends Entity {
 
   set newNorm(value: BigInt) {
     this.set("newNorm", Value.fromBigInt(value));
+  }
+}
+
+export class Collateral extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+
+    this.set("contractAddress", Value.fromBytes(Bytes.empty()));
+    this.set("tokenId", Value.fromBigInt(BigInt.zero()));
+    this.set("value", Value.fromBigInt(BigInt.zero()));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save Collateral entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        "Cannot save Collateral entity with non-string ID. " +
+          'Considering using .toHex() to convert the "id" to a string.'
+      );
+      store.set("Collateral", id.toString(), this);
+    }
+  }
+
+  static load(id: string): Collateral | null {
+    return changetype<Collateral | null>(store.get("Collateral", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get contractAddress(): Bytes {
+    let value = this.get("contractAddress");
+    return value!.toBytes();
+  }
+
+  set contractAddress(value: Bytes) {
+    this.set("contractAddress", Value.fromBytes(value));
+  }
+
+  get tokenId(): BigInt {
+    let value = this.get("tokenId");
+    return value!.toBigInt();
+  }
+
+  set tokenId(value: BigInt) {
+    this.set("tokenId", Value.fromBigInt(value));
+  }
+
+  get value(): BigInt {
+    let value = this.get("value");
+    return value!.toBigInt();
+  }
+
+  set value(value: BigInt) {
+    this.set("value", Value.fromBigInt(value));
+  }
+
+  get vault(): string | null {
+    let value = this.get("vault");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set vault(value: string | null) {
+    if (!value) {
+      this.unset("vault");
+    } else {
+      this.set("vault", Value.fromString(<string>value));
+    }
+  }
+}
+
+export class AddCollateralEvent extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+
+    this.set("timestamp", Value.fromBigInt(BigInt.zero()));
+    this.set("strategy", Value.fromString(""));
+    this.set("collateral", Value.fromString(""));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save AddCollateralEvent entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        "Cannot save AddCollateralEvent entity with non-string ID. " +
+          'Considering using .toHex() to convert the "id" to a string.'
+      );
+      store.set("AddCollateralEvent", id.toString(), this);
+    }
+  }
+
+  static load(id: string): AddCollateralEvent | null {
+    return changetype<AddCollateralEvent | null>(
+      store.get("AddCollateralEvent", id)
+    );
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get timestamp(): BigInt {
+    let value = this.get("timestamp");
+    return value!.toBigInt();
+  }
+
+  set timestamp(value: BigInt) {
+    this.set("timestamp", Value.fromBigInt(value));
+  }
+
+  get strategy(): string {
+    let value = this.get("strategy");
+    return value!.toString();
+  }
+
+  set strategy(value: string) {
+    this.set("strategy", Value.fromString(value));
+  }
+
+  get collateral(): string {
+    let value = this.get("collateral");
+    return value!.toString();
+  }
+
+  set collateral(value: string) {
+    this.set("collateral", Value.fromString(value));
+  }
+}
+
+export class RemoveCollateralEvent extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+
+    this.set("timestamp", Value.fromBigInt(BigInt.zero()));
+    this.set("strategy", Value.fromString(""));
+    this.set("collateral", Value.fromString(""));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(
+      id != null,
+      "Cannot save RemoveCollateralEvent entity without an ID"
+    );
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        "Cannot save RemoveCollateralEvent entity with non-string ID. " +
+          'Considering using .toHex() to convert the "id" to a string.'
+      );
+      store.set("RemoveCollateralEvent", id.toString(), this);
+    }
+  }
+
+  static load(id: string): RemoveCollateralEvent | null {
+    return changetype<RemoveCollateralEvent | null>(
+      store.get("RemoveCollateralEvent", id)
+    );
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get timestamp(): BigInt {
+    let value = this.get("timestamp");
+    return value!.toBigInt();
+  }
+
+  set timestamp(value: BigInt) {
+    this.set("timestamp", Value.fromBigInt(value));
+  }
+
+  get strategy(): string {
+    let value = this.get("strategy");
+    return value!.toString();
+  }
+
+  set strategy(value: string) {
+    this.set("strategy", Value.fromString(value));
+  }
+
+  get collateral(): string {
+    let value = this.get("collateral");
+    return value!.toString();
+  }
+
+  set collateral(value: string) {
+    this.set("collateral", Value.fromString(value));
   }
 }
