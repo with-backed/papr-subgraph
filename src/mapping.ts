@@ -1,23 +1,32 @@
-import { BigInt, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt, log } from "@graphprotocol/graph-ts";
 
 import {
   IncreaseDebt,
   ReduceDebt,
   UpdateNormalization,
-  CloseVault,
-  OpenVault,
+  AddCollateral,
+  RemoveCollateral,
 } from "../generated/SlyFox/LendingStrategy";
 
 import { CreateLendingStrategy } from "../generated/MamaSlyFox/StrategyFactory";
 
 import {
   Account,
+  AddCollateralEvent,
+  Collateral,
+  DebtDecreasedEvent,
+  DebtIncreasedEvent,
   LendingStrategy,
   NormalizationUpdate,
+  RemoveCollateralEvent,
   Vault,
 } from "../generated/schema";
 
 import { LendingStrategy as LendingStrategyABI } from "../generated/SlyFox/LendingStrategy";
+
+function generateCollateralId(addr: Address, tokenId: BigInt): string {
+  return `${addr.toHexString()}-${tokenId.toString()}`;
+}
 
 export function handleCreateLendingStrategy(
   event: CreateLendingStrategy
@@ -30,6 +39,9 @@ export function handleCreateLendingStrategy(
   lendingStrategy.allowedCollateralRoot = event.params.allowedCollateralRoot;
   lendingStrategy.strategyURI = event.params.allowedCollateralURI;
   lendingStrategy.underlying = event.params.underlying;
+  lendingStrategy.targetAPR = LendingStrategyABI.bind(
+    event.params.strategyAddress
+  ).targetAPR();
 
   lendingStrategy.poolAddress = LendingStrategyABI.bind(
     event.params.strategyAddress
@@ -41,12 +53,28 @@ export function handleCreateLendingStrategy(
   lendingStrategy.save();
 }
 
-export function handleOpenVault(event: OpenVault): void {
-  const vault = new Vault(event.params.vaultId.toString());
+export function handleAddCollateral(event: AddCollateral): void {
+  let vault: Vault | null = Vault.load(event.params.vaultId.toString());
+  const collateralAdded = new Collateral(
+    generateCollateralId(
+      event.params.collateral.addr,
+      event.params.collateral.id
+    )
+  );
+  collateralAdded.contractAddress = event.params.collateral.addr;
+  collateralAdded.tokenId = event.params.collateral.id;
+  collateralAdded.value = event.params.oracleInfo.price;
 
-  let account = Account.load(event.params.owner.toHexString());
+  if (!vault) {
+    vault = new Vault(event.params.vaultId.toString());
+    vault.nonce = event.params.vaultNonce;
+  }
+
+  collateralAdded.vault = vault.id;
+
+  let account = Account.load(event.transaction.from.toHexString());
   if (!account) {
-    account = new Account(event.params.owner.toHexString());
+    account = new Account(event.transaction.from.toHexString());
   }
 
   const strategy = LendingStrategy.load(
@@ -58,10 +86,52 @@ export function handleOpenVault(event: OpenVault): void {
 
   vault.strategy = strategy.id;
   vault.owner = account.id;
-  vault.debt = BigInt.fromI32(0);
-  vault.open = true;
+  vault.totalCollateralValue = vault.totalCollateralValue.plus(
+    collateralAdded.value
+  );
+
+  collateralAdded.save();
   vault.save();
   account.save();
+
+  const addCollateralEvent = new AddCollateralEvent(
+    event.transaction.hash.toHexString()
+  );
+  addCollateralEvent.collateral = collateralAdded.id;
+  addCollateralEvent.timestamp = event.block.timestamp;
+  addCollateralEvent.strategy = strategy.id;
+  addCollateralEvent.vault = vault.id;
+  addCollateralEvent.save();
+}
+
+export function handleCollateralRemoved(event: RemoveCollateral): void {
+  const vault = Vault.load(event.params.vaultId.toString());
+  if (!vault) return;
+
+  const collateralRemoved = Collateral.load(
+    generateCollateralId(
+      event.params.collateral.addr,
+      event.params.collateral.id
+    )
+  );
+  if (!collateralRemoved) return;
+
+  vault.totalCollateralValue = vault.totalCollateralValue.minus(
+    collateralRemoved.value
+  );
+  vault.save();
+
+  collateralRemoved.vault = "";
+  collateralRemoved.save();
+
+  const collateralRemovedEvent = new RemoveCollateralEvent(
+    event.transaction.hash.toHexString()
+  );
+  collateralRemovedEvent.collateral = collateralRemoved.id;
+  collateralRemovedEvent.timestamp = event.block.timestamp;
+  collateralRemovedEvent.strategy = vault.strategy;
+  collateralRemovedEvent.vault = vault.id;
+  collateralRemovedEvent.save();
 }
 
 export function handleIncreaseDebt(event: IncreaseDebt): void {
@@ -72,6 +142,14 @@ export function handleIncreaseDebt(event: IncreaseDebt): void {
 
   vault.debt = vault.debt.plus(event.params.amount);
   vault.save();
+
+  const debtIncreasedEvent = new DebtIncreasedEvent(
+    event.transaction.hash.toHexString()
+  );
+  debtIncreasedEvent.timestamp = event.block.timestamp;
+  debtIncreasedEvent.amount = event.params.amount;
+  debtIncreasedEvent.strategy = vault.strategy;
+  debtIncreasedEvent.vault = vault.id;
 }
 
 export function handleReduceDebt(event: ReduceDebt): void {
@@ -82,16 +160,14 @@ export function handleReduceDebt(event: ReduceDebt): void {
 
   vault.debt = vault.debt.minus(event.params.amount);
   vault.save();
-}
 
-export function handleCloseVault(event: CloseVault): void {
-  const vault = Vault.load(event.params.vaultId.toHexString());
-  if (!vault) {
-    return;
-  }
-
-  vault.open = false;
-  vault.save();
+  const debtDecreasedEvent = new DebtDecreasedEvent(
+    event.transaction.hash.toHexString()
+  );
+  debtDecreasedEvent.timestamp = event.block.timestamp;
+  debtDecreasedEvent.amount = event.params.amount;
+  debtDecreasedEvent.strategy = vault.strategy;
+  debtDecreasedEvent.vault = vault.id;
 }
 
 export function handleUpdateNormalization(event: UpdateNormalization): void {
