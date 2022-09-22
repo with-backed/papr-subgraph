@@ -64,6 +64,36 @@ export class AddCollateralOracleInfoStruct extends ethereum.Tuple {
   }
 }
 
+export class ChangeCollateralAllowed extends ethereum.Event {
+  get params(): ChangeCollateralAllowed__Params {
+    return new ChangeCollateralAllowed__Params(this);
+  }
+}
+
+export class ChangeCollateralAllowed__Params {
+  _event: ChangeCollateralAllowed;
+
+  constructor(event: ChangeCollateralAllowed) {
+    this._event = event;
+  }
+
+  get arg(): ChangeCollateralAllowedArgStruct {
+    return changetype<ChangeCollateralAllowedArgStruct>(
+      this._event.parameters[0].value.toTuple()
+    );
+  }
+}
+
+export class ChangeCollateralAllowedArgStruct extends ethereum.Tuple {
+  get addr(): Address {
+    return this[0].toAddress();
+  }
+
+  get allowed(): boolean {
+    return this[1].toBoolean();
+  }
+}
+
 export class IncreaseDebt extends ethereum.Event {
   get params(): IncreaseDebt__Params {
     return new IncreaseDebt__Params(this);
@@ -83,6 +113,28 @@ export class IncreaseDebt__Params {
 
   get amount(): BigInt {
     return this._event.parameters[1].value.toBigInt();
+  }
+}
+
+export class OwnershipTransferred extends ethereum.Event {
+  get params(): OwnershipTransferred__Params {
+    return new OwnershipTransferred__Params(this);
+  }
+}
+
+export class OwnershipTransferred__Params {
+  _event: OwnershipTransferred;
+
+  constructor(event: OwnershipTransferred) {
+    this._event = event;
+  }
+
+  get previousOwner(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+
+  get newOwner(): Address {
+    return this._event.parameters[1].value.toAddress();
   }
 }
 
@@ -211,29 +263,6 @@ export class LendingStrategy extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  allowedCollateralRoot(): Bytes {
-    let result = super.call(
-      "allowedCollateralRoot",
-      "allowedCollateralRoot():(bytes32)",
-      []
-    );
-
-    return result[0].toBytes();
-  }
-
-  try_allowedCollateralRoot(): ethereum.CallResult<Bytes> {
-    let result = super.tryCall(
-      "allowedCollateralRoot",
-      "allowedCollateralRoot():(bytes32)",
-      []
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBytes());
-  }
-
   collateralFrozenOraclePrice(param0: Bytes): BigInt {
     let result = super.call(
       "collateralFrozenOraclePrice",
@@ -335,6 +364,25 @@ export class LendingStrategy extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  isAllowed(param0: Address): boolean {
+    let result = super.call("isAllowed", "isAllowed(address):(bool)", [
+      ethereum.Value.fromAddress(param0)
+    ]);
+
+    return result[0].toBoolean();
+  }
+
+  try_isAllowed(param0: Address): ethereum.CallResult<boolean> {
+    let result = super.tryCall("isAllowed", "isAllowed(address):(bool)", [
+      ethereum.Value.fromAddress(param0)
+    ]);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBoolean());
   }
 
   lastUpdated(): BigInt {
@@ -541,6 +589,36 @@ export class LendingStrategy extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toBytes());
+  }
+
+  owner(): Address {
+    let result = super.call("owner", "owner():(address)", []);
+
+    return result[0].toAddress();
+  }
+
+  try_owner(): ethereum.CallResult<Address> {
+    let result = super.tryCall("owner", "owner():(address)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
+  pendingOwner(): Address {
+    let result = super.call("pendingOwner", "pendingOwner():(address)", []);
+
+    return result[0].toAddress();
+  }
+
+  try_pendingOwner(): ethereum.CallResult<Address> {
+    let result = super.tryCall("pendingOwner", "pendingOwner():(address)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
   pool(): Address {
@@ -928,6 +1006,32 @@ export class AddCollateralWithCallbackCallSigStruct extends ethereum.Tuple {
   }
 }
 
+export class ClaimOwnershipCall extends ethereum.Call {
+  get inputs(): ClaimOwnershipCall__Inputs {
+    return new ClaimOwnershipCall__Inputs(this);
+  }
+
+  get outputs(): ClaimOwnershipCall__Outputs {
+    return new ClaimOwnershipCall__Outputs(this);
+  }
+}
+
+export class ClaimOwnershipCall__Inputs {
+  _call: ClaimOwnershipCall;
+
+  constructor(call: ClaimOwnershipCall) {
+    this._call = call;
+  }
+}
+
+export class ClaimOwnershipCall__Outputs {
+  _call: ClaimOwnershipCall;
+
+  constructor(call: ClaimOwnershipCall) {
+    this._call = call;
+  }
+}
+
 export class IncreaseDebtCall extends ethereum.Call {
   get inputs(): IncreaseDebtCall__Inputs {
     return new IncreaseDebtCall__Inputs(this);
@@ -1229,6 +1333,86 @@ export class RemoveCollateralCallCollateralStruct extends ethereum.Tuple {
 
   get id(): BigInt {
     return this[1].toBigInt();
+  }
+}
+
+export class SetAllowedCollateralCall extends ethereum.Call {
+  get inputs(): SetAllowedCollateralCall__Inputs {
+    return new SetAllowedCollateralCall__Inputs(this);
+  }
+
+  get outputs(): SetAllowedCollateralCall__Outputs {
+    return new SetAllowedCollateralCall__Outputs(this);
+  }
+}
+
+export class SetAllowedCollateralCall__Inputs {
+  _call: SetAllowedCollateralCall;
+
+  constructor(call: SetAllowedCollateralCall) {
+    this._call = call;
+  }
+
+  get args(): Array<SetAllowedCollateralCallArgsStruct> {
+    return this._call.inputValues[0].value.toTupleArray<
+      SetAllowedCollateralCallArgsStruct
+    >();
+  }
+}
+
+export class SetAllowedCollateralCall__Outputs {
+  _call: SetAllowedCollateralCall;
+
+  constructor(call: SetAllowedCollateralCall) {
+    this._call = call;
+  }
+}
+
+export class SetAllowedCollateralCallArgsStruct extends ethereum.Tuple {
+  get addr(): Address {
+    return this[0].toAddress();
+  }
+
+  get allowed(): boolean {
+    return this[1].toBoolean();
+  }
+}
+
+export class TransferOwnershipCall extends ethereum.Call {
+  get inputs(): TransferOwnershipCall__Inputs {
+    return new TransferOwnershipCall__Inputs(this);
+  }
+
+  get outputs(): TransferOwnershipCall__Outputs {
+    return new TransferOwnershipCall__Outputs(this);
+  }
+}
+
+export class TransferOwnershipCall__Inputs {
+  _call: TransferOwnershipCall;
+
+  constructor(call: TransferOwnershipCall) {
+    this._call = call;
+  }
+
+  get newOwner(): Address {
+    return this._call.inputValues[0].value.toAddress();
+  }
+
+  get direct(): boolean {
+    return this._call.inputValues[1].value.toBoolean();
+  }
+
+  get renounce(): boolean {
+    return this._call.inputValues[2].value.toBoolean();
+  }
+}
+
+export class TransferOwnershipCall__Outputs {
+  _call: TransferOwnershipCall;
+
+  constructor(call: TransferOwnershipCall) {
+    this._call = call;
   }
 }
 

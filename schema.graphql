@@ -6,10 +6,9 @@ type LendingStrategy @entity {
   poolAddress: Bytes!
   underlying: Bytes!
   targetAPR: BigInt!
-  allowedCollateralRoot: Bytes!
-  strategyURI: String!
   norm: BigInt!
   vaults: [Vault!] @derivedFrom(field: "strategy")
+  allowedCollateral: [Bytes!]!
   normUpdates: [NormalizationUpdate!] @derivedFrom(field: "strategy")
 }
 
@@ -74,4 +73,11 @@ type DebtDecreasedEvent @entity {
   vault: Vault!
   strategy: LendingStrategy!
   amount: BigInt!
+}
+
+type CollateralAllowedChangeEvent @entity {
+  id: ID!
+  timestamp: BigInt!
+  collateralAddress: Bytes!
+  allowed: Boolean!
 }

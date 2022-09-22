@@ -22,9 +22,8 @@ export class LendingStrategy extends Entity {
     this.set("poolAddress", Value.fromBytes(Bytes.empty()));
     this.set("underlying", Value.fromBytes(Bytes.empty()));
     this.set("targetAPR", Value.fromBigInt(BigInt.zero()));
-    this.set("allowedCollateralRoot", Value.fromBytes(Bytes.empty()));
-    this.set("strategyURI", Value.fromString(""));
     this.set("norm", Value.fromBigInt(BigInt.zero()));
+    this.set("allowedCollateral", Value.fromBytesArray(new Array(0)));
   }
 
   save(): void {
@@ -107,24 +106,6 @@ export class LendingStrategy extends Entity {
     this.set("targetAPR", Value.fromBigInt(value));
   }
 
-  get allowedCollateralRoot(): Bytes {
-    let value = this.get("allowedCollateralRoot");
-    return value!.toBytes();
-  }
-
-  set allowedCollateralRoot(value: Bytes) {
-    this.set("allowedCollateralRoot", Value.fromBytes(value));
-  }
-
-  get strategyURI(): string {
-    let value = this.get("strategyURI");
-    return value!.toString();
-  }
-
-  set strategyURI(value: string) {
-    this.set("strategyURI", Value.fromString(value));
-  }
-
   get norm(): BigInt {
     let value = this.get("norm");
     return value!.toBigInt();
@@ -149,6 +130,15 @@ export class LendingStrategy extends Entity {
     } else {
       this.set("vaults", Value.fromStringArray(<Array<string>>value));
     }
+  }
+
+  get allowedCollateral(): Array<Bytes> {
+    let value = this.get("allowedCollateral");
+    return value!.toBytesArray();
+  }
+
+  set allowedCollateral(value: Array<Bytes>) {
+    this.set("allowedCollateral", Value.fromBytesArray(value));
   }
 
   get normUpdates(): Array<string> | null {
@@ -773,5 +763,74 @@ export class DebtDecreasedEvent extends Entity {
 
   set amount(value: BigInt) {
     this.set("amount", Value.fromBigInt(value));
+  }
+}
+
+export class CollateralAllowedChangeEvent extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+
+    this.set("timestamp", Value.fromBigInt(BigInt.zero()));
+    this.set("collateralAddress", Value.fromBytes(Bytes.empty()));
+    this.set("allowed", Value.fromBoolean(false));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(
+      id != null,
+      "Cannot save CollateralAllowedChangeEvent entity without an ID"
+    );
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        "Cannot save CollateralAllowedChangeEvent entity with non-string ID. " +
+          'Considering using .toHex() to convert the "id" to a string.'
+      );
+      store.set("CollateralAllowedChangeEvent", id.toString(), this);
+    }
+  }
+
+  static load(id: string): CollateralAllowedChangeEvent | null {
+    return changetype<CollateralAllowedChangeEvent | null>(
+      store.get("CollateralAllowedChangeEvent", id)
+    );
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get timestamp(): BigInt {
+    let value = this.get("timestamp");
+    return value!.toBigInt();
+  }
+
+  set timestamp(value: BigInt) {
+    this.set("timestamp", Value.fromBigInt(value));
+  }
+
+  get collateralAddress(): Bytes {
+    let value = this.get("collateralAddress");
+    return value!.toBytes();
+  }
+
+  set collateralAddress(value: Bytes) {
+    this.set("collateralAddress", Value.fromBytes(value));
+  }
+
+  get allowed(): boolean {
+    let value = this.get("allowed");
+    return value!.toBoolean();
+  }
+
+  set allowed(value: boolean) {
+    this.set("allowed", Value.fromBoolean(value));
   }
 }

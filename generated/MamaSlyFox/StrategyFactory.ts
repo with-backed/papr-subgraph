@@ -27,24 +27,20 @@ export class CreateLendingStrategy__Params {
     return this._event.parameters[0].value.toAddress();
   }
 
-  get allowedCollateralRoot(): Bytes {
-    return this._event.parameters[1].value.toBytes();
-  }
-
   get underlying(): Address {
-    return this._event.parameters[2].value.toAddress();
+    return this._event.parameters[1].value.toAddress();
   }
 
   get name(): string {
-    return this._event.parameters[3].value.toString();
+    return this._event.parameters[2].value.toString();
   }
 
   get symbol(): string {
-    return this._event.parameters[4].value.toString();
+    return this._event.parameters[3].value.toString();
   }
 
-  get allowedCollateralURI(): string {
-    return this._event.parameters[5].value.toString();
+  get strategyURI(): string {
+    return this._event.parameters[4].value.toString();
   }
 }
 
@@ -52,19 +48,17 @@ export class StrategyFactory__parametersResult {
   value0: string;
   value1: string;
   value2: string;
-  value3: Bytes;
+  value3: BigInt;
   value4: BigInt;
-  value5: BigInt;
-  value6: Address;
+  value5: Address;
 
   constructor(
     value0: string,
     value1: string,
     value2: string,
-    value3: Bytes,
+    value3: BigInt,
     value4: BigInt,
-    value5: BigInt,
-    value6: Address
+    value5: Address
   ) {
     this.value0 = value0;
     this.value1 = value1;
@@ -72,7 +66,6 @@ export class StrategyFactory__parametersResult {
     this.value3 = value3;
     this.value4 = value4;
     this.value5 = value5;
-    this.value6 = value6;
   }
 
   toMap(): TypedMap<string, ethereum.Value> {
@@ -80,10 +73,9 @@ export class StrategyFactory__parametersResult {
     map.set("value0", ethereum.Value.fromString(this.value0));
     map.set("value1", ethereum.Value.fromString(this.value1));
     map.set("value2", ethereum.Value.fromString(this.value2));
-    map.set("value3", ethereum.Value.fromFixedBytes(this.value3));
+    map.set("value3", ethereum.Value.fromUnsignedBigInt(this.value3));
     map.set("value4", ethereum.Value.fromUnsignedBigInt(this.value4));
-    map.set("value5", ethereum.Value.fromUnsignedBigInt(this.value5));
-    map.set("value6", ethereum.Value.fromAddress(this.value6));
+    map.set("value5", ethereum.Value.fromAddress(this.value5));
     return map;
   }
 }
@@ -97,19 +89,17 @@ export class StrategyFactory extends ethereum.SmartContract {
     name: string,
     symbol: string,
     strategyURI: string,
-    allowedCollateralRoot: Bytes,
     targetAPR: BigInt,
     maxLTV: BigInt,
     underlying: Address
   ): Address {
     let result = super.call(
       "newStrategy",
-      "newStrategy(string,string,string,bytes32,uint256,uint256,address):(address)",
+      "newStrategy(string,string,string,uint256,uint256,address):(address)",
       [
         ethereum.Value.fromString(name),
         ethereum.Value.fromString(symbol),
         ethereum.Value.fromString(strategyURI),
-        ethereum.Value.fromFixedBytes(allowedCollateralRoot),
         ethereum.Value.fromUnsignedBigInt(targetAPR),
         ethereum.Value.fromUnsignedBigInt(maxLTV),
         ethereum.Value.fromAddress(underlying)
@@ -123,19 +113,17 @@ export class StrategyFactory extends ethereum.SmartContract {
     name: string,
     symbol: string,
     strategyURI: string,
-    allowedCollateralRoot: Bytes,
     targetAPR: BigInt,
     maxLTV: BigInt,
     underlying: Address
   ): ethereum.CallResult<Address> {
     let result = super.tryCall(
       "newStrategy",
-      "newStrategy(string,string,string,bytes32,uint256,uint256,address):(address)",
+      "newStrategy(string,string,string,uint256,uint256,address):(address)",
       [
         ethereum.Value.fromString(name),
         ethereum.Value.fromString(symbol),
         ethereum.Value.fromString(strategyURI),
-        ethereum.Value.fromFixedBytes(allowedCollateralRoot),
         ethereum.Value.fromUnsignedBigInt(targetAPR),
         ethereum.Value.fromUnsignedBigInt(maxLTV),
         ethereum.Value.fromAddress(underlying)
@@ -151,7 +139,7 @@ export class StrategyFactory extends ethereum.SmartContract {
   parameters(): StrategyFactory__parametersResult {
     let result = super.call(
       "parameters",
-      "parameters():(string,string,string,bytes32,uint256,uint256,address)",
+      "parameters():(string,string,string,uint256,uint256,address)",
       []
     );
 
@@ -159,17 +147,16 @@ export class StrategyFactory extends ethereum.SmartContract {
       result[0].toString(),
       result[1].toString(),
       result[2].toString(),
-      result[3].toBytes(),
+      result[3].toBigInt(),
       result[4].toBigInt(),
-      result[5].toBigInt(),
-      result[6].toAddress()
+      result[5].toAddress()
     );
   }
 
   try_parameters(): ethereum.CallResult<StrategyFactory__parametersResult> {
     let result = super.tryCall(
       "parameters",
-      "parameters():(string,string,string,bytes32,uint256,uint256,address)",
+      "parameters():(string,string,string,uint256,uint256,address)",
       []
     );
     if (result.reverted) {
@@ -181,10 +168,9 @@ export class StrategyFactory extends ethereum.SmartContract {
         value[0].toString(),
         value[1].toString(),
         value[2].toString(),
-        value[3].toBytes(),
+        value[3].toBigInt(),
         value[4].toBigInt(),
-        value[5].toBigInt(),
-        value[6].toAddress()
+        value[5].toAddress()
       )
     );
   }
@@ -219,20 +205,16 @@ export class NewStrategyCall__Inputs {
     return this._call.inputValues[2].value.toString();
   }
 
-  get allowedCollateralRoot(): Bytes {
-    return this._call.inputValues[3].value.toBytes();
-  }
-
   get targetAPR(): BigInt {
-    return this._call.inputValues[4].value.toBigInt();
+    return this._call.inputValues[3].value.toBigInt();
   }
 
   get maxLTV(): BigInt {
-    return this._call.inputValues[5].value.toBigInt();
+    return this._call.inputValues[4].value.toBigInt();
   }
 
   get underlying(): Address {
-    return this._call.inputValues[6].value.toAddress();
+    return this._call.inputValues[5].value.toAddress();
   }
 }
 

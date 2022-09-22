@@ -11,12 +11,6 @@
         },
         {
           "indexed": true,
-          "internalType": "bytes32",
-          "name": "allowedCollateralRoot",
-          "type": "bytes32"
-        },
-        {
-          "indexed": true,
           "internalType": "contract ERC20",
           "name": "underlying",
           "type": "address"
@@ -36,7 +30,7 @@
         {
           "indexed": false,
           "internalType": "string",
-          "name": "allowedCollateralURI",
+          "name": "strategyURI",
           "type": "string"
         }
       ],
@@ -59,11 +53,6 @@
           "internalType": "string",
           "name": "strategyURI",
           "type": "string"
-        },
-        {
-          "internalType": "bytes32",
-          "name": "allowedCollateralRoot",
-          "type": "bytes32"
         },
         {
           "internalType": "uint256",
@@ -110,11 +99,6 @@
           "internalType": "string",
           "name": "strategyURI",
           "type": "string"
-        },
-        {
-          "internalType": "bytes32",
-          "name": "allowedCollateralRoot",
-          "type": "bytes32"
         },
         {
           "internalType": "uint256",
