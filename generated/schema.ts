@@ -377,7 +377,7 @@ export class NormalizationUpdate extends Entity {
   }
 }
 
-export class Collateral extends Entity {
+export class VaultCollateral extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
@@ -389,19 +389,19 @@ export class Collateral extends Entity {
 
   save(): void {
     let id = this.get("id");
-    assert(id != null, "Cannot save Collateral entity without an ID");
+    assert(id != null, "Cannot save VaultCollateral entity without an ID");
     if (id) {
       assert(
         id.kind == ValueKind.STRING,
-        "Cannot save Collateral entity with non-string ID. " +
+        "Cannot save VaultCollateral entity with non-string ID. " +
           'Considering using .toHex() to convert the "id" to a string.'
       );
-      store.set("Collateral", id.toString(), this);
+      store.set("VaultCollateral", id.toString(), this);
     }
   }
 
-  static load(id: string): Collateral | null {
-    return changetype<Collateral | null>(store.get("Collateral", id));
+  static load(id: string): VaultCollateral | null {
+    return changetype<VaultCollateral | null>(store.get("VaultCollateral", id));
   }
 
   get id(): string {
@@ -455,6 +455,79 @@ export class Collateral extends Entity {
     } else {
       this.set("vault", Value.fromString(<string>value));
     }
+  }
+}
+
+export class AllowedCollateral extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+
+    this.set("contractAddress", Value.fromBytes(Bytes.empty()));
+    this.set("allowed", Value.fromBoolean(false));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save AllowedCollateral entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        "Cannot save AllowedCollateral entity with non-string ID. " +
+          'Considering using .toHex() to convert the "id" to a string.'
+      );
+      store.set("AllowedCollateral", id.toString(), this);
+    }
+  }
+
+  static load(id: string): AllowedCollateral | null {
+    return changetype<AllowedCollateral | null>(
+      store.get("AllowedCollateral", id)
+    );
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get contractAddress(): Bytes {
+    let value = this.get("contractAddress");
+    return value!.toBytes();
+  }
+
+  set contractAddress(value: Bytes) {
+    this.set("contractAddress", Value.fromBytes(value));
+  }
+
+  get strategy(): string | null {
+    let value = this.get("strategy");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set strategy(value: string | null) {
+    if (!value) {
+      this.unset("strategy");
+    } else {
+      this.set("strategy", Value.fromString(<string>value));
+    }
+  }
+
+  get allowed(): boolean {
+    let value = this.get("allowed");
+    return value!.toBoolean();
+  }
+
+  set allowed(value: boolean) {
+    this.set("allowed", Value.fromBoolean(value));
   }
 }
 

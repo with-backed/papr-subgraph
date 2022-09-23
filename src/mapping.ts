@@ -14,7 +14,7 @@ import { CreateLendingStrategy } from "../generated/MamaSlyFox/StrategyFactory";
 import {
   Account,
   AddCollateralEvent,
-  Collateral,
+  VaultCollateral,
   CollateralAllowedChangeEvent,
   DebtDecreasedEvent,
   DebtIncreasedEvent,
@@ -22,6 +22,7 @@ import {
   NormalizationUpdate,
   RemoveCollateralEvent,
   Vault,
+  AllowedCollateral,
 } from "../generated/schema";
 
 import { LendingStrategy as LendingStrategyABI } from "../generated/SlyFox/LendingStrategy";
@@ -55,7 +56,7 @@ export function handleCreateLendingStrategy(
 
 export function handleAddCollateral(event: AddCollateral): void {
   let vault: Vault | null = Vault.load(event.params.vaultId.toString());
-  const collateralAdded = new Collateral(
+  const collateralAdded = new VaultCollateral(
     generateCollateralId(
       event.params.collateral.addr,
       event.params.collateral.id
@@ -108,7 +109,7 @@ export function handleCollateralRemoved(event: RemoveCollateral): void {
   const vault = Vault.load(event.params.vaultId.toString());
   if (!vault) return;
 
-  const collateralRemoved = Collateral.load(
+  const collateralRemoved = VaultCollateral.load(
     generateCollateralId(
       event.params.collateral.addr,
       event.params.collateral.id
@@ -199,6 +200,17 @@ export function handleCollateralAllowedChanged(
     event.params._event.address.toHexString()
   );
   if (!strategy) return;
+  let allowedCollateral = AllowedCollateral.load(
+    `${strategy.id}-${event.params.arg.addr.toHexString()}`
+  );
+  if (!allowedCollateral) {
+    allowedCollateral = new AllowedCollateral(
+      `${strategy.id}-${event.params.arg.addr.toHexString()}`
+    );
+  }
+  allowedCollateral.contractAddress = event.params.arg.addr;
+  allowedCollateral.allowed = event.params.arg.allowed;
+  allowedCollateral.strategy = strategy.id;
 
   const allowedCollateralChangeEvent = new CollateralAllowedChangeEvent(
     event.transaction.hash.toHexString()
@@ -209,4 +221,6 @@ export function handleCollateralAllowedChanged(
   allowedCollateralChangeEvent.strategy = strategy.id;
 
   allowedCollateralChangeEvent.save();
+  strategy.save();
+  allowedCollateral.save();
 }
