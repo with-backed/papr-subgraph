@@ -22,6 +22,11 @@
   },
   {
     "inputs": [],
+    "name": "InvalidCollateral",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "InvalidCollateralVaultIDCombination",
     "type": "error"
   },
@@ -84,6 +89,31 @@
     "anonymous": false,
     "inputs": [
       {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "addr",
+            "type": "address"
+          },
+          {
+            "internalType": "bool",
+            "name": "allowed",
+            "type": "bool"
+          }
+        ],
+        "indexed": false,
+        "internalType": "struct ILendingStrategy.SetAllowedCollateralArg",
+        "name": "arg",
+        "type": "tuple"
+      }
+    ],
+    "name": "ChangeCollateralAllowed",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
         "indexed": true,
         "internalType": "uint256",
         "name": "vaultId",
@@ -97,6 +127,25 @@
       }
     ],
     "name": "IncreaseDebt",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipTransferred",
     "type": "event"
   },
   {
@@ -331,15 +380,9 @@
   },
   {
     "inputs": [],
-    "name": "allowedCollateralRoot",
-    "outputs": [
-      {
-        "internalType": "bytes32",
-        "name": "",
-        "type": "bytes32"
-      }
-    ],
-    "stateMutability": "view",
+    "name": "claimOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -464,6 +507,25 @@
     "name": "initialize",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "isAllowed",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -683,6 +745,32 @@
   },
   {
     "inputs": [],
+    "name": "owner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "pendingOwner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "pool",
     "outputs": [
       {
@@ -743,6 +831,31 @@
       }
     ],
     "name": "removeCollateral",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "addr",
+            "type": "address"
+          },
+          {
+            "internalType": "bool",
+            "name": "allowed",
+            "type": "bool"
+          }
+        ],
+        "internalType": "struct ILendingStrategy.SetAllowedCollateralArg[]",
+        "name": "args",
+        "type": "tuple[]"
+      }
+    ],
+    "name": "setAllowedCollateral",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -810,6 +923,29 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      },
+      {
+        "internalType": "bool",
+        "name": "direct",
+        "type": "bool"
+      },
+      {
+        "internalType": "bool",
+        "name": "renounce",
+        "type": "bool"
+      }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {

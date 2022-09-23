@@ -6,7 +6,7 @@ dataSources:
     name: MamaSlyFox
     network: goerli
     source:
-      address: "0x309c7435a96b514886667f3085baeba6b8264e0b"
+      address: "0x7e1ac403d6b3d2f857909e44c560779a8771cad9"
       abi: StrategyFactory
       startBlock: 7554367
     mapping:
@@ -23,8 +23,7 @@ dataSources:
         - name: ERC721
           file: MamaSlyFox/abis/ERC721.json
       eventHandlers:
-        - event: CreateLendingStrategy(indexed address,indexed bytes32,indexed
-            address,string,string,string)
+        - event: CreateLendingStrategy(indexed address,indexed address,string,string,string)
           handler: handleCreateLendingStrategy
       file: MamaSlyFox/MamaSlyFox.wasm
   - kind: ethereum/contract
@@ -58,4 +57,6 @@ dataSources:
           handler: handleReduceDebt
         - event: UpdateNormalization(uint256)
           handler: handleUpdateNormalization
+        - event: ChangeCollateralAllowed((address,bool))
+          handler: handleCollateralAllowedChanged
       file: MamaSlyFox/MamaSlyFox.wasm

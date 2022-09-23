@@ -1,4 +1,4 @@
-import { Address, BigInt, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt, Bytes, log } from "@graphprotocol/graph-ts";
 
 import {
   IncreaseDebt,
@@ -6,6 +6,7 @@ import {
   UpdateNormalization,
   AddCollateral,
   RemoveCollateral,
+  ChangeCollateralAllowed,
 } from "../generated/SlyFox/LendingStrategy";
 
 import { CreateLendingStrategy } from "../generated/MamaSlyFox/StrategyFactory";
@@ -14,6 +15,7 @@ import {
   Account,
   AddCollateralEvent,
   Collateral,
+  CollateralAllowedChangeEvent,
   DebtDecreasedEvent,
   DebtIncreasedEvent,
   LendingStrategy,
@@ -36,8 +38,6 @@ export function handleCreateLendingStrategy(
   );
 
   lendingStrategy.createdAt = event.block.timestamp;
-  lendingStrategy.allowedCollateralRoot = event.params.allowedCollateralRoot;
-  lendingStrategy.strategyURI = event.params.allowedCollateralURI;
   lendingStrategy.underlying = event.params.underlying;
   lendingStrategy.targetAPR = LendingStrategyABI.bind(
     event.params.strategyAddress
@@ -190,4 +190,23 @@ export function handleUpdateNormalization(event: UpdateNormalization): void {
 
   strategy.save();
   normUpdate.save();
+}
+
+export function handleCollateralAllowedChanged(
+  event: ChangeCollateralAllowed
+): void {
+  const strategy = LendingStrategy.load(
+    event.params._event.address.toHexString()
+  );
+  if (!strategy) return;
+
+  const allowedCollateralChangeEvent = new CollateralAllowedChangeEvent(
+    event.transaction.hash.toHexString()
+  );
+  allowedCollateralChangeEvent.timestamp = event.block.timestamp;
+  allowedCollateralChangeEvent.collateralAddress = event.params.arg.addr;
+  allowedCollateralChangeEvent.allowed = event.params.arg.allowed;
+  allowedCollateralChangeEvent.strategy = strategy.id;
+
+  allowedCollateralChangeEvent.save();
 }
