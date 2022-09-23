@@ -8,7 +8,8 @@ type LendingStrategy @entity {
   targetAPR: BigInt!
   norm: BigInt!
   vaults: [Vault!] @derivedFrom(field: "strategy")
-  allowedCollateral: [Bytes!]!
+  allowedCollateral: [CollateralAllowedChangeEvent!]!
+    @derivedFrom(field: "strategy")
   normUpdates: [NormalizationUpdate!] @derivedFrom(field: "strategy")
 }
 
@@ -79,5 +80,6 @@ type CollateralAllowedChangeEvent @entity {
   id: ID!
   timestamp: BigInt!
   collateralAddress: Bytes!
+  strategy: LendingStrategy!
   allowed: Boolean!
 }

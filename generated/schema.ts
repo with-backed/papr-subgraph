@@ -23,7 +23,6 @@ export class LendingStrategy extends Entity {
     this.set("underlying", Value.fromBytes(Bytes.empty()));
     this.set("targetAPR", Value.fromBigInt(BigInt.zero()));
     this.set("norm", Value.fromBigInt(BigInt.zero()));
-    this.set("allowedCollateral", Value.fromBytesArray(new Array(0)));
   }
 
   save(): void {
@@ -132,13 +131,13 @@ export class LendingStrategy extends Entity {
     }
   }
 
-  get allowedCollateral(): Array<Bytes> {
+  get allowedCollateral(): Array<string> {
     let value = this.get("allowedCollateral");
-    return value!.toBytesArray();
+    return value!.toStringArray();
   }
 
-  set allowedCollateral(value: Array<Bytes>) {
-    this.set("allowedCollateral", Value.fromBytesArray(value));
+  set allowedCollateral(value: Array<string>) {
+    this.set("allowedCollateral", Value.fromStringArray(value));
   }
 
   get normUpdates(): Array<string> | null {
@@ -773,6 +772,7 @@ export class CollateralAllowedChangeEvent extends Entity {
 
     this.set("timestamp", Value.fromBigInt(BigInt.zero()));
     this.set("collateralAddress", Value.fromBytes(Bytes.empty()));
+    this.set("strategy", Value.fromString(""));
     this.set("allowed", Value.fromBoolean(false));
   }
 
@@ -823,6 +823,15 @@ export class CollateralAllowedChangeEvent extends Entity {
 
   set collateralAddress(value: Bytes) {
     this.set("collateralAddress", Value.fromBytes(value));
+  }
+
+  get strategy(): string {
+    let value = this.get("strategy");
+    return value!.toString();
+  }
+
+  set strategy(value: string) {
+    this.set("strategy", Value.fromString(value));
   }
 
   get allowed(): boolean {

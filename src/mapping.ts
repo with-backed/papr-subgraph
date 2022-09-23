@@ -200,29 +200,13 @@ export function handleCollateralAllowedChanged(
   );
   if (!strategy) return;
 
-  let newAllowedCollateral: Bytes[] = [];
-
-  for (let i = 0; i < strategy.allowedCollateral.length; i++) {
-    if (
-      !event.params.arg.allowed &&
-      strategy.allowedCollateral[i] === event.params.arg.addr
-    ) {
-      continue;
-    }
-    newAllowedCollateral.push(strategy.allowedCollateral[i]);
-  }
-  if (event.params.arg.allowed)
-    newAllowedCollateral.push(event.params.arg.addr);
-
-  strategy.allowedCollateral = newAllowedCollateral;
-  strategy.save();
-
   const allowedCollateralChangeEvent = new CollateralAllowedChangeEvent(
     event.transaction.hash.toHexString()
   );
   allowedCollateralChangeEvent.timestamp = event.block.timestamp;
   allowedCollateralChangeEvent.collateralAddress = event.params.arg.addr;
   allowedCollateralChangeEvent.allowed = event.params.arg.allowed;
+  allowedCollateralChangeEvent.strategy = strategy.id;
 
   allowedCollateralChangeEvent.save();
 }
