@@ -6,7 +6,7 @@ dataSources:
     name: SlyFox
     network: goerli
     source:
-      abi: LendingStrategy
+      abi: PaprController
       address: "0xF478340769a200f20fEa385dEEA6D42550DD8986"
       startBlock: 7745714
     mapping:
@@ -14,11 +14,11 @@ dataSources:
       apiVersion: 0.0.5
       language: wasm/assemblyscript
       entities:
-        - LendingStrategy
+        - PaprController
         - Vault
       abis:
-        - name: LendingStrategy
-          file: ./abis/LendingStrategy.json
+        - name: PaprController
+          file: ./abis/PaprController.json
         - name: ERC721
           file: ./abis/ERC721.json
       eventHandlers:

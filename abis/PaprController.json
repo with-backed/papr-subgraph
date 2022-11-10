@@ -104,11 +104,6 @@
       "type": "error"
     },
     {
-      "inputs": [],
-      "name": "InvalidCollateralVaultIDCombination",
-      "type": "error"
-    },
-    {
       "inputs": [
         {
           "internalType": "uint256",
@@ -132,6 +127,16 @@
     {
       "inputs": [],
       "name": "NotLiquidatable",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "OnlyCollateralOwner",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "OracleMessageTooOld",
       "type": "error"
     },
     {
@@ -183,15 +188,9 @@
             }
           ],
           "indexed": false,
-          "internalType": "struct ILendingStrategy.Collateral",
+          "internalType": "struct IPaprController.Collateral",
           "name": "collateral",
           "type": "tuple"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "price",
-          "type": "uint256"
         }
       ],
       "name": "AddCollateral",
@@ -214,7 +213,7 @@
             }
           ],
           "indexed": false,
-          "internalType": "struct ILendingStrategy.SetAllowedCollateralArg",
+          "internalType": "struct IPaprController.SetAllowedCollateralArg",
           "name": "arg",
           "type": "tuple"
         }
@@ -321,15 +320,9 @@
             }
           ],
           "indexed": false,
-          "internalType": "struct ILendingStrategy.Collateral",
+          "internalType": "struct IPaprController.Collateral",
           "name": "collateral",
           "type": "tuple"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "vaultCollateralValue",
-          "type": "uint256"
         }
       ],
       "name": "RemoveCollateral",
@@ -425,64 +418,8 @@
               "type": "uint256"
             }
           ],
-          "internalType": "struct ILendingStrategy.Collateral",
+          "internalType": "struct IPaprController.Collateral",
           "name": "collateral",
-          "type": "tuple"
-        },
-        {
-          "components": [
-            {
-              "components": [
-                {
-                  "internalType": "bytes32",
-                  "name": "id",
-                  "type": "bytes32"
-                },
-                {
-                  "internalType": "bytes",
-                  "name": "payload",
-                  "type": "bytes"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "timestamp",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "bytes",
-                  "name": "signature",
-                  "type": "bytes"
-                }
-              ],
-              "internalType": "struct ReservoirOracle.Message",
-              "name": "message",
-              "type": "tuple"
-            },
-            {
-              "components": [
-                {
-                  "internalType": "uint8",
-                  "name": "v",
-                  "type": "uint8"
-                },
-                {
-                  "internalType": "bytes32",
-                  "name": "r",
-                  "type": "bytes32"
-                },
-                {
-                  "internalType": "bytes32",
-                  "name": "s",
-                  "type": "bytes32"
-                }
-              ],
-              "internalType": "struct ReservoirOracleUnderwriter.Sig",
-              "name": "sig",
-              "type": "tuple"
-            }
-          ],
-          "internalType": "struct ReservoirOracleUnderwriter.OracleInfo",
-          "name": "oracleInfo",
           "type": "tuple"
         }
       ],
@@ -506,64 +443,8 @@
               "type": "uint256"
             }
           ],
-          "internalType": "struct ILendingStrategy.Collateral",
+          "internalType": "struct IPaprController.Collateral",
           "name": "collateral",
-          "type": "tuple"
-        },
-        {
-          "components": [
-            {
-              "components": [
-                {
-                  "internalType": "bytes32",
-                  "name": "id",
-                  "type": "bytes32"
-                },
-                {
-                  "internalType": "bytes",
-                  "name": "payload",
-                  "type": "bytes"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "timestamp",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "bytes",
-                  "name": "signature",
-                  "type": "bytes"
-                }
-              ],
-              "internalType": "struct ReservoirOracle.Message",
-              "name": "message",
-              "type": "tuple"
-            },
-            {
-              "components": [
-                {
-                  "internalType": "uint8",
-                  "name": "v",
-                  "type": "uint8"
-                },
-                {
-                  "internalType": "bytes32",
-                  "name": "r",
-                  "type": "bytes32"
-                },
-                {
-                  "internalType": "bytes32",
-                  "name": "s",
-                  "type": "bytes32"
-                }
-              ],
-              "internalType": "struct ReservoirOracleUnderwriter.Sig",
-              "name": "sig",
-              "type": "tuple"
-            }
-          ],
-          "internalType": "struct ReservoirOracleUnderwriter.OracleInfo",
-          "name": "oracleInfo",
           "type": "tuple"
         },
         {
@@ -779,6 +660,11 @@
           "type": "address"
         },
         {
+          "internalType": "contract ERC721",
+          "name": "collateralAsset",
+          "type": "address"
+        },
+        {
           "internalType": "uint256",
           "name": "underlyingAmount",
           "type": "uint256"
@@ -797,6 +683,62 @@
           "internalType": "address",
           "name": "proceedsTo",
           "type": "address"
+        },
+        {
+          "components": [
+            {
+              "components": [
+                {
+                  "internalType": "bytes32",
+                  "name": "id",
+                  "type": "bytes32"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "payload",
+                  "type": "bytes"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "timestamp",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "signature",
+                  "type": "bytes"
+                }
+              ],
+              "internalType": "struct ReservoirOracle.Message",
+              "name": "message",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint8",
+                  "name": "v",
+                  "type": "uint8"
+                },
+                {
+                  "internalType": "bytes32",
+                  "name": "r",
+                  "type": "bytes32"
+                },
+                {
+                  "internalType": "bytes32",
+                  "name": "s",
+                  "type": "bytes32"
+                }
+              ],
+              "internalType": "struct ReservoirOracleUnderwriter.Sig",
+              "name": "sig",
+              "type": "tuple"
+            }
+          ],
+          "internalType": "struct ReservoirOracleUnderwriter.OracleInfo",
+          "name": "oracleInfo",
+          "type": "tuple"
         }
       ],
       "name": "buyAndReduceDebt",
@@ -820,56 +762,25 @@
     {
       "inputs": [
         {
-          "internalType": "bytes32",
+          "internalType": "contract ERC721",
           "name": "",
-          "type": "bytes32"
-        }
-      ],
-      "name": "collateralFrozenOraclePrice",
-      "outputs": [
+          "type": "address"
+        },
         {
           "internalType": "uint256",
           "name": "",
           "type": "uint256"
         }
       ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "components": [
-            {
-              "internalType": "contract ERC721",
-              "name": "addr",
-              "type": "address"
-            },
-            {
-              "internalType": "uint256",
-              "name": "id",
-              "type": "uint256"
-            }
-          ],
-          "internalType": "struct ILendingStrategy.Collateral",
-          "name": "collateral",
-          "type": "tuple"
-        },
+      "name": "collateralOwner",
+      "outputs": [
         {
           "internalType": "address",
-          "name": "account",
+          "name": "",
           "type": "address"
         }
       ],
-      "name": "collateralHash",
-      "outputs": [
-        {
-          "internalType": "bytes32",
-          "name": "",
-          "type": "bytes32"
-        }
-      ],
-      "stateMutability": "pure",
+      "stateMutability": "view",
       "type": "function"
     },
     {
@@ -880,9 +791,70 @@
           "type": "address"
         },
         {
+          "internalType": "contract ERC721",
+          "name": "asset",
+          "type": "address"
+        },
+        {
           "internalType": "uint256",
           "name": "amount",
           "type": "uint256"
+        },
+        {
+          "components": [
+            {
+              "components": [
+                {
+                  "internalType": "bytes32",
+                  "name": "id",
+                  "type": "bytes32"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "payload",
+                  "type": "bytes"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "timestamp",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "signature",
+                  "type": "bytes"
+                }
+              ],
+              "internalType": "struct ReservoirOracle.Message",
+              "name": "message",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint8",
+                  "name": "v",
+                  "type": "uint8"
+                },
+                {
+                  "internalType": "bytes32",
+                  "name": "r",
+                  "type": "bytes32"
+                },
+                {
+                  "internalType": "bytes32",
+                  "name": "s",
+                  "type": "bytes32"
+                }
+              ],
+              "internalType": "struct ReservoirOracleUnderwriter.Sig",
+              "name": "sig",
+              "type": "tuple"
+            }
+          ],
+          "internalType": "struct ReservoirOracleUnderwriter.OracleInfo",
+          "name": "oracleInfo",
+          "type": "tuple"
         }
       ],
       "name": "increaseDebt",
@@ -954,6 +926,16 @@
           "internalType": "address",
           "name": "account",
           "type": "address"
+        },
+        {
+          "internalType": "contract ERC721",
+          "name": "asset",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "collateralPrice",
+          "type": "uint256"
         }
       ],
       "name": "liquidationPrice",
@@ -984,7 +966,7 @@
       "inputs": [
         {
           "internalType": "uint256",
-          "name": "collateralValue",
+          "name": "totalCollateraValue",
           "type": "uint256"
         }
       ],
@@ -1015,6 +997,11 @@
     {
       "inputs": [
         {
+          "internalType": "contract ERC721",
+          "name": "collateralAsset",
+          "type": "address"
+        },
+        {
           "internalType": "uint256",
           "name": "debt",
           "type": "uint256"
@@ -1033,6 +1020,62 @@
           "internalType": "address",
           "name": "proceedsTo",
           "type": "address"
+        },
+        {
+          "components": [
+            {
+              "components": [
+                {
+                  "internalType": "bytes32",
+                  "name": "id",
+                  "type": "bytes32"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "payload",
+                  "type": "bytes"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "timestamp",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "signature",
+                  "type": "bytes"
+                }
+              ],
+              "internalType": "struct ReservoirOracle.Message",
+              "name": "message",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint8",
+                  "name": "v",
+                  "type": "uint8"
+                },
+                {
+                  "internalType": "bytes32",
+                  "name": "r",
+                  "type": "bytes32"
+                },
+                {
+                  "internalType": "bytes32",
+                  "name": "s",
+                  "type": "bytes32"
+                }
+              ],
+              "internalType": "struct ReservoirOracleUnderwriter.Sig",
+              "name": "sig",
+              "type": "tuple"
+            }
+          ],
+          "internalType": "struct ReservoirOracleUnderwriter.OracleInfo",
+          "name": "oracleInfo",
+          "type": "tuple"
         }
       ],
       "name": "mintAndSellDebt",
@@ -1070,19 +1113,6 @@
       "name": "multiplier",
       "outputs": [
         {
-          "internalType": "int256",
-          "name": "",
-          "type": "int256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "newNorm",
-      "outputs": [
-        {
           "internalType": "uint256",
           "name": "",
           "type": "uint256"
@@ -1093,12 +1123,12 @@
     },
     {
       "inputs": [],
-      "name": "normalization",
+      "name": "newTarget",
       "outputs": [
         {
-          "internalType": "uint128",
+          "internalType": "uint256",
           "name": "",
-          "type": "uint128"
+          "type": "uint256"
         }
       ],
       "stateMutability": "view",
@@ -1269,6 +1299,62 @@
           "internalType": "address",
           "name": "sendTo",
           "type": "address"
+        },
+        {
+          "components": [
+            {
+              "components": [
+                {
+                  "internalType": "bytes32",
+                  "name": "id",
+                  "type": "bytes32"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "payload",
+                  "type": "bytes"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "timestamp",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "signature",
+                  "type": "bytes"
+                }
+              ],
+              "internalType": "struct ReservoirOracle.Message",
+              "name": "message",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint8",
+                  "name": "v",
+                  "type": "uint8"
+                },
+                {
+                  "internalType": "bytes32",
+                  "name": "r",
+                  "type": "bytes32"
+                },
+                {
+                  "internalType": "bytes32",
+                  "name": "s",
+                  "type": "bytes32"
+                }
+              ],
+              "internalType": "struct ReservoirOracleUnderwriter.Sig",
+              "name": "sig",
+              "type": "tuple"
+            }
+          ],
+          "internalType": "struct ReservoirOracleUnderwriter.OracleInfo",
+          "name": "oracleInfo",
+          "type": "tuple"
         }
       ],
       "name": "purchaseLiquidationAuctionNFT",
@@ -1294,6 +1380,11 @@
         {
           "internalType": "address",
           "name": "account",
+          "type": "address"
+        },
+        {
+          "internalType": "contract ERC721",
+          "name": "asset",
           "type": "address"
         },
         {
@@ -1327,8 +1418,64 @@
               "type": "uint256"
             }
           ],
-          "internalType": "struct ILendingStrategy.Collateral",
+          "internalType": "struct IPaprController.Collateral",
           "name": "collateral",
+          "type": "tuple"
+        },
+        {
+          "components": [
+            {
+              "components": [
+                {
+                  "internalType": "bytes32",
+                  "name": "id",
+                  "type": "bytes32"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "payload",
+                  "type": "bytes"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "timestamp",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "signature",
+                  "type": "bytes"
+                }
+              ],
+              "internalType": "struct ReservoirOracle.Message",
+              "name": "message",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint8",
+                  "name": "v",
+                  "type": "uint8"
+                },
+                {
+                  "internalType": "bytes32",
+                  "name": "r",
+                  "type": "bytes32"
+                },
+                {
+                  "internalType": "bytes32",
+                  "name": "s",
+                  "type": "bytes32"
+                }
+              ],
+              "internalType": "struct ReservoirOracleUnderwriter.Sig",
+              "name": "sig",
+              "type": "tuple"
+            }
+          ],
+          "internalType": "struct ReservoirOracleUnderwriter.OracleInfo",
+          "name": "oracleInfo",
           "type": "tuple"
         }
       ],
@@ -1352,7 +1499,7 @@
               "type": "bool"
             }
           ],
-          "internalType": "struct ILendingStrategy.SetAllowedCollateralArg[]",
+          "internalType": "struct IPaprController.SetAllowedCollateralArg[]",
           "name": "args",
           "type": "tuple[]"
         }
@@ -1395,8 +1542,64 @@
               "type": "uint256"
             }
           ],
-          "internalType": "struct ILendingStrategy.Collateral",
+          "internalType": "struct IPaprController.Collateral",
           "name": "collateral",
+          "type": "tuple"
+        },
+        {
+          "components": [
+            {
+              "components": [
+                {
+                  "internalType": "bytes32",
+                  "name": "id",
+                  "type": "bytes32"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "payload",
+                  "type": "bytes"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "timestamp",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "signature",
+                  "type": "bytes"
+                }
+              ],
+              "internalType": "struct ReservoirOracle.Message",
+              "name": "message",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint8",
+                  "name": "v",
+                  "type": "uint8"
+                },
+                {
+                  "internalType": "bytes32",
+                  "name": "r",
+                  "type": "bytes32"
+                },
+                {
+                  "internalType": "bytes32",
+                  "name": "s",
+                  "type": "bytes32"
+                }
+              ],
+              "internalType": "struct ReservoirOracleUnderwriter.Sig",
+              "name": "sig",
+              "type": "tuple"
+            }
+          ],
+          "internalType": "struct ReservoirOracleUnderwriter.OracleInfo",
+          "name": "oracleInfo",
           "type": "tuple"
         }
       ],
@@ -1446,6 +1649,19 @@
         }
       ],
       "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "target",
+      "outputs": [
+        {
+          "internalType": "uint128",
+          "name": "",
+          "type": "uint128"
+        }
+      ],
+      "stateMutability": "view",
       "type": "function"
     },
     {
@@ -1500,14 +1716,14 @@
     {
       "inputs": [
         {
-          "internalType": "uint256",
-          "name": "tokenId",
-          "type": "uint256"
+          "internalType": "contract ERC721",
+          "name": "asset",
+          "type": "address"
         },
         {
-          "internalType": "address",
-          "name": "contractAddress",
-          "type": "address"
+          "internalType": "enum ReservoirOracleUnderwriter.PriceKind",
+          "name": "priceKind",
+          "type": "uint8"
         },
         {
           "components": [
@@ -1606,7 +1822,7 @@
       "outputs": [
         {
           "internalType": "uint256",
-          "name": "newNormalization",
+          "name": "newTarget",
           "type": "uint256"
         }
       ],
@@ -1616,22 +1832,39 @@
     {
       "inputs": [
         {
-          "internalType": "uint256",
-          "name": "nonce",
-          "type": "uint256"
-        },
-        {
           "internalType": "address",
           "name": "account",
           "type": "address"
+        },
+        {
+          "internalType": "contract ERC721",
+          "name": "asset",
+          "type": "address"
         }
       ],
-      "name": "vaultIdentifier",
+      "name": "vaultInfo",
       "outputs": [
         {
-          "internalType": "uint256",
+          "components": [
+            {
+              "internalType": "uint16",
+              "name": "count",
+              "type": "uint16"
+            },
+            {
+              "internalType": "uint40",
+              "name": "latestAuctionStartTime",
+              "type": "uint40"
+            },
+            {
+              "internalType": "uint200",
+              "name": "debt",
+              "type": "uint200"
+            }
+          ],
+          "internalType": "struct IPaprController.VaultInfo",
           "name": "",
-          "type": "uint256"
+          "type": "tuple"
         }
       ],
       "stateMutability": "view",
@@ -1643,31 +1876,24 @@
           "internalType": "address",
           "name": "account",
           "type": "address"
+        },
+        {
+          "internalType": "contract ERC721",
+          "name": "asset",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "price",
+          "type": "uint256"
         }
       ],
-      "name": "vaultInfo",
+      "name": "vaultTotalCollateralValue",
       "outputs": [
         {
-          "components": [
-            {
-              "internalType": "uint40",
-              "name": "latestAuctionStartTime",
-              "type": "uint40"
-            },
-            {
-              "internalType": "uint96",
-              "name": "debt",
-              "type": "uint96"
-            },
-            {
-              "internalType": "uint96",
-              "name": "collateralValue",
-              "type": "uint96"
-            }
-          ],
-          "internalType": "struct ILendingStrategy.VaultInfo",
+          "internalType": "uint256",
           "name": "",
-          "type": "tuple"
+          "type": "uint256"
         }
       ],
       "stateMutability": "view",
