@@ -3,35 +3,12 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: MamaSlyFox
-    network: goerli
-    source:
-      address: "0x7e1ac403d6b3d2f857909e44c560779a8771cad9"
-      abi: StrategyFactory
-      startBlock: 7554367
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.5
-      language: wasm/assemblyscript
-      entities:
-        - LendingStrategy
-      abis:
-        - name: StrategyFactory
-          file: ./abis/StrategyFactory.json
-        - name: LendingStrategy
-          file: ./abis/LendingStrategy.json
-        - name: ERC721
-          file: ./abis/ERC721.json
-      eventHandlers:
-        - event: CreateLendingStrategy(indexed address,indexed address,string,string,string)
-          handler: handleCreateLendingStrategy
-      file: ./src/mapping.ts
-  - kind: ethereum/contract
     name: SlyFox
     network: goerli
     source:
       abi: LendingStrategy
-      startBlock: 7554367
+      address: "0xF478340769a200f20fEa385dEEA6D42550DD8986"
+      startBlock: 7745714
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -40,20 +17,18 @@ dataSources:
         - LendingStrategy
         - Vault
       abis:
-        - name: StrategyFactory
-          file: ./abis/StrategyFactory.json
         - name: LendingStrategy
           file: ./abis/LendingStrategy.json
         - name: ERC721
           file: ./abis/ERC721.json
       eventHandlers:
-        - event: AddCollateral(indexed uint256,uint256,(address,uint256),(uint128,uint8))
+        - event: AddCollateral(indexed address,(address,uint256),uint256)
           handler: handleAddCollateral
-        - event: RemoveCollateral(indexed uint256,(address,uint256),uint256)
+        - event: RemoveCollateral(indexed address,(address,uint256),uint256)
           handler: handleRemoveCollateral
-        - event: IncreaseDebt(indexed uint256,uint256)
+        - event: IncreaseDebt(indexed address,uint256)
           handler: handleIncreaseDebt
-        - event: ReduceDebt(indexed uint256,uint256)
+        - event: ReduceDebt(indexed address,uint256)
           handler: handleReduceDebt
         - event: UpdateNormalization(uint256)
           handler: handleUpdateNormalization

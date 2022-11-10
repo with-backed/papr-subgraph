@@ -31,6 +31,22 @@
     "type": "error"
   },
   {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "minOut",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "actualOut",
+        "type": "uint256"
+      }
+    ],
+    "name": "TooLittleOut",
+    "type": "error"
+  },
+  {
     "anonymous": false,
     "inputs": [
       {
@@ -379,6 +395,45 @@
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "vaultId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "underlyingAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "minOut",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint160",
+        "name": "sqrtPriceLimitX96",
+        "type": "uint160"
+      },
+      {
+        "internalType": "address",
+        "name": "proceedsTo",
+        "type": "address"
+      }
+    ],
+    "name": "buyAndReduceDebt",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "out",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "claimOwnership",
     "outputs": [],
@@ -626,9 +681,9 @@
         "type": "uint256"
       },
       {
-        "internalType": "int256",
+        "internalType": "uint256",
         "name": "debt",
-        "type": "int256"
+        "type": "uint256"
       },
       {
         "internalType": "uint256",
@@ -647,7 +702,13 @@
       }
     ],
     "name": "mintAndSellDebt",
-    "outputs": [],
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "stateMutability": "nonpayable",
     "type": "function"
   },
