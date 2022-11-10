@@ -263,6 +263,53 @@ export class LendingStrategy extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
+  buyAndReduceDebt(
+    vaultId: BigInt,
+    underlyingAmount: BigInt,
+    minOut: BigInt,
+    sqrtPriceLimitX96: BigInt,
+    proceedsTo: Address
+  ): BigInt {
+    let result = super.call(
+      "buyAndReduceDebt",
+      "buyAndReduceDebt(uint256,uint256,uint256,uint160,address):(uint256)",
+      [
+        ethereum.Value.fromUnsignedBigInt(vaultId),
+        ethereum.Value.fromUnsignedBigInt(underlyingAmount),
+        ethereum.Value.fromUnsignedBigInt(minOut),
+        ethereum.Value.fromUnsignedBigInt(sqrtPriceLimitX96),
+        ethereum.Value.fromAddress(proceedsTo)
+      ]
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_buyAndReduceDebt(
+    vaultId: BigInt,
+    underlyingAmount: BigInt,
+    minOut: BigInt,
+    sqrtPriceLimitX96: BigInt,
+    proceedsTo: Address
+  ): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "buyAndReduceDebt",
+      "buyAndReduceDebt(uint256,uint256,uint256,uint160,address):(uint256)",
+      [
+        ethereum.Value.fromUnsignedBigInt(vaultId),
+        ethereum.Value.fromUnsignedBigInt(underlyingAmount),
+        ethereum.Value.fromUnsignedBigInt(minOut),
+        ethereum.Value.fromUnsignedBigInt(sqrtPriceLimitX96),
+        ethereum.Value.fromAddress(proceedsTo)
+      ]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
   collateralFrozenOraclePrice(param0: Bytes): BigInt {
     let result = super.call(
       "collateralFrozenOraclePrice",
@@ -473,6 +520,53 @@ export class LendingStrategy extends ethereum.SmartContract {
 
   try_maxLTV(): ethereum.CallResult<BigInt> {
     let result = super.tryCall("maxLTV", "maxLTV():(uint256)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  mintAndSellDebt(
+    vaultNonce: BigInt,
+    debt: BigInt,
+    minOut: BigInt,
+    sqrtPriceLimitX96: BigInt,
+    proceedsTo: Address
+  ): BigInt {
+    let result = super.call(
+      "mintAndSellDebt",
+      "mintAndSellDebt(uint256,uint256,uint256,uint160,address):(uint256)",
+      [
+        ethereum.Value.fromUnsignedBigInt(vaultNonce),
+        ethereum.Value.fromUnsignedBigInt(debt),
+        ethereum.Value.fromUnsignedBigInt(minOut),
+        ethereum.Value.fromUnsignedBigInt(sqrtPriceLimitX96),
+        ethereum.Value.fromAddress(proceedsTo)
+      ]
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_mintAndSellDebt(
+    vaultNonce: BigInt,
+    debt: BigInt,
+    minOut: BigInt,
+    sqrtPriceLimitX96: BigInt,
+    proceedsTo: Address
+  ): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "mintAndSellDebt",
+      "mintAndSellDebt(uint256,uint256,uint256,uint160,address):(uint256)",
+      [
+        ethereum.Value.fromUnsignedBigInt(vaultNonce),
+        ethereum.Value.fromUnsignedBigInt(debt),
+        ethereum.Value.fromUnsignedBigInt(minOut),
+        ethereum.Value.fromUnsignedBigInt(sqrtPriceLimitX96),
+        ethereum.Value.fromAddress(proceedsTo)
+      ]
+    );
     if (result.reverted) {
       return new ethereum.CallResult();
     }
@@ -1006,6 +1100,56 @@ export class AddCollateralWithCallbackCallSigStruct extends ethereum.Tuple {
   }
 }
 
+export class BuyAndReduceDebtCall extends ethereum.Call {
+  get inputs(): BuyAndReduceDebtCall__Inputs {
+    return new BuyAndReduceDebtCall__Inputs(this);
+  }
+
+  get outputs(): BuyAndReduceDebtCall__Outputs {
+    return new BuyAndReduceDebtCall__Outputs(this);
+  }
+}
+
+export class BuyAndReduceDebtCall__Inputs {
+  _call: BuyAndReduceDebtCall;
+
+  constructor(call: BuyAndReduceDebtCall) {
+    this._call = call;
+  }
+
+  get vaultId(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+
+  get underlyingAmount(): BigInt {
+    return this._call.inputValues[1].value.toBigInt();
+  }
+
+  get minOut(): BigInt {
+    return this._call.inputValues[2].value.toBigInt();
+  }
+
+  get sqrtPriceLimitX96(): BigInt {
+    return this._call.inputValues[3].value.toBigInt();
+  }
+
+  get proceedsTo(): Address {
+    return this._call.inputValues[4].value.toAddress();
+  }
+}
+
+export class BuyAndReduceDebtCall__Outputs {
+  _call: BuyAndReduceDebtCall;
+
+  constructor(call: BuyAndReduceDebtCall) {
+    this._call = call;
+  }
+
+  get out(): BigInt {
+    return this._call.outputValues[0].value.toBigInt();
+  }
+}
+
 export class ClaimOwnershipCall extends ethereum.Call {
   get inputs(): ClaimOwnershipCall__Inputs {
     return new ClaimOwnershipCall__Inputs(this);
@@ -1169,6 +1313,10 @@ export class MintAndSellDebtCall__Outputs {
 
   constructor(call: MintAndSellDebtCall) {
     this._call = call;
+  }
+
+  get value0(): BigInt {
+    return this._call.outputValues[0].value.toBigInt();
   }
 }
 

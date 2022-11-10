@@ -17,11 +17,9 @@ export class LendingStrategy extends Entity {
     this.set("id", Value.fromString(id));
 
     this.set("createdAt", Value.fromBigInt(BigInt.zero()));
-    this.set("name", Value.fromString(""));
-    this.set("symbol", Value.fromString(""));
     this.set("poolAddress", Value.fromBytes(Bytes.empty()));
     this.set("underlying", Value.fromBytes(Bytes.empty()));
-    this.set("targetAPR", Value.fromBigInt(BigInt.zero()));
+    this.set("debtToken", Value.fromBytes(Bytes.empty()));
     this.set("norm", Value.fromBigInt(BigInt.zero()));
   }
 
@@ -60,24 +58,6 @@ export class LendingStrategy extends Entity {
     this.set("createdAt", Value.fromBigInt(value));
   }
 
-  get name(): string {
-    let value = this.get("name");
-    return value!.toString();
-  }
-
-  set name(value: string) {
-    this.set("name", Value.fromString(value));
-  }
-
-  get symbol(): string {
-    let value = this.get("symbol");
-    return value!.toString();
-  }
-
-  set symbol(value: string) {
-    this.set("symbol", Value.fromString(value));
-  }
-
   get poolAddress(): Bytes {
     let value = this.get("poolAddress");
     return value!.toBytes();
@@ -96,13 +76,13 @@ export class LendingStrategy extends Entity {
     this.set("underlying", Value.fromBytes(value));
   }
 
-  get targetAPR(): BigInt {
-    let value = this.get("targetAPR");
-    return value!.toBigInt();
+  get debtToken(): Bytes {
+    let value = this.get("debtToken");
+    return value!.toBytes();
   }
 
-  set targetAPR(value: BigInt) {
-    this.set("targetAPR", Value.fromBigInt(value));
+  set debtToken(value: Bytes) {
+    this.set("debtToken", Value.fromBytes(value));
   }
 
   get norm(): BigInt {
@@ -158,65 +138,12 @@ export class LendingStrategy extends Entity {
   }
 }
 
-export class Account extends Entity {
-  constructor(id: string) {
-    super();
-    this.set("id", Value.fromString(id));
-  }
-
-  save(): void {
-    let id = this.get("id");
-    assert(id != null, "Cannot save Account entity without an ID");
-    if (id) {
-      assert(
-        id.kind == ValueKind.STRING,
-        "Cannot save Account entity with non-string ID. " +
-          'Considering using .toHex() to convert the "id" to a string.'
-      );
-      store.set("Account", id.toString(), this);
-    }
-  }
-
-  static load(id: string): Account | null {
-    return changetype<Account | null>(store.get("Account", id));
-  }
-
-  get id(): string {
-    let value = this.get("id");
-    return value!.toString();
-  }
-
-  set id(value: string) {
-    this.set("id", Value.fromString(value));
-  }
-
-  get vaults(): Array<string> | null {
-    let value = this.get("vaults");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toStringArray();
-    }
-  }
-
-  set vaults(value: Array<string> | null) {
-    if (!value) {
-      this.unset("vaults");
-    } else {
-      this.set("vaults", Value.fromStringArray(<Array<string>>value));
-    }
-  }
-}
-
 export class Vault extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
 
-    this.set("nonce", Value.fromBigInt(BigInt.zero()));
     this.set("strategy", Value.fromString(""));
-    this.set("owner", Value.fromString(""));
-    this.set("tokenId", Value.fromBigInt(BigInt.zero()));
     this.set("debt", Value.fromBigInt(BigInt.zero()));
     this.set("totalCollateralValue", Value.fromBigInt(BigInt.zero()));
   }
@@ -247,15 +174,6 @@ export class Vault extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get nonce(): BigInt {
-    let value = this.get("nonce");
-    return value!.toBigInt();
-  }
-
-  set nonce(value: BigInt) {
-    this.set("nonce", Value.fromBigInt(value));
-  }
-
   get strategy(): string {
     let value = this.get("strategy");
     return value!.toString();
@@ -263,24 +181,6 @@ export class Vault extends Entity {
 
   set strategy(value: string) {
     this.set("strategy", Value.fromString(value));
-  }
-
-  get owner(): string {
-    let value = this.get("owner");
-    return value!.toString();
-  }
-
-  set owner(value: string) {
-    this.set("owner", Value.fromString(value));
-  }
-
-  get tokenId(): BigInt {
-    let value = this.get("tokenId");
-    return value!.toBigInt();
-  }
-
-  set tokenId(value: BigInt) {
-    this.set("tokenId", Value.fromBigInt(value));
   }
 
   get debt(): BigInt {
@@ -319,6 +219,7 @@ export class NormalizationUpdate extends Entity {
     this.set("timestamp", Value.fromBigInt(BigInt.zero()));
     this.set("strategy", Value.fromString(""));
     this.set("newNorm", Value.fromBigInt(BigInt.zero()));
+    this.set("txHash", Value.fromBytes(Bytes.empty()));
   }
 
   save(): void {
@@ -375,6 +276,15 @@ export class NormalizationUpdate extends Entity {
   set newNorm(value: BigInt) {
     this.set("newNorm", Value.fromBigInt(value));
   }
+
+  get txHash(): Bytes {
+    let value = this.get("txHash");
+    return value!.toBytes();
+  }
+
+  set txHash(value: Bytes) {
+    this.set("txHash", Value.fromBytes(value));
+  }
 }
 
 export class VaultCollateral extends Entity {
@@ -385,6 +295,7 @@ export class VaultCollateral extends Entity {
     this.set("contractAddress", Value.fromBytes(Bytes.empty()));
     this.set("tokenId", Value.fromBigInt(BigInt.zero()));
     this.set("value", Value.fromBigInt(BigInt.zero()));
+    this.set("symbol", Value.fromString(""));
   }
 
   save(): void {
@@ -455,6 +366,15 @@ export class VaultCollateral extends Entity {
     } else {
       this.set("vault", Value.fromString(<string>value));
     }
+  }
+
+  get symbol(): string {
+    let value = this.get("symbol");
+    return value!.toString();
+  }
+
+  set symbol(value: string) {
+    this.set("symbol", Value.fromString(value));
   }
 }
 
@@ -540,6 +460,7 @@ export class AddCollateralEvent extends Entity {
     this.set("vault", Value.fromString(""));
     this.set("strategy", Value.fromString(""));
     this.set("collateral", Value.fromString(""));
+    this.set("txHash", Value.fromBytes(Bytes.empty()));
   }
 
   save(): void {
@@ -605,6 +526,15 @@ export class AddCollateralEvent extends Entity {
   set collateral(value: string) {
     this.set("collateral", Value.fromString(value));
   }
+
+  get txHash(): Bytes {
+    let value = this.get("txHash");
+    return value!.toBytes();
+  }
+
+  set txHash(value: Bytes) {
+    this.set("txHash", Value.fromBytes(value));
+  }
 }
 
 export class RemoveCollateralEvent extends Entity {
@@ -616,6 +546,7 @@ export class RemoveCollateralEvent extends Entity {
     this.set("vault", Value.fromString(""));
     this.set("strategy", Value.fromString(""));
     this.set("collateral", Value.fromString(""));
+    this.set("txHash", Value.fromBytes(Bytes.empty()));
   }
 
   save(): void {
@@ -684,6 +615,15 @@ export class RemoveCollateralEvent extends Entity {
   set collateral(value: string) {
     this.set("collateral", Value.fromString(value));
   }
+
+  get txHash(): Bytes {
+    let value = this.get("txHash");
+    return value!.toBytes();
+  }
+
+  set txHash(value: Bytes) {
+    this.set("txHash", Value.fromBytes(value));
+  }
 }
 
 export class DebtIncreasedEvent extends Entity {
@@ -695,6 +635,7 @@ export class DebtIncreasedEvent extends Entity {
     this.set("vault", Value.fromString(""));
     this.set("strategy", Value.fromString(""));
     this.set("amount", Value.fromBigInt(BigInt.zero()));
+    this.set("txHash", Value.fromBytes(Bytes.empty()));
   }
 
   save(): void {
@@ -760,6 +701,15 @@ export class DebtIncreasedEvent extends Entity {
   set amount(value: BigInt) {
     this.set("amount", Value.fromBigInt(value));
   }
+
+  get txHash(): Bytes {
+    let value = this.get("txHash");
+    return value!.toBytes();
+  }
+
+  set txHash(value: Bytes) {
+    this.set("txHash", Value.fromBytes(value));
+  }
 }
 
 export class DebtDecreasedEvent extends Entity {
@@ -771,6 +721,7 @@ export class DebtDecreasedEvent extends Entity {
     this.set("vault", Value.fromString(""));
     this.set("strategy", Value.fromString(""));
     this.set("amount", Value.fromBigInt(BigInt.zero()));
+    this.set("txHash", Value.fromBytes(Bytes.empty()));
   }
 
   save(): void {
@@ -836,6 +787,15 @@ export class DebtDecreasedEvent extends Entity {
   set amount(value: BigInt) {
     this.set("amount", Value.fromBigInt(value));
   }
+
+  get txHash(): Bytes {
+    let value = this.get("txHash");
+    return value!.toBytes();
+  }
+
+  set txHash(value: Bytes) {
+    this.set("txHash", Value.fromBytes(value));
+  }
 }
 
 export class CollateralAllowedChangeEvent extends Entity {
@@ -847,6 +807,7 @@ export class CollateralAllowedChangeEvent extends Entity {
     this.set("collateralAddress", Value.fromBytes(Bytes.empty()));
     this.set("strategy", Value.fromString(""));
     this.set("allowed", Value.fromBoolean(false));
+    this.set("txHash", Value.fromBytes(Bytes.empty()));
   }
 
   save(): void {
@@ -914,5 +875,14 @@ export class CollateralAllowedChangeEvent extends Entity {
 
   set allowed(value: boolean) {
     this.set("allowed", Value.fromBoolean(value));
+  }
+
+  get txHash(): Bytes {
+    let value = this.get("txHash");
+    return value!.toBytes();
+  }
+
+  set txHash(value: Bytes) {
+    this.set("txHash", Value.fromBytes(value));
   }
 }

@@ -1,28 +1,18 @@
 type LendingStrategy @entity {
   id: ID!
   createdAt: BigInt!
-  name: String!
-  symbol: String!
   poolAddress: Bytes!
   underlying: Bytes!
-  targetAPR: BigInt!
+  debtToken: Bytes!
   norm: BigInt!
   vaults: [Vault!] @derivedFrom(field: "strategy")
   allowedCollateral: [AllowedCollateral!]! @derivedFrom(field: "strategy")
   normUpdates: [NormalizationUpdate!] @derivedFrom(field: "strategy")
 }
 
-type Account @entity {
-  id: ID!
-  vaults: [Vault!] @derivedFrom(field: "owner")
-}
-
 type Vault @entity {
   id: ID!
-  nonce: BigInt!
   strategy: LendingStrategy!
-  owner: Account!
-  tokenId: BigInt!
   debt: BigInt!
   totalCollateralValue: BigInt!
   collateral: [VaultCollateral!]! @derivedFrom(field: "vault")
@@ -33,6 +23,7 @@ type NormalizationUpdate @entity {
   timestamp: BigInt!
   strategy: LendingStrategy!
   newNorm: BigInt!
+  txHash: Bytes!
 }
 
 type VaultCollateral @entity {
@@ -41,6 +32,7 @@ type VaultCollateral @entity {
   tokenId: BigInt!
   value: BigInt!
   vault: Vault
+  symbol: String!
 }
 
 type AllowedCollateral @entity {
@@ -56,6 +48,7 @@ type AddCollateralEvent @entity {
   vault: Vault!
   strategy: LendingStrategy!
   collateral: VaultCollateral!
+  txHash: Bytes!
 }
 
 type RemoveCollateralEvent @entity {
@@ -64,6 +57,7 @@ type RemoveCollateralEvent @entity {
   vault: Vault!
   strategy: LendingStrategy!
   collateral: VaultCollateral!
+  txHash: Bytes!
 }
 
 type DebtIncreasedEvent @entity {
@@ -72,6 +66,7 @@ type DebtIncreasedEvent @entity {
   vault: Vault!
   strategy: LendingStrategy!
   amount: BigInt!
+  txHash: Bytes!
 }
 
 type DebtDecreasedEvent @entity {
@@ -80,6 +75,7 @@ type DebtDecreasedEvent @entity {
   vault: Vault!
   strategy: LendingStrategy!
   amount: BigInt!
+  txHash: Bytes!
 }
 
 type CollateralAllowedChangeEvent @entity {
@@ -88,4 +84,5 @@ type CollateralAllowedChangeEvent @entity {
   collateralAddress: Bytes!
   strategy: LendingStrategy!
   allowed: Boolean!
+  txHash: Bytes!
 }
