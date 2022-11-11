@@ -148,6 +148,7 @@ export class Vault extends Entity {
     this.set("controller", Value.fromString(""));
     this.set("debt", Value.fromBigInt(BigInt.zero()));
     this.set("debtPerCollateral", Value.fromBigInt(BigInt.zero()));
+    this.set("collateralCount", Value.fromI32(0));
   }
 
   save(): void {
@@ -228,6 +229,15 @@ export class Vault extends Entity {
 
   set collateral(value: Array<string>) {
     this.set("collateral", Value.fromStringArray(value));
+  }
+
+  get collateralCount(): i32 {
+    let value = this.get("collateralCount");
+    return value!.toI32();
+  }
+
+  set collateralCount(value: i32) {
+    this.set("collateralCount", Value.fromI32(value));
   }
 }
 

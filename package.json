@@ -5,7 +5,8 @@
     "build:codegen": "graph codegen subgraph.yaml",
     "build:compile": "graph build subgraph.yaml",
     "build:all": "yarn build:codegen && yarn build:compile",
-    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ adamgobes/sly-fox --access-token"
+    "deploy": "yarn build:all && goldsky subgraph deploy",
+    "deploy:thegraph": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ adamgobes/sly-fox --access-token"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.23.1",
