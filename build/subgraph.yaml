@@ -6,32 +6,36 @@ dataSources:
     name: SlyFox
     network: goerli
     source:
-      abi: LendingStrategy
-      address: "0xF478340769a200f20fEa385dEEA6D42550DD8986"
+      abi: PaprController
       startBlock: 7745714
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
       entities:
-        - LendingStrategy
+        - PaprController
         - Vault
       abis:
-        - name: LendingStrategy
-          file: SlyFox/abis/LendingStrategy.json
+        - name: PaprController
+          file: SlyFox/abis/PaprController.json
         - name: ERC721
           file: SlyFox/abis/ERC721.json
       eventHandlers:
-        - event: AddCollateral(indexed address,(address,uint256),uint256)
+        - event: AddCollateral(indexed address,(address,uint256))
           handler: handleAddCollateral
-        - event: RemoveCollateral(indexed address,(address,uint256),uint256)
+        - event: RemoveCollateral(indexed address,(address,uint256))
           handler: handleRemoveCollateral
-        - event: IncreaseDebt(indexed address,uint256)
+        - event: IncreaseDebt(indexed address,indexed address,uint256)
           handler: handleIncreaseDebt
-        - event: ReduceDebt(indexed address,uint256)
+        - event: ReduceDebt(indexed address,indexed address,uint256)
           handler: handleReduceDebt
-        - event: UpdateNormalization(uint256)
-          handler: handleUpdateNormalization
+        - event: UpdateTarget(uint256)
+          handler: handleTargetUpdate
         - event: ChangeCollateralAllowed((address,bool))
           handler: handleCollateralAllowedChanged
+        - event: StartAuction(indexed uint256,indexed uint256,indexed
+            address,address,uint256,uint256,uint256,address)
+          handler: handleStartAuction
+        - event: EndAuction(indexed uint256,uint256)
+          handler: handleEndAuction
       file: SlyFox/SlyFox.wasm

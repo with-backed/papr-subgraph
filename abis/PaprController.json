@@ -250,6 +250,12 @@
           "type": "address"
         },
         {
+          "indexed": true,
+          "internalType": "contract ERC721",
+          "name": "collateralAddress",
+          "type": "address"
+        },
+        {
           "indexed": false,
           "internalType": "uint256",
           "name": "amount",
@@ -285,6 +291,12 @@
           "indexed": true,
           "internalType": "address",
           "name": "account",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "contract ERC721",
+          "name": "collateralAddress",
           "type": "address"
         },
         {
@@ -351,6 +363,12 @@
         },
         {
           "indexed": false,
+          "internalType": "address",
+          "name": "nftOwner",
+          "type": "address"
+        },
+        {
+          "indexed": false,
           "internalType": "uint256",
           "name": "perPeriodDecayPercentWad",
           "type": "uint256"
@@ -383,11 +401,11 @@
         {
           "indexed": false,
           "internalType": "uint256",
-          "name": "newNorm",
+          "name": "newTarget",
           "type": "uint256"
         }
       ],
-      "name": "UpdateNormalization",
+      "name": "UpdateTarget",
       "type": "event"
     },
     {

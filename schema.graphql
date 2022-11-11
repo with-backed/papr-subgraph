@@ -17,7 +17,7 @@ type Vault @entity {
   collateralContract: Bytes!
   controller: PaprController!
   debt: BigInt!
-  debtPerCollateral: Int!
+  debtPerCollateral: BigInt!
   collateral: [VaultCollateral!]! @derivedFrom(field: "vault")
 }
 
@@ -49,7 +49,6 @@ type AddCollateralEvent @entity {
   vault: Vault!
   controller: PaprController!
   collateral: VaultCollateral!
-  txHash: Bytes!
 }
 
 type RemoveCollateralEvent @entity {
@@ -58,7 +57,6 @@ type RemoveCollateralEvent @entity {
   vault: Vault!
   controller: PaprController!
   collateral: VaultCollateral!
-  txHash: Bytes!
 }
 
 type DebtIncreasedEvent @entity {
@@ -67,7 +65,6 @@ type DebtIncreasedEvent @entity {
   vault: Vault!
   controller: PaprController!
   amount: BigInt!
-  txHash: Bytes!
 }
 
 type DebtDecreasedEvent @entity {
@@ -76,21 +73,22 @@ type DebtDecreasedEvent @entity {
   vault: Vault!
   controller: PaprController!
   amount: BigInt!
-  txHash: Bytes!
 }
 
 type Auction @entity {
   id: ID!
   startedBy: Bytes!
   startTime: Int!
-  endTime: Int!
-  endPrice: BigInt!
+  endTime: Int
+  endPrice: BigInt
   vault: Vault!
+  startTxHash: Bytes!
+  endTxHash: Bytes
   # below are in event
   auctionAssetID: BigInt!
   auctionAssetContract: Bytes!
   perPeriodDecayPercentWad: BigInt!
-  secondsInPeriod: Int!
+  secondsInPeriod: BigInt!
   startPrice: BigInt!
   paymentAsset: Bytes!
 }
@@ -101,5 +99,4 @@ type CollateralAllowedChangeEvent @entity {
   collateralAddress: Bytes!
   controller: PaprController!
   allowed: Boolean!
-  txHash: Bytes!
 }
