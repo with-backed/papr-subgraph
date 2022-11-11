@@ -11,7 +11,7 @@ import {
   BigDecimal
 } from "@graphprotocol/graph-ts";
 
-export class LendingStrategy extends Entity {
+export class PaprController extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
@@ -19,25 +19,25 @@ export class LendingStrategy extends Entity {
     this.set("createdAt", Value.fromBigInt(BigInt.zero()));
     this.set("poolAddress", Value.fromBytes(Bytes.empty()));
     this.set("underlying", Value.fromBytes(Bytes.empty()));
-    this.set("debtToken", Value.fromBytes(Bytes.empty()));
-    this.set("norm", Value.fromBigInt(BigInt.zero()));
+    this.set("paprToken", Value.fromBytes(Bytes.empty()));
+    this.set("target", Value.fromBigInt(BigInt.zero()));
   }
 
   save(): void {
     let id = this.get("id");
-    assert(id != null, "Cannot save LendingStrategy entity without an ID");
+    assert(id != null, "Cannot save PaprController entity without an ID");
     if (id) {
       assert(
         id.kind == ValueKind.STRING,
-        "Cannot save LendingStrategy entity with non-string ID. " +
+        "Cannot save PaprController entity with non-string ID. " +
           'Considering using .toHex() to convert the "id" to a string.'
       );
-      store.set("LendingStrategy", id.toString(), this);
+      store.set("PaprController", id.toString(), this);
     }
   }
 
-  static load(id: string): LendingStrategy | null {
-    return changetype<LendingStrategy | null>(store.get("LendingStrategy", id));
+  static load(id: string): PaprController | null {
+    return changetype<PaprController | null>(store.get("PaprController", id));
   }
 
   get id(): string {
@@ -76,22 +76,22 @@ export class LendingStrategy extends Entity {
     this.set("underlying", Value.fromBytes(value));
   }
 
-  get debtToken(): Bytes {
-    let value = this.get("debtToken");
+  get paprToken(): Bytes {
+    let value = this.get("paprToken");
     return value!.toBytes();
   }
 
-  set debtToken(value: Bytes) {
-    this.set("debtToken", Value.fromBytes(value));
+  set paprToken(value: Bytes) {
+    this.set("paprToken", Value.fromBytes(value));
   }
 
-  get norm(): BigInt {
-    let value = this.get("norm");
+  get target(): BigInt {
+    let value = this.get("target");
     return value!.toBigInt();
   }
 
-  set norm(value: BigInt) {
-    this.set("norm", Value.fromBigInt(value));
+  set target(value: BigInt) {
+    this.set("target", Value.fromBigInt(value));
   }
 
   get vaults(): Array<string> | null {
@@ -120,8 +120,8 @@ export class LendingStrategy extends Entity {
     this.set("allowedCollateral", Value.fromStringArray(value));
   }
 
-  get normUpdates(): Array<string> | null {
-    let value = this.get("normUpdates");
+  get targetUpdates(): Array<string> | null {
+    let value = this.get("targetUpdates");
     if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -129,11 +129,11 @@ export class LendingStrategy extends Entity {
     }
   }
 
-  set normUpdates(value: Array<string> | null) {
+  set targetUpdates(value: Array<string> | null) {
     if (!value) {
-      this.unset("normUpdates");
+      this.unset("targetUpdates");
     } else {
-      this.set("normUpdates", Value.fromStringArray(<Array<string>>value));
+      this.set("targetUpdates", Value.fromStringArray(<Array<string>>value));
     }
   }
 }
@@ -143,9 +143,11 @@ export class Vault extends Entity {
     super();
     this.set("id", Value.fromString(id));
 
-    this.set("strategy", Value.fromString(""));
+    this.set("account", Value.fromBytes(Bytes.empty()));
+    this.set("collateralContract", Value.fromBytes(Bytes.empty()));
+    this.set("controller", Value.fromString(""));
     this.set("debt", Value.fromBigInt(BigInt.zero()));
-    this.set("totalCollateralValue", Value.fromBigInt(BigInt.zero()));
+    this.set("debtPerCollateral", Value.fromBigInt(BigInt.zero()));
   }
 
   save(): void {
@@ -174,13 +176,31 @@ export class Vault extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get strategy(): string {
-    let value = this.get("strategy");
+  get account(): Bytes {
+    let value = this.get("account");
+    return value!.toBytes();
+  }
+
+  set account(value: Bytes) {
+    this.set("account", Value.fromBytes(value));
+  }
+
+  get collateralContract(): Bytes {
+    let value = this.get("collateralContract");
+    return value!.toBytes();
+  }
+
+  set collateralContract(value: Bytes) {
+    this.set("collateralContract", Value.fromBytes(value));
+  }
+
+  get controller(): string {
+    let value = this.get("controller");
     return value!.toString();
   }
 
-  set strategy(value: string) {
-    this.set("strategy", Value.fromString(value));
+  set controller(value: string) {
+    this.set("controller", Value.fromString(value));
   }
 
   get debt(): BigInt {
@@ -192,13 +212,13 @@ export class Vault extends Entity {
     this.set("debt", Value.fromBigInt(value));
   }
 
-  get totalCollateralValue(): BigInt {
-    let value = this.get("totalCollateralValue");
+  get debtPerCollateral(): BigInt {
+    let value = this.get("debtPerCollateral");
     return value!.toBigInt();
   }
 
-  set totalCollateralValue(value: BigInt) {
-    this.set("totalCollateralValue", Value.fromBigInt(value));
+  set debtPerCollateral(value: BigInt) {
+    this.set("debtPerCollateral", Value.fromBigInt(value));
   }
 
   get collateral(): Array<string> {
@@ -211,34 +231,31 @@ export class Vault extends Entity {
   }
 }
 
-export class NormalizationUpdate extends Entity {
+export class TargetUpdate extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
 
     this.set("timestamp", Value.fromBigInt(BigInt.zero()));
-    this.set("strategy", Value.fromString(""));
-    this.set("newNorm", Value.fromBigInt(BigInt.zero()));
-    this.set("txHash", Value.fromBytes(Bytes.empty()));
+    this.set("newTarget", Value.fromBigInt(BigInt.zero()));
+    this.set("controller", Value.fromString(""));
   }
 
   save(): void {
     let id = this.get("id");
-    assert(id != null, "Cannot save NormalizationUpdate entity without an ID");
+    assert(id != null, "Cannot save TargetUpdate entity without an ID");
     if (id) {
       assert(
         id.kind == ValueKind.STRING,
-        "Cannot save NormalizationUpdate entity with non-string ID. " +
+        "Cannot save TargetUpdate entity with non-string ID. " +
           'Considering using .toHex() to convert the "id" to a string.'
       );
-      store.set("NormalizationUpdate", id.toString(), this);
+      store.set("TargetUpdate", id.toString(), this);
     }
   }
 
-  static load(id: string): NormalizationUpdate | null {
-    return changetype<NormalizationUpdate | null>(
-      store.get("NormalizationUpdate", id)
-    );
+  static load(id: string): TargetUpdate | null {
+    return changetype<TargetUpdate | null>(store.get("TargetUpdate", id));
   }
 
   get id(): string {
@@ -259,31 +276,22 @@ export class NormalizationUpdate extends Entity {
     this.set("timestamp", Value.fromBigInt(value));
   }
 
-  get strategy(): string {
-    let value = this.get("strategy");
-    return value!.toString();
-  }
-
-  set strategy(value: string) {
-    this.set("strategy", Value.fromString(value));
-  }
-
-  get newNorm(): BigInt {
-    let value = this.get("newNorm");
+  get newTarget(): BigInt {
+    let value = this.get("newTarget");
     return value!.toBigInt();
   }
 
-  set newNorm(value: BigInt) {
-    this.set("newNorm", Value.fromBigInt(value));
+  set newTarget(value: BigInt) {
+    this.set("newTarget", Value.fromBigInt(value));
   }
 
-  get txHash(): Bytes {
-    let value = this.get("txHash");
-    return value!.toBytes();
+  get controller(): string {
+    let value = this.get("controller");
+    return value!.toString();
   }
 
-  set txHash(value: Bytes) {
-    this.set("txHash", Value.fromBytes(value));
+  set controller(value: string) {
+    this.set("controller", Value.fromString(value));
   }
 }
 
@@ -294,7 +302,6 @@ export class VaultCollateral extends Entity {
 
     this.set("contractAddress", Value.fromBytes(Bytes.empty()));
     this.set("tokenId", Value.fromBigInt(BigInt.zero()));
-    this.set("value", Value.fromBigInt(BigInt.zero()));
     this.set("symbol", Value.fromString(""));
   }
 
@@ -342,15 +349,6 @@ export class VaultCollateral extends Entity {
     this.set("tokenId", Value.fromBigInt(value));
   }
 
-  get value(): BigInt {
-    let value = this.get("value");
-    return value!.toBigInt();
-  }
-
-  set value(value: BigInt) {
-    this.set("value", Value.fromBigInt(value));
-  }
-
   get vault(): string | null {
     let value = this.get("vault");
     if (!value || value.kind == ValueKind.NULL) {
@@ -384,6 +382,7 @@ export class AllowedCollateral extends Entity {
     this.set("id", Value.fromString(id));
 
     this.set("contractAddress", Value.fromBytes(Bytes.empty()));
+    this.set("controller", Value.fromString(""));
     this.set("allowed", Value.fromBoolean(false));
   }
 
@@ -424,21 +423,13 @@ export class AllowedCollateral extends Entity {
     this.set("contractAddress", Value.fromBytes(value));
   }
 
-  get strategy(): string | null {
-    let value = this.get("strategy");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
+  get controller(): string {
+    let value = this.get("controller");
+    return value!.toString();
   }
 
-  set strategy(value: string | null) {
-    if (!value) {
-      this.unset("strategy");
-    } else {
-      this.set("strategy", Value.fromString(<string>value));
-    }
+  set controller(value: string) {
+    this.set("controller", Value.fromString(value));
   }
 
   get allowed(): boolean {
@@ -458,9 +449,8 @@ export class AddCollateralEvent extends Entity {
 
     this.set("timestamp", Value.fromBigInt(BigInt.zero()));
     this.set("vault", Value.fromString(""));
-    this.set("strategy", Value.fromString(""));
+    this.set("controller", Value.fromString(""));
     this.set("collateral", Value.fromString(""));
-    this.set("txHash", Value.fromBytes(Bytes.empty()));
   }
 
   save(): void {
@@ -509,13 +499,13 @@ export class AddCollateralEvent extends Entity {
     this.set("vault", Value.fromString(value));
   }
 
-  get strategy(): string {
-    let value = this.get("strategy");
+  get controller(): string {
+    let value = this.get("controller");
     return value!.toString();
   }
 
-  set strategy(value: string) {
-    this.set("strategy", Value.fromString(value));
+  set controller(value: string) {
+    this.set("controller", Value.fromString(value));
   }
 
   get collateral(): string {
@@ -526,15 +516,6 @@ export class AddCollateralEvent extends Entity {
   set collateral(value: string) {
     this.set("collateral", Value.fromString(value));
   }
-
-  get txHash(): Bytes {
-    let value = this.get("txHash");
-    return value!.toBytes();
-  }
-
-  set txHash(value: Bytes) {
-    this.set("txHash", Value.fromBytes(value));
-  }
 }
 
 export class RemoveCollateralEvent extends Entity {
@@ -544,9 +525,8 @@ export class RemoveCollateralEvent extends Entity {
 
     this.set("timestamp", Value.fromBigInt(BigInt.zero()));
     this.set("vault", Value.fromString(""));
-    this.set("strategy", Value.fromString(""));
+    this.set("controller", Value.fromString(""));
     this.set("collateral", Value.fromString(""));
-    this.set("txHash", Value.fromBytes(Bytes.empty()));
   }
 
   save(): void {
@@ -598,13 +578,13 @@ export class RemoveCollateralEvent extends Entity {
     this.set("vault", Value.fromString(value));
   }
 
-  get strategy(): string {
-    let value = this.get("strategy");
+  get controller(): string {
+    let value = this.get("controller");
     return value!.toString();
   }
 
-  set strategy(value: string) {
-    this.set("strategy", Value.fromString(value));
+  set controller(value: string) {
+    this.set("controller", Value.fromString(value));
   }
 
   get collateral(): string {
@@ -615,15 +595,6 @@ export class RemoveCollateralEvent extends Entity {
   set collateral(value: string) {
     this.set("collateral", Value.fromString(value));
   }
-
-  get txHash(): Bytes {
-    let value = this.get("txHash");
-    return value!.toBytes();
-  }
-
-  set txHash(value: Bytes) {
-    this.set("txHash", Value.fromBytes(value));
-  }
 }
 
 export class DebtIncreasedEvent extends Entity {
@@ -633,9 +604,8 @@ export class DebtIncreasedEvent extends Entity {
 
     this.set("timestamp", Value.fromBigInt(BigInt.zero()));
     this.set("vault", Value.fromString(""));
-    this.set("strategy", Value.fromString(""));
+    this.set("controller", Value.fromString(""));
     this.set("amount", Value.fromBigInt(BigInt.zero()));
-    this.set("txHash", Value.fromBytes(Bytes.empty()));
   }
 
   save(): void {
@@ -684,13 +654,13 @@ export class DebtIncreasedEvent extends Entity {
     this.set("vault", Value.fromString(value));
   }
 
-  get strategy(): string {
-    let value = this.get("strategy");
+  get controller(): string {
+    let value = this.get("controller");
     return value!.toString();
   }
 
-  set strategy(value: string) {
-    this.set("strategy", Value.fromString(value));
+  set controller(value: string) {
+    this.set("controller", Value.fromString(value));
   }
 
   get amount(): BigInt {
@@ -701,15 +671,6 @@ export class DebtIncreasedEvent extends Entity {
   set amount(value: BigInt) {
     this.set("amount", Value.fromBigInt(value));
   }
-
-  get txHash(): Bytes {
-    let value = this.get("txHash");
-    return value!.toBytes();
-  }
-
-  set txHash(value: Bytes) {
-    this.set("txHash", Value.fromBytes(value));
-  }
 }
 
 export class DebtDecreasedEvent extends Entity {
@@ -719,9 +680,8 @@ export class DebtDecreasedEvent extends Entity {
 
     this.set("timestamp", Value.fromBigInt(BigInt.zero()));
     this.set("vault", Value.fromString(""));
-    this.set("strategy", Value.fromString(""));
+    this.set("controller", Value.fromString(""));
     this.set("amount", Value.fromBigInt(BigInt.zero()));
-    this.set("txHash", Value.fromBytes(Bytes.empty()));
   }
 
   save(): void {
@@ -770,13 +730,13 @@ export class DebtDecreasedEvent extends Entity {
     this.set("vault", Value.fromString(value));
   }
 
-  get strategy(): string {
-    let value = this.get("strategy");
+  get controller(): string {
+    let value = this.get("controller");
     return value!.toString();
   }
 
-  set strategy(value: string) {
-    this.set("strategy", Value.fromString(value));
+  set controller(value: string) {
+    this.set("controller", Value.fromString(value));
   }
 
   get amount(): BigInt {
@@ -787,14 +747,183 @@ export class DebtDecreasedEvent extends Entity {
   set amount(value: BigInt) {
     this.set("amount", Value.fromBigInt(value));
   }
+}
 
-  get txHash(): Bytes {
-    let value = this.get("txHash");
+export class Auction extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+
+    this.set("startedBy", Value.fromBytes(Bytes.empty()));
+    this.set("startTime", Value.fromI32(0));
+    this.set("endTime", Value.fromI32(0));
+    this.set("vault", Value.fromString(""));
+    this.set("startTxHash", Value.fromBytes(Bytes.empty()));
+    this.set("auctionAssetID", Value.fromBigInt(BigInt.zero()));
+    this.set("auctionAssetContract", Value.fromBytes(Bytes.empty()));
+    this.set("perPeriodDecayPercentWad", Value.fromBigInt(BigInt.zero()));
+    this.set("secondsInPeriod", Value.fromBigInt(BigInt.zero()));
+    this.set("startPrice", Value.fromBigInt(BigInt.zero()));
+    this.set("paymentAsset", Value.fromBytes(Bytes.empty()));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save Auction entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        "Cannot save Auction entity with non-string ID. " +
+          'Considering using .toHex() to convert the "id" to a string.'
+      );
+      store.set("Auction", id.toString(), this);
+    }
+  }
+
+  static load(id: string): Auction | null {
+    return changetype<Auction | null>(store.get("Auction", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get startedBy(): Bytes {
+    let value = this.get("startedBy");
     return value!.toBytes();
   }
 
-  set txHash(value: Bytes) {
-    this.set("txHash", Value.fromBytes(value));
+  set startedBy(value: Bytes) {
+    this.set("startedBy", Value.fromBytes(value));
+  }
+
+  get startTime(): i32 {
+    let value = this.get("startTime");
+    return value!.toI32();
+  }
+
+  set startTime(value: i32) {
+    this.set("startTime", Value.fromI32(value));
+  }
+
+  get endTime(): i32 {
+    let value = this.get("endTime");
+    return value!.toI32();
+  }
+
+  set endTime(value: i32) {
+    this.set("endTime", Value.fromI32(value));
+  }
+
+  get endPrice(): BigInt | null {
+    let value = this.get("endPrice");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set endPrice(value: BigInt | null) {
+    if (!value) {
+      this.unset("endPrice");
+    } else {
+      this.set("endPrice", Value.fromBigInt(<BigInt>value));
+    }
+  }
+
+  get vault(): string {
+    let value = this.get("vault");
+    return value!.toString();
+  }
+
+  set vault(value: string) {
+    this.set("vault", Value.fromString(value));
+  }
+
+  get startTxHash(): Bytes {
+    let value = this.get("startTxHash");
+    return value!.toBytes();
+  }
+
+  set startTxHash(value: Bytes) {
+    this.set("startTxHash", Value.fromBytes(value));
+  }
+
+  get endTxHash(): Bytes | null {
+    let value = this.get("endTxHash");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set endTxHash(value: Bytes | null) {
+    if (!value) {
+      this.unset("endTxHash");
+    } else {
+      this.set("endTxHash", Value.fromBytes(<Bytes>value));
+    }
+  }
+
+  get auctionAssetID(): BigInt {
+    let value = this.get("auctionAssetID");
+    return value!.toBigInt();
+  }
+
+  set auctionAssetID(value: BigInt) {
+    this.set("auctionAssetID", Value.fromBigInt(value));
+  }
+
+  get auctionAssetContract(): Bytes {
+    let value = this.get("auctionAssetContract");
+    return value!.toBytes();
+  }
+
+  set auctionAssetContract(value: Bytes) {
+    this.set("auctionAssetContract", Value.fromBytes(value));
+  }
+
+  get perPeriodDecayPercentWad(): BigInt {
+    let value = this.get("perPeriodDecayPercentWad");
+    return value!.toBigInt();
+  }
+
+  set perPeriodDecayPercentWad(value: BigInt) {
+    this.set("perPeriodDecayPercentWad", Value.fromBigInt(value));
+  }
+
+  get secondsInPeriod(): BigInt {
+    let value = this.get("secondsInPeriod");
+    return value!.toBigInt();
+  }
+
+  set secondsInPeriod(value: BigInt) {
+    this.set("secondsInPeriod", Value.fromBigInt(value));
+  }
+
+  get startPrice(): BigInt {
+    let value = this.get("startPrice");
+    return value!.toBigInt();
+  }
+
+  set startPrice(value: BigInt) {
+    this.set("startPrice", Value.fromBigInt(value));
+  }
+
+  get paymentAsset(): Bytes {
+    let value = this.get("paymentAsset");
+    return value!.toBytes();
+  }
+
+  set paymentAsset(value: Bytes) {
+    this.set("paymentAsset", Value.fromBytes(value));
   }
 }
 
@@ -805,9 +934,8 @@ export class CollateralAllowedChangeEvent extends Entity {
 
     this.set("timestamp", Value.fromBigInt(BigInt.zero()));
     this.set("collateralAddress", Value.fromBytes(Bytes.empty()));
-    this.set("strategy", Value.fromString(""));
+    this.set("controller", Value.fromString(""));
     this.set("allowed", Value.fromBoolean(false));
-    this.set("txHash", Value.fromBytes(Bytes.empty()));
   }
 
   save(): void {
@@ -859,13 +987,13 @@ export class CollateralAllowedChangeEvent extends Entity {
     this.set("collateralAddress", Value.fromBytes(value));
   }
 
-  get strategy(): string {
-    let value = this.get("strategy");
+  get controller(): string {
+    let value = this.get("controller");
     return value!.toString();
   }
 
-  set strategy(value: string) {
-    this.set("strategy", Value.fromString(value));
+  set controller(value: string) {
+    this.set("controller", Value.fromString(value));
   }
 
   get allowed(): boolean {
@@ -875,14 +1003,5 @@ export class CollateralAllowedChangeEvent extends Entity {
 
   set allowed(value: boolean) {
     this.set("allowed", Value.fromBoolean(value));
-  }
-
-  get txHash(): Bytes {
-    let value = this.get("txHash");
-    return value!.toBytes();
-  }
-
-  set txHash(value: Bytes) {
-    this.set("txHash", Value.fromBytes(value));
   }
 }

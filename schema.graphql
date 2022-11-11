@@ -1,36 +1,37 @@
-type LendingStrategy @entity {
+type PaprController @entity {
   id: ID!
   createdAt: BigInt!
+  # TODO watch for update pool address events
   poolAddress: Bytes!
   underlying: Bytes!
-  debtToken: Bytes!
-  norm: BigInt!
-  vaults: [Vault!] @derivedFrom(field: "strategy")
-  allowedCollateral: [AllowedCollateral!]! @derivedFrom(field: "strategy")
-  normUpdates: [NormalizationUpdate!] @derivedFrom(field: "strategy")
+  paprToken: Bytes!
+  target: BigInt!
+  vaults: [Vault!] @derivedFrom(field: "controller")
+  allowedCollateral: [AllowedCollateral!]! @derivedFrom(field: "controller")
+  targetUpdates: [TargetUpdate!] @derivedFrom(field: "controller")
 }
 
 type Vault @entity {
   id: ID!
-  strategy: LendingStrategy!
+  account: Bytes!
+  collateralContract: Bytes!
+  controller: PaprController!
   debt: BigInt!
-  totalCollateralValue: BigInt!
+  debtPerCollateral: BigInt!
   collateral: [VaultCollateral!]! @derivedFrom(field: "vault")
 }
 
-type NormalizationUpdate @entity {
+type TargetUpdate @entity {
   id: ID!
   timestamp: BigInt!
-  strategy: LendingStrategy!
-  newNorm: BigInt!
-  txHash: Bytes!
+  newTarget: BigInt!
+  controller: PaprController!
 }
 
 type VaultCollateral @entity {
   id: ID!
   contractAddress: Bytes!
   tokenId: BigInt!
-  value: BigInt!
   vault: Vault
   symbol: String!
 }
@@ -38,7 +39,7 @@ type VaultCollateral @entity {
 type AllowedCollateral @entity {
   id: ID!
   contractAddress: Bytes!
-  strategy: LendingStrategy
+  controller: PaprController!
   allowed: Boolean!
 }
 
@@ -46,43 +47,56 @@ type AddCollateralEvent @entity {
   id: ID!
   timestamp: BigInt!
   vault: Vault!
-  strategy: LendingStrategy!
+  controller: PaprController!
   collateral: VaultCollateral!
-  txHash: Bytes!
 }
 
 type RemoveCollateralEvent @entity {
   id: ID!
   timestamp: BigInt!
   vault: Vault!
-  strategy: LendingStrategy!
+  controller: PaprController!
   collateral: VaultCollateral!
-  txHash: Bytes!
 }
 
 type DebtIncreasedEvent @entity {
   id: ID!
   timestamp: BigInt!
   vault: Vault!
-  strategy: LendingStrategy!
+  controller: PaprController!
   amount: BigInt!
-  txHash: Bytes!
 }
 
 type DebtDecreasedEvent @entity {
   id: ID!
   timestamp: BigInt!
   vault: Vault!
-  strategy: LendingStrategy!
+  controller: PaprController!
   amount: BigInt!
-  txHash: Bytes!
+}
+
+type Auction @entity {
+  id: ID!
+  startedBy: Bytes!
+  startTime: Int!
+  endTime: Int
+  endPrice: BigInt
+  vault: Vault!
+  startTxHash: Bytes!
+  endTxHash: Bytes
+  # below are in event
+  auctionAssetID: BigInt!
+  auctionAssetContract: Bytes!
+  perPeriodDecayPercentWad: BigInt!
+  secondsInPeriod: BigInt!
+  startPrice: BigInt!
+  paymentAsset: Bytes!
 }
 
 type CollateralAllowedChangeEvent @entity {
   id: ID!
   timestamp: BigInt!
   collateralAddress: Bytes!
-  strategy: LendingStrategy!
+  controller: PaprController!
   allowed: Boolean!
-  txHash: Bytes!
 }
