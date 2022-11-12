@@ -43,6 +43,7 @@ function initVault(
 ): Vault {
   const vault = new Vault(generateVaultId(account, asset));
   vault.controller = controller.toHexString();
+  vault.account = account;
   vault.collateralCount = 0;
   vault.save();
 
@@ -171,9 +172,14 @@ export function handleReduceDebt(event: ReduceDebt): void {
   }
 
   vault.debt = vault.debt.minus(event.params.amount);
-  vault.debtPerCollateral = vault.debt.div(
-    BigInt.fromI32(vault.collateralCount)
-  );
+  if (vault.collateralCount === 0) {
+    vault.debtPerCollateral = new BigInt(0);
+  } else {
+    vault.debtPerCollateral = vault.debt.div(
+      BigInt.fromI32(vault.collateralCount)
+    );
+  }
+
   vault.save();
 
   const debtDecreasedEvent = new DebtDecreasedEvent(
