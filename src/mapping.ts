@@ -33,7 +33,7 @@ function generateCollateralId(addr: Address, tokenId: BigInt): string {
 }
 
 function generateVaultId(account: Address, asset: Address): string {
-  return `${account.toHexString()}-${asset.toString()}`;
+  return `${account.toHexString()}-${asset.toHexString()}`;
 }
 
 function initVault(
