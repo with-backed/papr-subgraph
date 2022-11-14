@@ -23,6 +23,8 @@ import {
   Vault,
   AllowedCollateral,
   Auction,
+  AuctionStartEvent,
+  AuctionEndEvent,
 } from "../generated/schema";
 
 import { PaprController as PaprControllerABI } from "../generated/SlyFox/PaprController";
@@ -286,16 +288,18 @@ export function handleStartAuction(event: StartAuction): void {
     event.params.nftOwner,
     event.params.auctionAssetContract
   );
-  auction.startTime = event.block.timestamp.toI32();
-  auction.startTxHash = event.transaction.hash;
   auction.save();
+  const start = new AuctionStartEvent(event.transaction.hash.toHexString());
+  start.timestamp = event.block.timestamp.toI32();
+  start.auction = auction.id
+  start.save();
 }
 
 export function handleEndAuction(event: EndAuction): void {
   const auction = Auction.load(event.params.auctionID.toString());
   if (!auction) return;
-  auction.endTime = event.block.timestamp.toI32();
-  auction.endTxHash = event.transaction.hash;
-  auction.endPrice = event.params.price;
-  auction.save();
+  const end = new AuctionEndEvent(event.transaction.hash.toHexString())
+  end.timestamp = event.block.timestamp.toI32();
+  end.auction = auction.id
+  end.save()
 }

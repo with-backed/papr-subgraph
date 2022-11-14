@@ -79,12 +79,10 @@ type DebtDecreasedEvent @entity {
 type Auction @entity {
   id: ID!
   startedBy: Bytes!
-  startTime: Int!
-  endTime: Int
   endPrice: BigInt
   vault: Vault!
-  startTxHash: Bytes!
-  endTxHash: Bytes
+  start: AuctionStartEvent! @derivedFrom(field: "auction")
+  end: AuctionEndEvent @derivedFrom(field: "auction")
   # below are in event
   auctionAssetID: BigInt!
   auctionAssetContract: Bytes!
@@ -92,6 +90,18 @@ type Auction @entity {
   secondsInPeriod: BigInt!
   startPrice: BigInt!
   paymentAsset: Bytes!
+}
+
+type AuctionStartEvent @entity {
+  id: ID!
+  timestamp: Int!
+  auction: Auction!
+}
+
+type AuctionEndEvent @entity {
+  id: ID!
+  timestamp: Int!
+  auction: Auction!
 }
 
 type CollateralAllowedChangeEvent @entity {

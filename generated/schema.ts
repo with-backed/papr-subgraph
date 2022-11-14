@@ -765,10 +765,7 @@ export class Auction extends Entity {
     this.set("id", Value.fromString(id));
 
     this.set("startedBy", Value.fromBytes(Bytes.empty()));
-    this.set("startTime", Value.fromI32(0));
-    this.set("endTime", Value.fromI32(0));
     this.set("vault", Value.fromString(""));
-    this.set("startTxHash", Value.fromBytes(Bytes.empty()));
     this.set("auctionAssetID", Value.fromBigInt(BigInt.zero()));
     this.set("auctionAssetContract", Value.fromBytes(Bytes.empty()));
     this.set("perPeriodDecayPercentWad", Value.fromBigInt(BigInt.zero()));
@@ -812,24 +809,6 @@ export class Auction extends Entity {
     this.set("startedBy", Value.fromBytes(value));
   }
 
-  get startTime(): i32 {
-    let value = this.get("startTime");
-    return value!.toI32();
-  }
-
-  set startTime(value: i32) {
-    this.set("startTime", Value.fromI32(value));
-  }
-
-  get endTime(): i32 {
-    let value = this.get("endTime");
-    return value!.toI32();
-  }
-
-  set endTime(value: i32) {
-    this.set("endTime", Value.fromI32(value));
-  }
-
   get endPrice(): BigInt | null {
     let value = this.get("endPrice");
     if (!value || value.kind == ValueKind.NULL) {
@@ -856,29 +835,29 @@ export class Auction extends Entity {
     this.set("vault", Value.fromString(value));
   }
 
-  get startTxHash(): Bytes {
-    let value = this.get("startTxHash");
-    return value!.toBytes();
+  get start(): string {
+    let value = this.get("start");
+    return value!.toString();
   }
 
-  set startTxHash(value: Bytes) {
-    this.set("startTxHash", Value.fromBytes(value));
+  set start(value: string) {
+    this.set("start", Value.fromString(value));
   }
 
-  get endTxHash(): Bytes | null {
-    let value = this.get("endTxHash");
+  get end(): string | null {
+    let value = this.get("end");
     if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
-      return value.toBytes();
+      return value.toString();
     }
   }
 
-  set endTxHash(value: Bytes | null) {
+  set end(value: string | null) {
     if (!value) {
-      this.unset("endTxHash");
+      this.unset("end");
     } else {
-      this.set("endTxHash", Value.fromBytes(<Bytes>value));
+      this.set("end", Value.fromString(<string>value));
     }
   }
 
@@ -934,6 +913,116 @@ export class Auction extends Entity {
 
   set paymentAsset(value: Bytes) {
     this.set("paymentAsset", Value.fromBytes(value));
+  }
+}
+
+export class AuctionStartEvent extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+
+    this.set("timestamp", Value.fromI32(0));
+    this.set("auction", Value.fromString(""));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save AuctionStartEvent entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        "Cannot save AuctionStartEvent entity with non-string ID. " +
+          'Considering using .toHex() to convert the "id" to a string.'
+      );
+      store.set("AuctionStartEvent", id.toString(), this);
+    }
+  }
+
+  static load(id: string): AuctionStartEvent | null {
+    return changetype<AuctionStartEvent | null>(
+      store.get("AuctionStartEvent", id)
+    );
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get timestamp(): i32 {
+    let value = this.get("timestamp");
+    return value!.toI32();
+  }
+
+  set timestamp(value: i32) {
+    this.set("timestamp", Value.fromI32(value));
+  }
+
+  get auction(): string {
+    let value = this.get("auction");
+    return value!.toString();
+  }
+
+  set auction(value: string) {
+    this.set("auction", Value.fromString(value));
+  }
+}
+
+export class AuctionEndEvent extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+
+    this.set("timestamp", Value.fromI32(0));
+    this.set("auction", Value.fromString(""));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save AuctionEndEvent entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        "Cannot save AuctionEndEvent entity with non-string ID. " +
+          'Considering using .toHex() to convert the "id" to a string.'
+      );
+      store.set("AuctionEndEvent", id.toString(), this);
+    }
+  }
+
+  static load(id: string): AuctionEndEvent | null {
+    return changetype<AuctionEndEvent | null>(store.get("AuctionEndEvent", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get timestamp(): i32 {
+    let value = this.get("timestamp");
+    return value!.toI32();
+  }
+
+  set timestamp(value: i32) {
+    this.set("timestamp", Value.fromI32(value));
+  }
+
+  get auction(): string {
+    let value = this.get("auction");
+    return value!.toString();
+  }
+
+  set auction(value: string) {
+    this.set("auction", Value.fromString(value));
   }
 }
 
