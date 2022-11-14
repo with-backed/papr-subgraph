@@ -288,12 +288,11 @@ export function handleStartAuction(event: StartAuction): void {
     event.params.nftOwner,
     event.params.auctionAssetContract
   );
-  const start = new AuctionStartEvent(event.params.auctionID.toString());
+  auction.save();
+  const start = new AuctionStartEvent(event.transaction.hash.toHexString());
   start.timestamp = event.block.timestamp.toI32();
   start.auction = auction.id
   start.save();
-  auction.start = start.id
-  auction.save();
 }
 
 export function handleEndAuction(event: EndAuction): void {
@@ -303,6 +302,4 @@ export function handleEndAuction(event: EndAuction): void {
   end.timestamp = event.block.timestamp.toI32();
   end.auction = auction.id
   end.save()
-  auction.end = end.id;
-  auction.save();
 }
