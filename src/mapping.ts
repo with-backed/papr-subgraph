@@ -32,19 +32,23 @@ function generateCollateralId(addr: Address, tokenId: BigInt): string {
   return `${addr.toHexString()}-${tokenId.toString()}`;
 }
 
-function generateVaultId(account: Address, asset: Address): string {
-  return `${account.toHexString()}-${asset.toHexString()}`;
+function generateVaultId(
+  controller: Address,
+  account: Address,
+  asset: Address
+): string {
+  return `${controller.toHexString()}-${account.toHexString()}-${asset.toHexString()}`;
 }
 
 function initVault(
+  controller: Address,
   account: Address,
-  asset: Address,
-  controller: Address
+  asset: Address
 ): Vault {
-  const vault = new Vault(generateVaultId(account, asset));
+  const vault = new Vault(generateVaultId(controller, account, asset));
   vault.controller = controller.toHexString();
   vault.account = account;
-  vault.collateralCount = 0;
+  vault.collateralContract = asset;
   vault.save();
 
   return vault;
@@ -52,13 +56,17 @@ function initVault(
 
 export function handleAddCollateral(event: AddCollateral): void {
   let vault: Vault | null = Vault.load(
-    generateVaultId(event.params.account, event.params.collateral.addr)
+    generateVaultId(
+      event.params._event.address,
+      event.params.account,
+      event.params.collateral.addr
+    )
   );
   if (!vault) {
     vault = initVault(
+      event.params._event.address,
       event.params.account,
-      event.params.collateral.addr,
-      event.params._event.address
+      event.params.collateral.addr
     );
   }
 
@@ -100,7 +108,11 @@ export function handleAddCollateral(event: AddCollateral): void {
 
 export function handleRemoveCollateral(event: RemoveCollateral): void {
   const vault = Vault.load(
-    generateVaultId(event.params.account, event.params.collateral.addr)
+    generateVaultId(
+      event.params._event.address,
+      event.params.account,
+      event.params.collateral.addr
+    )
   );
   if (!vault) return;
 
@@ -137,13 +149,17 @@ export function handleRemoveCollateral(event: RemoveCollateral): void {
 
 export function handleIncreaseDebt(event: IncreaseDebt): void {
   let vault = Vault.load(
-    generateVaultId(event.params.account, event.params.collateralAddress)
+    generateVaultId(
+      event.params._event.address,
+      event.params.account,
+      event.params.collateralAddress
+    )
   );
   if (!vault) {
     vault = initVault(
+      event.params._event.address,
       event.params.account,
-      event.params.collateralAddress,
-      event.params._event.address
+      event.params.collateralAddress
     );
   }
 
@@ -165,7 +181,11 @@ export function handleIncreaseDebt(event: IncreaseDebt): void {
 
 export function handleReduceDebt(event: ReduceDebt): void {
   const vault = Vault.load(
-    generateVaultId(event.params.account, event.params.collateralAddress)
+    generateVaultId(
+      event.params._event.address,
+      event.params.account,
+      event.params.collateralAddress
+    )
   );
   if (!vault) {
     return;
@@ -262,6 +282,7 @@ export function handleStartAuction(event: StartAuction): void {
   auction.secondsInPeriod = event.params.secondsInPeriod;
   auction.paymentAsset = event.params.paymentAsset;
   auction.vault = generateVaultId(
+    event.params._event.address,
     event.params.nftOwner,
     event.params.auctionAssetContract
   );
