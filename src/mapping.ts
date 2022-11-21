@@ -302,4 +302,6 @@ export function handleEndAuction(event: EndAuction): void {
   end.timestamp = event.block.timestamp.toI32();
   end.auction = auction.id
   end.save()
+  auction.endPrice = event.params.price;
+  auction.save()
 }
