@@ -701,62 +701,6 @@
           "internalType": "address",
           "name": "proceedsTo",
           "type": "address"
-        },
-        {
-          "components": [
-            {
-              "components": [
-                {
-                  "internalType": "bytes32",
-                  "name": "id",
-                  "type": "bytes32"
-                },
-                {
-                  "internalType": "bytes",
-                  "name": "payload",
-                  "type": "bytes"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "timestamp",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "bytes",
-                  "name": "signature",
-                  "type": "bytes"
-                }
-              ],
-              "internalType": "struct ReservoirOracle.Message",
-              "name": "message",
-              "type": "tuple"
-            },
-            {
-              "components": [
-                {
-                  "internalType": "uint8",
-                  "name": "v",
-                  "type": "uint8"
-                },
-                {
-                  "internalType": "bytes32",
-                  "name": "r",
-                  "type": "bytes32"
-                },
-                {
-                  "internalType": "bytes32",
-                  "name": "s",
-                  "type": "bytes32"
-                }
-              ],
-              "internalType": "struct ReservoirOracleUnderwriter.Sig",
-              "name": "sig",
-              "type": "tuple"
-            }
-          ],
-          "internalType": "struct ReservoirOracleUnderwriter.OracleInfo",
-          "name": "oracleInfo",
-          "type": "tuple"
         }
       ],
       "name": "buyAndReduceDebt",

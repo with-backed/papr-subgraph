@@ -345,52 +345,6 @@ export class PaprController__auctionStateResult {
   }
 }
 
-export class PaprController__buyAndReduceDebtInputOracleInfoStruct extends ethereum.Tuple {
-  get message(): PaprController__buyAndReduceDebtInputOracleInfoMessageStruct {
-    return changetype<
-      PaprController__buyAndReduceDebtInputOracleInfoMessageStruct
-    >(this[0].toTuple());
-  }
-
-  get sig(): PaprController__buyAndReduceDebtInputOracleInfoSigStruct {
-    return changetype<PaprController__buyAndReduceDebtInputOracleInfoSigStruct>(
-      this[1].toTuple()
-    );
-  }
-}
-
-export class PaprController__buyAndReduceDebtInputOracleInfoMessageStruct extends ethereum.Tuple {
-  get id(): Bytes {
-    return this[0].toBytes();
-  }
-
-  get payload(): Bytes {
-    return this[1].toBytes();
-  }
-
-  get timestamp(): BigInt {
-    return this[2].toBigInt();
-  }
-
-  get signature(): Bytes {
-    return this[3].toBytes();
-  }
-}
-
-export class PaprController__buyAndReduceDebtInputOracleInfoSigStruct extends ethereum.Tuple {
-  get v(): i32 {
-    return this[0].toI32();
-  }
-
-  get r(): Bytes {
-    return this[1].toBytes();
-  }
-
-  get s(): Bytes {
-    return this[2].toBytes();
-  }
-}
-
 export class PaprController__mintAndSellDebtInputOracleInfoStruct extends ethereum.Tuple {
   get message(): PaprController__mintAndSellDebtInputOracleInfoMessageStruct {
     return changetype<
@@ -786,20 +740,18 @@ export class PaprController extends ethereum.SmartContract {
     underlyingAmount: BigInt,
     minOut: BigInt,
     sqrtPriceLimitX96: BigInt,
-    proceedsTo: Address,
-    oracleInfo: PaprController__buyAndReduceDebtInputOracleInfoStruct
+    proceedsTo: Address
   ): BigInt {
     let result = super.call(
       "buyAndReduceDebt",
-      "buyAndReduceDebt(address,address,uint256,uint256,uint160,address,((bytes32,bytes,uint256,bytes),(uint8,bytes32,bytes32))):(uint256)",
+      "buyAndReduceDebt(address,address,uint256,uint256,uint160,address):(uint256)",
       [
         ethereum.Value.fromAddress(account),
         ethereum.Value.fromAddress(collateralAsset),
         ethereum.Value.fromUnsignedBigInt(underlyingAmount),
         ethereum.Value.fromUnsignedBigInt(minOut),
         ethereum.Value.fromUnsignedBigInt(sqrtPriceLimitX96),
-        ethereum.Value.fromAddress(proceedsTo),
-        ethereum.Value.fromTuple(oracleInfo)
+        ethereum.Value.fromAddress(proceedsTo)
       ]
     );
 
@@ -812,20 +764,18 @@ export class PaprController extends ethereum.SmartContract {
     underlyingAmount: BigInt,
     minOut: BigInt,
     sqrtPriceLimitX96: BigInt,
-    proceedsTo: Address,
-    oracleInfo: PaprController__buyAndReduceDebtInputOracleInfoStruct
+    proceedsTo: Address
   ): ethereum.CallResult<BigInt> {
     let result = super.tryCall(
       "buyAndReduceDebt",
-      "buyAndReduceDebt(address,address,uint256,uint256,uint160,address,((bytes32,bytes,uint256,bytes),(uint8,bytes32,bytes32))):(uint256)",
+      "buyAndReduceDebt(address,address,uint256,uint256,uint160,address):(uint256)",
       [
         ethereum.Value.fromAddress(account),
         ethereum.Value.fromAddress(collateralAsset),
         ethereum.Value.fromUnsignedBigInt(underlyingAmount),
         ethereum.Value.fromUnsignedBigInt(minOut),
         ethereum.Value.fromUnsignedBigInt(sqrtPriceLimitX96),
-        ethereum.Value.fromAddress(proceedsTo),
-        ethereum.Value.fromTuple(oracleInfo)
+        ethereum.Value.fromAddress(proceedsTo)
       ]
     );
     if (result.reverted) {
@@ -1737,12 +1687,6 @@ export class BuyAndReduceDebtCall__Inputs {
   get proceedsTo(): Address {
     return this._call.inputValues[5].value.toAddress();
   }
-
-  get oracleInfo(): BuyAndReduceDebtCallOracleInfoStruct {
-    return changetype<BuyAndReduceDebtCallOracleInfoStruct>(
-      this._call.inputValues[6].value.toTuple()
-    );
-  }
 }
 
 export class BuyAndReduceDebtCall__Outputs {
@@ -1754,52 +1698,6 @@ export class BuyAndReduceDebtCall__Outputs {
 
   get out(): BigInt {
     return this._call.outputValues[0].value.toBigInt();
-  }
-}
-
-export class BuyAndReduceDebtCallOracleInfoStruct extends ethereum.Tuple {
-  get message(): BuyAndReduceDebtCallOracleInfoMessageStruct {
-    return changetype<BuyAndReduceDebtCallOracleInfoMessageStruct>(
-      this[0].toTuple()
-    );
-  }
-
-  get sig(): BuyAndReduceDebtCallOracleInfoSigStruct {
-    return changetype<BuyAndReduceDebtCallOracleInfoSigStruct>(
-      this[1].toTuple()
-    );
-  }
-}
-
-export class BuyAndReduceDebtCallOracleInfoMessageStruct extends ethereum.Tuple {
-  get id(): Bytes {
-    return this[0].toBytes();
-  }
-
-  get payload(): Bytes {
-    return this[1].toBytes();
-  }
-
-  get timestamp(): BigInt {
-    return this[2].toBigInt();
-  }
-
-  get signature(): Bytes {
-    return this[3].toBytes();
-  }
-}
-
-export class BuyAndReduceDebtCallOracleInfoSigStruct extends ethereum.Tuple {
-  get v(): i32 {
-    return this[0].toI32();
-  }
-
-  get r(): Bytes {
-    return this[1].toBytes();
-  }
-
-  get s(): Bytes {
-    return this[2].toBytes();
   }
 }
 
