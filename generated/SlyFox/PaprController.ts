@@ -44,33 +44,25 @@ export class AddCollateralCollateralStruct extends ethereum.Tuple {
   }
 }
 
-export class ChangeCollateralAllowed extends ethereum.Event {
-  get params(): ChangeCollateralAllowed__Params {
-    return new ChangeCollateralAllowed__Params(this);
+export class AllowCollateral extends ethereum.Event {
+  get params(): AllowCollateral__Params {
+    return new AllowCollateral__Params(this);
   }
 }
 
-export class ChangeCollateralAllowed__Params {
-  _event: ChangeCollateralAllowed;
+export class AllowCollateral__Params {
+  _event: AllowCollateral;
 
-  constructor(event: ChangeCollateralAllowed) {
+  constructor(event: AllowCollateral) {
     this._event = event;
   }
 
-  get arg(): ChangeCollateralAllowedArgStruct {
-    return changetype<ChangeCollateralAllowedArgStruct>(
-      this._event.parameters[0].value.toTuple()
-    );
-  }
-}
-
-export class ChangeCollateralAllowedArgStruct extends ethereum.Tuple {
-  get addr(): Address {
-    return this[0].toAddress();
+  get collateral(): Address {
+    return this._event.parameters[0].value.toAddress();
   }
 
-  get allowed(): boolean {
-    return this[1].toBoolean();
+  get isAllowed(): boolean {
+    return this._event.parameters[1].value.toBoolean();
   }
 }
 
@@ -1464,45 +1456,6 @@ export class PaprController extends ethereum.SmartContract {
       )
     );
   }
-
-  vaultTotalCollateralValue(
-    account: Address,
-    asset: Address,
-    price: BigInt
-  ): BigInt {
-    let result = super.call(
-      "vaultTotalCollateralValue",
-      "vaultTotalCollateralValue(address,address,uint256):(uint256)",
-      [
-        ethereum.Value.fromAddress(account),
-        ethereum.Value.fromAddress(asset),
-        ethereum.Value.fromUnsignedBigInt(price)
-      ]
-    );
-
-    return result[0].toBigInt();
-  }
-
-  try_vaultTotalCollateralValue(
-    account: Address,
-    asset: Address,
-    price: BigInt
-  ): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "vaultTotalCollateralValue",
-      "vaultTotalCollateralValue(address,address,uint256):(uint256)",
-      [
-        ethereum.Value.fromAddress(account),
-        ethereum.Value.fromAddress(asset),
-        ethereum.Value.fromUnsignedBigInt(price)
-      ]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
 }
 
 export class ConstructorCall extends ethereum.Call {
@@ -1530,7 +1483,7 @@ export class ConstructorCall__Inputs {
     return this._call.inputValues[1].value.toString();
   }
 
-  get maxLTV(): BigInt {
+  get _maxLTV(): BigInt {
     return this._call.inputValues[2].value.toBigInt();
   }
 
@@ -1592,52 +1545,6 @@ export class AddCollateralCall__Outputs {
 }
 
 export class AddCollateralCallCollateralStruct extends ethereum.Tuple {
-  get addr(): Address {
-    return this[0].toAddress();
-  }
-
-  get id(): BigInt {
-    return this[1].toBigInt();
-  }
-}
-
-export class AddCollateralWithCallbackCall extends ethereum.Call {
-  get inputs(): AddCollateralWithCallbackCall__Inputs {
-    return new AddCollateralWithCallbackCall__Inputs(this);
-  }
-
-  get outputs(): AddCollateralWithCallbackCall__Outputs {
-    return new AddCollateralWithCallbackCall__Outputs(this);
-  }
-}
-
-export class AddCollateralWithCallbackCall__Inputs {
-  _call: AddCollateralWithCallbackCall;
-
-  constructor(call: AddCollateralWithCallbackCall) {
-    this._call = call;
-  }
-
-  get collateral(): AddCollateralWithCallbackCallCollateralStruct {
-    return changetype<AddCollateralWithCallbackCallCollateralStruct>(
-      this._call.inputValues[0].value.toTuple()
-    );
-  }
-
-  get data(): Bytes {
-    return this._call.inputValues[1].value.toBytes();
-  }
-}
-
-export class AddCollateralWithCallbackCall__Outputs {
-  _call: AddCollateralWithCallbackCall;
-
-  constructor(call: AddCollateralWithCallbackCall) {
-    this._call = call;
-  }
-}
-
-export class AddCollateralWithCallbackCallCollateralStruct extends ethereum.Tuple {
   get addr(): Address {
     return this[0].toAddress();
   }
@@ -2272,9 +2179,11 @@ export class SetAllowedCollateralCall__Inputs {
     this._call = call;
   }
 
-  get args(): Array<SetAllowedCollateralCallArgsStruct> {
+  get collateralConfigs(): Array<
+    SetAllowedCollateralCallCollateralConfigsStruct
+  > {
     return this._call.inputValues[0].value.toTupleArray<
-      SetAllowedCollateralCallArgsStruct
+      SetAllowedCollateralCallCollateralConfigsStruct
     >();
   }
 }
@@ -2287,8 +2196,8 @@ export class SetAllowedCollateralCall__Outputs {
   }
 }
 
-export class SetAllowedCollateralCallArgsStruct extends ethereum.Tuple {
-  get addr(): Address {
+export class SetAllowedCollateralCallCollateralConfigsStruct extends ethereum.Tuple {
+  get collateral(): Address {
     return this[0].toAddress();
   }
 

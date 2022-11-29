@@ -31,7 +31,7 @@ dataSources:
           handler: handleReduceDebt
         - event: UpdateTarget(uint256)
           handler: handleTargetUpdate
-        - event: ChangeCollateralAllowed((address,bool))
+        - event: AllowCollateral(indexed address,bool)
           handler: handleCollateralAllowedChanged
         - event: StartAuction(indexed uint256,indexed uint256,indexed address,address,uint256,uint256,uint256,address)
           handler: handleStartAuction
