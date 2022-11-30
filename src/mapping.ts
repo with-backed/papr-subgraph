@@ -6,7 +6,7 @@ import {
   UpdateTarget,
   AddCollateral,
   RemoveCollateral,
-  ChangeCollateralAllowed,
+  AllowCollateral,
   StartAuction,
   EndAuction,
 } from "../generated/SlyFox/PaprController";
@@ -244,30 +244,30 @@ export function handleTargetUpdate(event: UpdateTarget): void {
 }
 
 export function handleCollateralAllowedChanged(
-  event: ChangeCollateralAllowed
+  event: AllowCollateral
 ): void {
   const controller = PaprController.load(
     event.params._event.address.toHexString()
   );
   if (!controller) return;
   let allowedCollateral = AllowedCollateral.load(
-    `${controller.id}-${event.params.arg.addr.toHexString()}`
+    `${controller.id}-${event.params.collateral.toHexString()}`
   );
   if (!allowedCollateral) {
     allowedCollateral = new AllowedCollateral(
-      `${controller.id}-${event.params.arg.addr.toHexString()}`
+      `${controller.id}-${event.params.collateral.toHexString()}`
     );
   }
-  allowedCollateral.contractAddress = event.params.arg.addr;
-  allowedCollateral.allowed = event.params.arg.allowed;
+  allowedCollateral.contractAddress = event.params.collateral;
+  allowedCollateral.allowed = event.params.isAllowed;
   allowedCollateral.controller = controller.id;
 
   const allowedCollateralChangeEvent = new CollateralAllowedChangeEvent(
     event.transaction.hash.toHexString()
   );
   allowedCollateralChangeEvent.timestamp = event.block.timestamp;
-  allowedCollateralChangeEvent.collateralAddress = event.params.arg.addr;
-  allowedCollateralChangeEvent.allowed = event.params.arg.allowed;
+  allowedCollateralChangeEvent.collateralAddress = event.params.collateral;
+  allowedCollateralChangeEvent.allowed = event.params.isAllowed;
   allowedCollateralChangeEvent.controller = controller.id;
 
   allowedCollateralChangeEvent.save();

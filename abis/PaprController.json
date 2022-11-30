@@ -14,7 +14,7 @@
         },
         {
           "internalType": "uint256",
-          "name": "maxLTV",
+          "name": "_maxLTV",
           "type": "uint256"
         },
         {
@@ -200,25 +200,19 @@
       "anonymous": false,
       "inputs": [
         {
-          "components": [
-            {
-              "internalType": "address",
-              "name": "addr",
-              "type": "address"
-            },
-            {
-              "internalType": "bool",
-              "name": "allowed",
-              "type": "bool"
-            }
-          ],
+          "indexed": true,
+          "internalType": "address",
+          "name": "collateral",
+          "type": "address"
+        },
+        {
           "indexed": false,
-          "internalType": "struct IPaprController.SetAllowedCollateralArg",
-          "name": "arg",
-          "type": "tuple"
+          "internalType": "bool",
+          "name": "isAllowed",
+          "type": "bool"
         }
       ],
-      "name": "ChangeCollateralAllowed",
+      "name": "AllowCollateral",
       "type": "event"
     },
     {
@@ -442,36 +436,6 @@
         }
       ],
       "name": "addCollateral",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "components": [
-            {
-              "internalType": "contract ERC721",
-              "name": "addr",
-              "type": "address"
-            },
-            {
-              "internalType": "uint256",
-              "name": "id",
-              "type": "uint256"
-            }
-          ],
-          "internalType": "struct IPaprController.Collateral",
-          "name": "collateral",
-          "type": "tuple"
-        },
-        {
-          "internalType": "bytes",
-          "name": "data",
-          "type": "bytes"
-        }
-      ],
-      "name": "addCollateralWithCallback",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -1452,7 +1416,7 @@
           "components": [
             {
               "internalType": "address",
-              "name": "addr",
+              "name": "collateral",
               "type": "address"
             },
             {
@@ -1461,8 +1425,8 @@
               "type": "bool"
             }
           ],
-          "internalType": "struct IPaprController.SetAllowedCollateralArg[]",
-          "name": "args",
+          "internalType": "struct IPaprController.CollateralAllowedConfig[]",
+          "name": "collateralConfigs",
           "type": "tuple[]"
         }
       ],
@@ -1827,35 +1791,6 @@
           "internalType": "struct IPaprController.VaultInfo",
           "name": "",
           "type": "tuple"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "account",
-          "type": "address"
-        },
-        {
-          "internalType": "contract ERC721",
-          "name": "asset",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "price",
-          "type": "uint256"
-        }
-      ],
-      "name": "vaultTotalCollateralValue",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
         }
       ],
       "stateMutability": "view",
