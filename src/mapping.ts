@@ -11,7 +11,7 @@ import {
   EndAuction,
 } from "../generated/SlyFox/PaprController";
 
-import { Transfer as PHUSDCTransfer } from "../generated/PHUSDC/PHUSDC";
+import { Transfer as ERC20Transfer } from "../generated/PHUSDC/ERC20";
 
 import {
   AddCollateralEvent,
@@ -319,7 +319,7 @@ export function handleEndAuction(event: EndAuction): void {
   auction.save();
 }
 
-export function handlePHUSDCTransfer(event: PHUSDCTransfer): void {
+export function handlePHUSDCTransfer(event: ERC20Transfer): void {
   if (event.params.from != Address.zero()) {
     const from = findOrCreateUser(event.params.from);
     from.phUSDCHoldings = from.phUSDCHoldings.minus(event.params.value);
@@ -329,6 +329,20 @@ export function handlePHUSDCTransfer(event: PHUSDCTransfer): void {
   if (event.params.to != Address.zero()) {
     const to = findOrCreateUser(event.params.to);
     to.phUSDCHoldings = to.phUSDCHoldings.plus(event.params.value);
+    to.save();
+  }
+}
+
+export function handlePaprTransfer(event: ERC20Transfer): void {
+  if (event.params.from != Address.zero()) {
+    const from = findOrCreateUser(event.params.from);
+    from.paprHoldings = from.paprHoldings.minus(event.params.value);
+    from.save();
+  }
+
+  if (event.params.to != Address.zero()) {
+    const to = findOrCreateUser(event.params.to);
+    to.paprHoldings = to.paprHoldings.plus(event.params.value);
     to.save();
   }
 }
@@ -364,13 +378,13 @@ export function handleMoonbirdTransfer(event: ERC721Transfer): void {
 export function handleDinoTransfer(event: ERC721Transfer): void {
   if (event.params.from != Address.zero()) {
     const from = findOrCreateUser(event.params.from);
-    from.dinoCount = from.phUSDCHoldings.minus(BigInt.fromString("1"));
+    from.dinoCount = from.dinoCount.minus(BigInt.fromString("1"));
     from.save();
   }
 
   if (event.params.to != Address.zero()) {
     const to = findOrCreateUser(event.params.to);
-    to.dinoCount = to.phUSDCHoldings.plus(BigInt.fromString("1"));
+    to.dinoCount = to.dinoCount.plus(BigInt.fromString("1"));
     to.save();
   }
 }

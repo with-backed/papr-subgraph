@@ -116,6 +116,7 @@ type CollateralAllowedChangeEvent @entity {
 type User @entity {
   id: ID!
   paprDebt: BigInt!
+  paprHoldings: BigInt!
   phUSDCHoldings: BigInt!
   blitCount: BigInt!
   moonbirdCount: BigInt!

@@ -1121,6 +1121,7 @@ export class User extends Entity {
     this.set("id", Value.fromString(id));
 
     this.set("paprDebt", Value.fromBigInt(BigInt.zero()));
+    this.set("paprHoldings", Value.fromBigInt(BigInt.zero()));
     this.set("phUSDCHoldings", Value.fromBigInt(BigInt.zero()));
     this.set("blitCount", Value.fromBigInt(BigInt.zero()));
     this.set("moonbirdCount", Value.fromBigInt(BigInt.zero()));
@@ -1161,6 +1162,15 @@ export class User extends Entity {
 
   set paprDebt(value: BigInt) {
     this.set("paprDebt", Value.fromBigInt(value));
+  }
+
+  get paprHoldings(): BigInt {
+    let value = this.get("paprHoldings");
+    return value!.toBigInt();
+  }
+
+  set paprHoldings(value: BigInt) {
+    this.set("paprHoldings", Value.fromBigInt(value));
   }
 
   get phUSDCHoldings(): BigInt {
