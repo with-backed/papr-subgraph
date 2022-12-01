@@ -184,7 +184,7 @@ export function handleIncreaseDebt(event: IncreaseDebt): void {
   debtIncreasedEvent.save();
 
   const user = findOrCreateUser(event.params.account);
-  user.phUSDCDebt = user.phUSDCDebt.plus(event.params.amount); 
+  user.paprDebt = user.paprDebt.plus(event.params.amount); 
   user.save();
 }
 
@@ -221,7 +221,7 @@ export function handleReduceDebt(event: ReduceDebt): void {
   debtDecreasedEvent.save();
 
   const user = findOrCreateUser(event.params.account);
-  user.phUSDCDebt = user.phUSDCDebt.minus(event.params.amount);
+  user.paprDebt = user.paprDebt.minus(event.params.amount);
   user.save();
 }
 

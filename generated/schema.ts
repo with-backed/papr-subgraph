@@ -1120,7 +1120,7 @@ export class User extends Entity {
     super();
     this.set("id", Value.fromString(id));
 
-    this.set("phUSDCDebt", Value.fromBigInt(BigInt.zero()));
+    this.set("paprDebt", Value.fromBigInt(BigInt.zero()));
     this.set("phUSDCHoldings", Value.fromBigInt(BigInt.zero()));
     this.set("blitCount", Value.fromBigInt(BigInt.zero()));
     this.set("moonbirdCount", Value.fromBigInt(BigInt.zero()));
@@ -1154,13 +1154,13 @@ export class User extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get phUSDCDebt(): BigInt {
-    let value = this.get("phUSDCDebt");
+  get paprDebt(): BigInt {
+    let value = this.get("paprDebt");
     return value!.toBigInt();
   }
 
-  set phUSDCDebt(value: BigInt) {
-    this.set("phUSDCDebt", Value.fromBigInt(value));
+  set paprDebt(value: BigInt) {
+    this.set("paprDebt", Value.fromBigInt(value));
   }
 
   get phUSDCHoldings(): BigInt {
