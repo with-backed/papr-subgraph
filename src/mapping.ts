@@ -27,11 +27,11 @@ import {
   Auction,
   AuctionStartEvent,
   AuctionEndEvent,
-  PHUSDCMint,
+  User
 } from "../generated/schema";
 
 import { PaprController as PaprControllerABI } from "../generated/SlyFox/PaprController";
-import { ERC721 as ERC721ABI } from "../generated/SlyFox/ERC721";
+import { ERC721 as ERC721ABI, Transfer as ERC721Transfer } from "../generated/SlyFox/ERC721";
 
 function generateCollateralId(addr: Address, tokenId: BigInt): string {
   return `${addr.toHexString()}-${tokenId.toString()}`;
@@ -182,6 +182,9 @@ export function handleIncreaseDebt(event: IncreaseDebt): void {
   debtIncreasedEvent.controller = vault.controller;
   debtIncreasedEvent.vault = vault.id;
   debtIncreasedEvent.save();
+
+  const user = findOrCreateUser(event.params.account);
+  user.phUSDCDebt = user.phUSDCDebt.plus(event.params.amount); 
 }
 
 export function handleReduceDebt(event: ReduceDebt): void {
@@ -215,6 +218,9 @@ export function handleReduceDebt(event: ReduceDebt): void {
   debtDecreasedEvent.controller = vault.controller;
   debtDecreasedEvent.vault = vault.id;
   debtDecreasedEvent.save();
+
+  const user = findOrCreateUser(event.params.account);
+  user.phUSDCDebt = user.phUSDCDebt.minus(event.params.amount);
 }
 
 export function handleTargetUpdate(event: UpdateTarget): void {
@@ -311,16 +317,80 @@ export function handleEndAuction(event: EndAuction): void {
   auction.save();
 }
 
-export function handlePHUSDCMint(event: PHUSDCTransfer): void {
-  if (
-    event.params.from != Address.zero() &&
-    event.params.from !=
-      Address.fromString("0xdfbd2ed33a596e24e9020e35bc98f252eca334bf")
-  )
-    return;
-  // create new phUSDC mint entity
-  const phUSDCMint = new PHUSDCMint(event.transaction.hash.toHexString());
-  phUSDCMint.account = event.params.to;
-  phUSDCMint.amount = event.params.value;
-  phUSDCMint.save();
+export function handlePHUSDCTransfer(event: PHUSDCTransfer): void {
+  if (event.params.from != Address.zero()) {
+    const from = findOrCreateUser(event.params.from);
+    from.phUSDCHoldings = from.phUSDCHoldings.minus(event.params.value);
+    from.save();
+  }
+
+  if (event.params.to != Address.zero()) {
+    const to = findOrCreateUser(event.params.to);
+    to.phUSDCHoldings = to.phUSDCHoldings.plus(event.params.value);
+    to.save();
+  }
+}
+
+export function handleBlitTransfer(event: ERC721Transfer): void {
+  if (event.params.from != Address.zero()) {
+    const from = findOrCreateUser(event.params.from);
+    from.blitCount = from.blitCount.minus(BigInt.fromString("1"));
+    from.save();
+  }
+
+  if (event.params.to != Address.zero()) {
+    const to = findOrCreateUser(event.params.to);
+    to.blitCount = to.blitCount.plus(BigInt.fromString("1"));
+    to.save();
+  }
+}
+
+export function handleMoonbirdTransfer(event: ERC721Transfer): void {
+  if (event.params.from != Address.zero()) {
+    const from = findOrCreateUser(event.params.from);
+    from.moonbirdCount = from.moonbirdCount.minus(BigInt.fromString("1"));
+    from.save();
+  }
+
+  if (event.params.to != Address.zero()) {
+    const to = findOrCreateUser(event.params.to);
+    to.moonbirdCount = to.moonbirdCount.plus(BigInt.fromString("1"));
+    to.save();
+  }
+}
+
+export function handleDinoTransfer(event: ERC721Transfer): void {
+  if (event.params.from != Address.zero()) {
+    const from = findOrCreateUser(event.params.from);
+    from.dinoCount = from.phUSDCHoldings.minus(BigInt.fromString("1"));
+    from.save();
+  }
+
+  if (event.params.to != Address.zero()) {
+    const to = findOrCreateUser(event.params.to);
+    to.dinoCount = to.phUSDCHoldings.plus(BigInt.fromString("1"));
+    to.save();
+  }
+}
+
+export function handleToadTransfer(event: ERC721Transfer): void {
+  if (event.params.from != Address.zero()) {
+    const from = findOrCreateUser(event.params.from);
+    from.toadCount = from.toadCount.minus(BigInt.fromString("1"));
+    from.save();
+  }
+
+  if (event.params.to != Address.zero()) {
+    const to = findOrCreateUser(event.params.to);
+    to.toadCount = to.toadCount.plus(BigInt.fromString("1"));
+    to.save();
+  }
+}
+
+function findOrCreateUser(address: Bytes): User {
+  let user = User.load(address.toHexString());
+  if (!user) {
+    user = new User(address.toHexString());
+  }
+  return user; 
 }

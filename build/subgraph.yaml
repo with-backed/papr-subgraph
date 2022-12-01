@@ -51,11 +51,91 @@ dataSources:
       apiVersion: 0.0.5
       language: wasm/assemblyscript
       entities:
-        - PHUSDCMint
+        - User
       abis:
         - name: PHUSDC
           file: PHUSDC/abis/PHUSDC.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
-          handler: handlePHUSDCMint
+          handler: handlePHUSDCTransfer
+      file: SlyFox/SlyFox.wasm
+  - kind: ethereum/contract
+    name: blitTransfers
+    network: goerli
+    source:
+      address: "0x4770646fe8635fa9ed3cb72ed4b7ef6386a06827"
+      abi: ERC721
+      startBlock: 7935411
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - User
+      abis:
+        - name: ERC721
+          file: blitTransfers/abis/ERC721.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleBlitTransfer
+      file: SlyFox/SlyFox.wasm
+  - kind: ethereum/contract
+    name: moonbirdTransfer
+    network: goerli
+    source:
+      address: "0x0593cd2238d1b143bd1c67cd7fa98eee32a260ea"
+      abi: ERC721
+      startBlock: 7935411
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - User
+      abis:
+        - name: ERC721
+          file: moonbirdTransfer/abis/ERC721.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleMoonbirdTransfer
+      file: SlyFox/SlyFox.wasm
+  - kind: ethereum/contract
+    name: toadTransfer
+    network: goerli
+    source:
+      address: "0xd4e652bbfcf616c966e1b1e8ed37599d81f11889"
+      abi: ERC721
+      startBlock: 7935411
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - User
+      abis:
+        - name: ERC721
+          file: toadTransfer/abis/ERC721.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleToadTransfer
+      file: SlyFox/SlyFox.wasm
+  - kind: ethereum/contract
+    name: dinoTransfer
+    network: goerli
+    source:
+      address: "0xabe17952e7fe468711826c26b04b047c0da53b86"
+      abi: ERC721
+      startBlock: 7935411
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - User
+      abis:
+        - name: ERC721
+          file: dinoTransfer/abis/ERC721.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleDinoTransfer
       file: SlyFox/SlyFox.wasm

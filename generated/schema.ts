@@ -1115,30 +1115,34 @@ export class CollateralAllowedChangeEvent extends Entity {
   }
 }
 
-export class PHUSDCMint extends Entity {
+export class User extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
 
-    this.set("account", Value.fromBytes(Bytes.empty()));
-    this.set("amount", Value.fromBigInt(BigInt.zero()));
+    this.set("phUSDCDebt", Value.fromBigInt(BigInt.zero()));
+    this.set("phUSDCHoldings", Value.fromBigInt(BigInt.zero()));
+    this.set("blitCount", Value.fromBigInt(BigInt.zero()));
+    this.set("moonbirdCount", Value.fromBigInt(BigInt.zero()));
+    this.set("toadCount", Value.fromBigInt(BigInt.zero()));
+    this.set("dinoCount", Value.fromBigInt(BigInt.zero()));
   }
 
   save(): void {
     let id = this.get("id");
-    assert(id != null, "Cannot save PHUSDCMint entity without an ID");
+    assert(id != null, "Cannot save User entity without an ID");
     if (id) {
       assert(
         id.kind == ValueKind.STRING,
-        "Cannot save PHUSDCMint entity with non-string ID. " +
+        "Cannot save User entity with non-string ID. " +
           'Considering using .toHex() to convert the "id" to a string.'
       );
-      store.set("PHUSDCMint", id.toString(), this);
+      store.set("User", id.toString(), this);
     }
   }
 
-  static load(id: string): PHUSDCMint | null {
-    return changetype<PHUSDCMint | null>(store.get("PHUSDCMint", id));
+  static load(id: string): User | null {
+    return changetype<User | null>(store.get("User", id));
   }
 
   get id(): string {
@@ -1150,21 +1154,57 @@ export class PHUSDCMint extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get account(): Bytes {
-    let value = this.get("account");
-    return value!.toBytes();
-  }
-
-  set account(value: Bytes) {
-    this.set("account", Value.fromBytes(value));
-  }
-
-  get amount(): BigInt {
-    let value = this.get("amount");
+  get phUSDCDebt(): BigInt {
+    let value = this.get("phUSDCDebt");
     return value!.toBigInt();
   }
 
-  set amount(value: BigInt) {
-    this.set("amount", Value.fromBigInt(value));
+  set phUSDCDebt(value: BigInt) {
+    this.set("phUSDCDebt", Value.fromBigInt(value));
+  }
+
+  get phUSDCHoldings(): BigInt {
+    let value = this.get("phUSDCHoldings");
+    return value!.toBigInt();
+  }
+
+  set phUSDCHoldings(value: BigInt) {
+    this.set("phUSDCHoldings", Value.fromBigInt(value));
+  }
+
+  get blitCount(): BigInt {
+    let value = this.get("blitCount");
+    return value!.toBigInt();
+  }
+
+  set blitCount(value: BigInt) {
+    this.set("blitCount", Value.fromBigInt(value));
+  }
+
+  get moonbirdCount(): BigInt {
+    let value = this.get("moonbirdCount");
+    return value!.toBigInt();
+  }
+
+  set moonbirdCount(value: BigInt) {
+    this.set("moonbirdCount", Value.fromBigInt(value));
+  }
+
+  get toadCount(): BigInt {
+    let value = this.get("toadCount");
+    return value!.toBigInt();
+  }
+
+  set toadCount(value: BigInt) {
+    this.set("toadCount", Value.fromBigInt(value));
+  }
+
+  get dinoCount(): BigInt {
+    let value = this.get("dinoCount");
+    return value!.toBigInt();
+  }
+
+  set dinoCount(value: BigInt) {
+    this.set("dinoCount", Value.fromBigInt(value));
   }
 }
