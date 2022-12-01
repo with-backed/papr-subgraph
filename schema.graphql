@@ -81,6 +81,7 @@ type Auction @entity {
   startedBy: Bytes!
   endPrice: BigInt
   vault: Vault!
+  controller: PaprController!
   start: AuctionStartEvent! @derivedFrom(field: "auction")
   end: AuctionEndEvent @derivedFrom(field: "auction")
   # below are in event
@@ -110,4 +111,10 @@ type CollateralAllowedChangeEvent @entity {
   collateralAddress: Bytes!
   controller: PaprController!
   allowed: Boolean!
+}
+
+type PHUSDCMint @entity {
+  id: ID!
+  account: Bytes!
+  amount: BigInt!
 }

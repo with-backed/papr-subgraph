@@ -11,6 +11,8 @@ import {
   EndAuction,
 } from "../generated/SlyFox/PaprController";
 
+import { Transfer as PHUSDCTransfer } from "../generated/PHUSDC/PHUSDC";
+
 import {
   AddCollateralEvent,
   VaultCollateral,
@@ -25,6 +27,7 @@ import {
   Auction,
   AuctionStartEvent,
   AuctionEndEvent,
+  PHUSDCMint,
 } from "../generated/schema";
 
 import { PaprController as PaprControllerABI } from "../generated/SlyFox/PaprController";
@@ -288,20 +291,36 @@ export function handleStartAuction(event: StartAuction): void {
     event.params.nftOwner,
     event.params.auctionAssetContract
   );
+  auction.controller = event.params._event.address.toHexString();
+  auction.startedBy = event.transaction.from;
   auction.save();
   const start = new AuctionStartEvent(event.transaction.hash.toHexString());
   start.timestamp = event.block.timestamp.toI32();
-  start.auction = auction.id
+  start.auction = auction.id;
   start.save();
 }
 
 export function handleEndAuction(event: EndAuction): void {
   const auction = Auction.load(event.params.auctionID.toString());
   if (!auction) return;
-  const end = new AuctionEndEvent(event.transaction.hash.toHexString())
+  const end = new AuctionEndEvent(event.transaction.hash.toHexString());
   end.timestamp = event.block.timestamp.toI32();
-  end.auction = auction.id
-  end.save()
+  end.auction = auction.id;
+  end.save();
   auction.endPrice = event.params.price;
-  auction.save()
+  auction.save();
+}
+
+export function handlePHUSDCMint(event: PHUSDCTransfer): void {
+  if (
+    event.params.from != Address.zero() &&
+    event.params.from !=
+      Address.fromString("0xdfbd2ed33a596e24e9020e35bc98f252eca334bf")
+  )
+    return;
+  // create new phUSDC mint entity
+  const phUSDCMint = new PHUSDCMint(event.transaction.hash.toHexString());
+  phUSDCMint.account = event.params.to;
+  phUSDCMint.amount = event.params.value;
+  phUSDCMint.save();
 }
