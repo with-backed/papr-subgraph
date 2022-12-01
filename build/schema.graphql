@@ -113,8 +113,13 @@ type CollateralAllowedChangeEvent @entity {
   allowed: Boolean!
 }
 
-type PHUSDCMint @entity {
+type User @entity {
   id: ID!
-  account: Bytes!
-  amount: BigInt!
+  paprDebt: BigInt!
+  paprHoldings: BigInt!
+  phUSDCHoldings: BigInt!
+  blitCount: BigInt!
+  moonbirdCount: BigInt!
+  toadCount: BigInt!
+  dinoCount: BigInt!
 }
