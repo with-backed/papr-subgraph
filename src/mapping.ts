@@ -135,7 +135,7 @@ export function handleAddCollateral(event: AddCollateral): void {
   } else if (collateral.equals(moonbirds)) {
     user.moonbirdCount = user.moonbirdCount.plus(BigInt.fromString("1"));
   } else if (collateral.equals(toads)) {
-    user.blitCount = user.blitCount.plus(BigInt.fromString("1"));
+    user.toadCount = user.toadCount.plus(BigInt.fromString("1"));
   } else if (collateral.equals(blits)) {
     user.blitCount = user.blitCount.plus(BigInt.fromString("1"));
   }
@@ -189,7 +189,7 @@ export function handleRemoveCollateral(event: RemoveCollateral): void {
   } else if (collateral.equals(moonbirds)) {
     user.moonbirdCount = user.moonbirdCount.minus(BigInt.fromString("1"));
   } else if (collateral.equals(toads)) {
-    user.blitCount = user.blitCount.minus(BigInt.fromString("1"));
+    user.toadCount = user.toadCount.minus(BigInt.fromString("1"));
   } else if (collateral.equals(blits)) {
     user.blitCount = user.blitCount.minus(BigInt.fromString("1"));
   }
