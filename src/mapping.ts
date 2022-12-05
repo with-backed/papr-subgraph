@@ -33,6 +33,24 @@ import {
 import { PaprController as PaprControllerABI } from "../generated/SlyFox/PaprController";
 import { ERC721 as ERC721ABI, Transfer as ERC721Transfer } from "../generated/SlyFox/ERC721";
 
+// switch (address.toLowerCase()) {
+  //   case '0xabe17952e7fe468711826c26b04b047c0da53b86':
+  //     return user.dinoCount;
+  //   case '0x0593cd2238d1b143bd1c67cd7fa98eee32a260ea':
+  //     return user.moonbirdCount;
+  //   case '0xd4e652bbfcf616c966e1b1e8ed37599d81f11889':
+  //     return user.toadCount;
+  //   case '0x4770646fe8635fa9ed3cb72ed4b7ef6386a06827':
+  //     return user.blitCount;
+  //   default:
+  //     return 0;
+  // }
+
+const dinos = Address.fromHexString('0xabe17952e7fe468711826c26b04b047c0da53b86');
+const moonbirds = Address.fromHexString('0x0593cd2238d1b143bd1c67cd7fa98eee32a260ea');
+const toads = Address.fromHexString('0xd4e652bbfcf616c966e1b1e8ed37599d81f11889');
+const blits = Address.fromHexString('0x4770646fe8635fa9ed3cb72ed4b7ef6386a06827');
+
 function generateCollateralId(addr: Address, tokenId: BigInt): string {
   return `${addr.toHexString()}-${tokenId.toString()}`;
 }
@@ -109,6 +127,19 @@ export function handleAddCollateral(event: AddCollateral): void {
   addCollateralEvent.controller = event.params._event.address.toHexString();
   addCollateralEvent.vault = vault.id;
   addCollateralEvent.save();
+
+  const user = findOrCreateUser(event.params.account);
+  const collateral = event.params.collateral.addr
+  if (collateral.equals(dinos)) {
+    user.dinoCount = user.dinoCount.plus(BigInt.fromString("1"));
+  } else if (collateral.equals(moonbirds)) {
+    user.moonbirdCount = user.moonbirdCount.plus(BigInt.fromString("1"));
+  } else if (collateral.equals(toads)) {
+    user.blitCount = user.blitCount.plus(BigInt.fromString("1"));
+  } else if (collateral.equals(blits)) {
+    user.blitCount = user.blitCount.plus(BigInt.fromString("1"));
+  }
+  user.save()
 }
 
 export function handleRemoveCollateral(event: RemoveCollateral): void {
@@ -150,6 +181,19 @@ export function handleRemoveCollateral(event: RemoveCollateral): void {
   collateralRemovedEvent.controller = vault.controller;
   collateralRemovedEvent.vault = vault.id;
   collateralRemovedEvent.save();
+
+  const user = findOrCreateUser(event.params.account);
+  const collateral = event.params.collateral.addr
+  if (collateral.equals(dinos)) {
+    user.dinoCount = user.dinoCount.minus(BigInt.fromString("1"));
+  } else if (collateral.equals(moonbirds)) {
+    user.moonbirdCount = user.moonbirdCount.minus(BigInt.fromString("1"));
+  } else if (collateral.equals(toads)) {
+    user.blitCount = user.blitCount.minus(BigInt.fromString("1"));
+  } else if (collateral.equals(blits)) {
+    user.blitCount = user.blitCount.minus(BigInt.fromString("1"));
+  }
+  user.save()
 }
 
 export function handleIncreaseDebt(event: IncreaseDebt): void {
