@@ -81,6 +81,7 @@ type Auction @entity {
   startedBy: Bytes!
   endPrice: BigInt
   vault: Vault!
+  nftOwner: Bytes!
   controller: PaprController!
   start: AuctionStartEvent! @derivedFrom(field: "auction")
   end: AuctionEndEvent @derivedFrom(field: "auction")
