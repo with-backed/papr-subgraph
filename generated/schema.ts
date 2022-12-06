@@ -766,6 +766,7 @@ export class Auction extends Entity {
 
     this.set("startedBy", Value.fromBytes(Bytes.empty()));
     this.set("vault", Value.fromString(""));
+    this.set("nftOwner", Value.fromBytes(Bytes.empty()));
     this.set("controller", Value.fromString(""));
     this.set("auctionAssetID", Value.fromBigInt(BigInt.zero()));
     this.set("auctionAssetContract", Value.fromBytes(Bytes.empty()));
@@ -834,6 +835,15 @@ export class Auction extends Entity {
 
   set vault(value: string) {
     this.set("vault", Value.fromString(value));
+  }
+
+  get nftOwner(): Bytes {
+    let value = this.get("nftOwner");
+    return value!.toBytes();
+  }
+
+  set nftOwner(value: Bytes) {
+    this.set("nftOwner", Value.fromBytes(value));
   }
 
   get controller(): string {

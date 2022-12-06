@@ -299,6 +299,7 @@ export function handleStartAuction(event: StartAuction): void {
     event.params.nftOwner,
     event.params.auctionAssetContract
   );
+  auction.nftOwner = event.params.nftOwner;
   auction.controller = event.params._event.address.toHexString();
   auction.startedBy = event.transaction.from;
   auction.save();
