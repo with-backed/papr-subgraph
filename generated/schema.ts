@@ -20,6 +20,7 @@ export class PaprController extends Entity {
     this.set("poolAddress", Value.fromBytes(Bytes.empty()));
     this.set("underlying", Value.fromBytes(Bytes.empty()));
     this.set("paprToken", Value.fromBytes(Bytes.empty()));
+    this.set("maxLTV", Value.fromBigInt(BigInt.zero()));
     this.set("target", Value.fromBigInt(BigInt.zero()));
   }
 
@@ -83,6 +84,15 @@ export class PaprController extends Entity {
 
   set paprToken(value: Bytes) {
     this.set("paprToken", Value.fromBytes(value));
+  }
+
+  get maxLTV(): BigInt {
+    let value = this.get("maxLTV");
+    return value!.toBigInt();
+  }
+
+  set maxLTV(value: BigInt) {
+    this.set("maxLTV", Value.fromBigInt(value));
   }
 
   get target(): BigInt {
