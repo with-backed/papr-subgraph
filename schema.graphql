@@ -5,6 +5,7 @@ type PaprController @entity {
   poolAddress: Bytes!
   underlying: Bytes!
   paprToken: Bytes!
+  maxLTV: BigInt!
   target: BigInt!
   vaults: [Vault!] @derivedFrom(field: "controller")
   allowedCollateral: [AllowedCollateral!]! @derivedFrom(field: "controller")

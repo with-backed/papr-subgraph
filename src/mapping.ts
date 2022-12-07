@@ -236,6 +236,9 @@ export function handleTargetUpdate(event: UpdateTarget): void {
     controller.poolAddress = PaprControllerABI.bind(
       event.params._event.address
     ).pool();
+    controller.maxLTV = PaprControllerABI.bind(
+      event.params._event.address
+    ).maxLTV();
     controller.underlying = PaprControllerABI.bind(
       event.params._event.address
     ).underlying();
