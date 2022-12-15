@@ -47,7 +47,22 @@
   },
   {
     "inputs": [],
+    "name": "AlreadyInitialized",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "AuctionExists",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "CollateralAddressesDoNotMatch",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "DebtAmountExceedsUint200",
     "type": "error"
   },
   {
@@ -64,6 +79,16 @@
       }
     ],
     "name": "ExceedsMaxDebt",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "FundingPeriodTooLong",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "FundingPeriodTooShort",
     "type": "error"
   },
   {
@@ -103,6 +128,16 @@
     "type": "error"
   },
   {
+    "inputs": [],
+    "name": "InvalidUniswapV3Pool",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "LiquidationsLocked",
+    "type": "error"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -139,6 +174,11 @@
     "type": "error"
   },
   {
+    "inputs": [],
+    "name": "PoolTokensDoNotMatch",
+    "type": "error"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -156,12 +196,12 @@
   },
   {
     "inputs": [],
-    "name": "WrongCollateralFromOracleMessage",
+    "name": "WrongCurrencyFromOracleMessage",
     "type": "error"
   },
   {
     "inputs": [],
-    "name": "WrongCurrencyFromOracleMessage",
+    "name": "WrongIdentifierFromOracleMessage",
     "type": "error"
   },
   {
@@ -174,22 +214,16 @@
         "type": "address"
       },
       {
-        "components": [
-          {
-            "internalType": "contract ERC721",
-            "name": "addr",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "id",
-            "type": "uint256"
-          }
-        ],
-        "indexed": false,
-        "internalType": "struct IPaprController.Collateral",
-        "name": "collateral",
-        "type": "tuple"
+        "indexed": true,
+        "internalType": "contract ERC721",
+        "name": "collateralAddress",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
       }
     ],
     "name": "AddCollateral",
@@ -274,6 +308,25 @@
         "type": "address"
       }
     ],
+    "name": "OwnershipTransferStarted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
     "name": "OwnershipTransferred",
     "type": "event"
   },
@@ -312,25 +365,58 @@
         "type": "address"
       },
       {
-        "components": [
-          {
-            "internalType": "contract ERC721",
-            "name": "addr",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "id",
-            "type": "uint256"
-          }
-        ],
-        "indexed": false,
-        "internalType": "struct IPaprController.Collateral",
-        "name": "collateral",
-        "type": "tuple"
+        "indexed": true,
+        "internalType": "contract ERC721",
+        "name": "collateralAddress",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
       }
     ],
     "name": "RemoveCollateral",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "discount",
+        "type": "uint256"
+      }
+    ],
+    "name": "SetAuctionCreatorDiscount",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "fundingPeriod",
+        "type": "uint256"
+      }
+    ],
+    "name": "SetFundingPeriod",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "pool",
+        "type": "address"
+      }
+    ],
+    "name": "SetPool",
     "type": "event"
   },
   {
@@ -403,7 +489,7 @@
   },
   {
     "inputs": [],
-    "name": "PERIOD",
+    "name": "BIPS_ONE",
     "outputs": [
       {
         "internalType": "uint256",
@@ -412,6 +498,13 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "acceptOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -429,9 +522,9 @@
             "type": "uint256"
           }
         ],
-        "internalType": "struct IPaprController.Collateral",
-        "name": "collateral",
-        "type": "tuple"
+        "internalType": "struct IPaprController.Collateral[]",
+        "name": "collateralArr",
+        "type": "tuple[]"
       }
     ],
     "name": "addCollateral",
@@ -636,6 +729,19 @@
   {
     "inputs": [
       {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "burnPaprFromAuctionFees",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address",
         "name": "account",
         "type": "address"
@@ -646,41 +752,46 @@
         "type": "address"
       },
       {
-        "internalType": "uint256",
-        "name": "underlyingAmount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "minOut",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint160",
-        "name": "sqrtPriceLimitX96",
-        "type": "uint160"
-      },
-      {
-        "internalType": "address",
-        "name": "proceedsTo",
-        "type": "address"
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "minOut",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint160",
+            "name": "sqrtPriceLimitX96",
+            "type": "uint160"
+          },
+          {
+            "internalType": "address",
+            "name": "swapFeeTo",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "swapFeeBips",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct IPaprController.SwapParams",
+        "name": "params",
+        "type": "tuple"
       }
     ],
     "name": "buyAndReduceDebt",
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "out",
+        "name": "",
         "type": "uint256"
       }
     ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "claimOwnership",
-    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
@@ -703,6 +814,19 @@
         "internalType": "address",
         "name": "",
         "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "fundingPeriod",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -791,160 +915,45 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "name": "isAllowed",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "lastUpdated",
-    "outputs": [
-      {
-        "internalType": "uint72",
-        "name": "",
-        "type": "uint72"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "liquidationAuctionMinSpacing",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "liquidationPenaltyBips",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "account",
+        "name": "proceedsTo",
         "type": "address"
       },
-      {
-        "internalType": "contract ERC721",
-        "name": "asset",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "collateralPrice",
-        "type": "uint256"
-      }
-    ],
-    "name": "liquidationPrice",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "markTwapSinceLastUpdate",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "totalCollateraValue",
-        "type": "uint256"
-      }
-    ],
-    "name": "maxDebt",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "maxLTV",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
       {
         "internalType": "contract ERC721",
         "name": "collateralAsset",
         "type": "address"
       },
       {
-        "internalType": "uint256",
-        "name": "debt",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "minOut",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint160",
-        "name": "sqrtPriceLimitX96",
-        "type": "uint160"
-      },
-      {
-        "internalType": "address",
-        "name": "proceedsTo",
-        "type": "address"
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "minOut",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint160",
+            "name": "sqrtPriceLimitX96",
+            "type": "uint160"
+          },
+          {
+            "internalType": "address",
+            "name": "swapFeeTo",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "swapFeeBips",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct IPaprController.SwapParams",
+        "name": "params",
+        "type": "tuple"
       },
       {
         "components": [
@@ -1003,7 +1012,39 @@
         "type": "tuple"
       }
     ],
-    "name": "mintAndSellDebt",
+    "name": "increaseDebtAndSell",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "amountOut",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "isAllowed",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "lastUpdated",
     "outputs": [
       {
         "internalType": "uint256",
@@ -1011,7 +1052,91 @@
         "type": "uint256"
       }
     ],
-    "stateMutability": "nonpayable",
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "liquidationAuctionMinSpacing",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "liquidationPenaltyBips",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "liquidationsLocked",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "mark",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "totalCollateraValue",
+        "type": "uint256"
+      }
+    ],
+    "name": "maxDebt",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "maxLTV",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -1030,20 +1155,7 @@
         "type": "bytes[]"
       }
     ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "multiplier",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
+    "stateMutability": "payable",
     "type": "function"
   },
   {
@@ -1121,6 +1233,19 @@
   },
   {
     "inputs": [],
+    "name": "papr",
+    "outputs": [
+      {
+        "internalType": "contract ERC20",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "pendingOwner",
     "outputs": [
       {
@@ -1147,23 +1272,10 @@
   },
   {
     "inputs": [],
-    "name": "perpetual",
-    "outputs": [
-      {
-        "internalType": "contract ERC20",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "pool",
     "outputs": [
       {
-        "internalType": "contract IUniswapV3Pool",
+        "internalType": "address",
         "name": "",
         "type": "address"
       }
@@ -1343,9 +1455,9 @@
             "type": "uint256"
           }
         ],
-        "internalType": "struct IPaprController.Collateral",
-        "name": "collateral",
-        "type": "tuple"
+        "internalType": "struct IPaprController.Collateral[]",
+        "name": "collateralArr",
+        "type": "tuple[]"
       },
       {
         "components": [
@@ -1410,6 +1522,31 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "sendPaprFromAuctionFees",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "components": [
@@ -1435,16 +1572,42 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "start",
-    "outputs": [
+    "inputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "_fundingPeriod",
         "type": "uint256"
       }
     ],
-    "stateMutability": "view",
+    "name": "setFundingPeriod",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bool",
+        "name": "locked",
+        "type": "bool"
+      }
+    ],
+    "name": "setLiquidationsLocked",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_pool",
+        "type": "address"
+      }
+    ],
+    "name": "setPool",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -1581,9 +1744,35 @@
     "name": "target",
     "outputs": [
       {
-        "internalType": "uint128",
+        "internalType": "uint256",
         "name": "",
-        "type": "uint128"
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "targetMarkRatioMax",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "targetMarkRatioMin",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -1608,16 +1797,6 @@
         "internalType": "address",
         "name": "newOwner",
         "type": "address"
-      },
-      {
-        "internalType": "bool",
-        "name": "direct",
-        "type": "bool"
-      },
-      {
-        "internalType": "bool",
-        "name": "renounce",
-        "type": "bool"
       }
     ],
     "name": "transferOwnership",
@@ -1743,11 +1922,11 @@
   },
   {
     "inputs": [],
-    "name": "updateNormalization",
+    "name": "updateTarget",
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "newTarget",
+        "name": "nTarget",
         "type": "uint256"
       }
     ],

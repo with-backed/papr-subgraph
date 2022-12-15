@@ -27,20 +27,12 @@ export class AddCollateral__Params {
     return this._event.parameters[0].value.toAddress();
   }
 
-  get collateral(): AddCollateralCollateralStruct {
-    return changetype<AddCollateralCollateralStruct>(
-      this._event.parameters[1].value.toTuple()
-    );
-  }
-}
-
-export class AddCollateralCollateralStruct extends ethereum.Tuple {
-  get addr(): Address {
-    return this[0].toAddress();
+  get collateralAddress(): Address {
+    return this._event.parameters[1].value.toAddress();
   }
 
-  get id(): BigInt {
-    return this[1].toBigInt();
+  get tokenId(): BigInt {
+    return this._event.parameters[2].value.toBigInt();
   }
 }
 
@@ -114,6 +106,28 @@ export class IncreaseDebt__Params {
   }
 }
 
+export class OwnershipTransferStarted extends ethereum.Event {
+  get params(): OwnershipTransferStarted__Params {
+    return new OwnershipTransferStarted__Params(this);
+  }
+}
+
+export class OwnershipTransferStarted__Params {
+  _event: OwnershipTransferStarted;
+
+  constructor(event: OwnershipTransferStarted) {
+    this._event = event;
+  }
+
+  get previousOwner(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+
+  get newOwner(): Address {
+    return this._event.parameters[1].value.toAddress();
+  }
+}
+
 export class OwnershipTransferred extends ethereum.Event {
   get params(): OwnershipTransferred__Params {
     return new OwnershipTransferred__Params(this);
@@ -179,20 +193,66 @@ export class RemoveCollateral__Params {
     return this._event.parameters[0].value.toAddress();
   }
 
-  get collateral(): RemoveCollateralCollateralStruct {
-    return changetype<RemoveCollateralCollateralStruct>(
-      this._event.parameters[1].value.toTuple()
-    );
+  get collateralAddress(): Address {
+    return this._event.parameters[1].value.toAddress();
+  }
+
+  get tokenId(): BigInt {
+    return this._event.parameters[2].value.toBigInt();
   }
 }
 
-export class RemoveCollateralCollateralStruct extends ethereum.Tuple {
-  get addr(): Address {
-    return this[0].toAddress();
+export class SetAuctionCreatorDiscount extends ethereum.Event {
+  get params(): SetAuctionCreatorDiscount__Params {
+    return new SetAuctionCreatorDiscount__Params(this);
+  }
+}
+
+export class SetAuctionCreatorDiscount__Params {
+  _event: SetAuctionCreatorDiscount;
+
+  constructor(event: SetAuctionCreatorDiscount) {
+    this._event = event;
   }
 
-  get id(): BigInt {
-    return this[1].toBigInt();
+  get discount(): BigInt {
+    return this._event.parameters[0].value.toBigInt();
+  }
+}
+
+export class SetFundingPeriod extends ethereum.Event {
+  get params(): SetFundingPeriod__Params {
+    return new SetFundingPeriod__Params(this);
+  }
+}
+
+export class SetFundingPeriod__Params {
+  _event: SetFundingPeriod;
+
+  constructor(event: SetFundingPeriod) {
+    this._event = event;
+  }
+
+  get fundingPeriod(): BigInt {
+    return this._event.parameters[0].value.toBigInt();
+  }
+}
+
+export class SetPool extends ethereum.Event {
+  get params(): SetPool__Params {
+    return new SetPool__Params(this);
+  }
+}
+
+export class SetPool__Params {
+  _event: SetPool;
+
+  constructor(event: SetPool) {
+    this._event = event;
+  }
+
+  get pool(): Address {
+    return this._event.parameters[0].value.toAddress();
   }
 }
 
@@ -337,21 +397,65 @@ export class PaprController__auctionStateResult {
   }
 }
 
-export class PaprController__mintAndSellDebtInputOracleInfoStruct extends ethereum.Tuple {
-  get message(): PaprController__mintAndSellDebtInputOracleInfoMessageStruct {
-    return changetype<
-      PaprController__mintAndSellDebtInputOracleInfoMessageStruct
-    >(this[0].toTuple());
+export class PaprController__buyAndReduceDebtInputParamsStruct extends ethereum.Tuple {
+  get amount(): BigInt {
+    return this[0].toBigInt();
   }
 
-  get sig(): PaprController__mintAndSellDebtInputOracleInfoSigStruct {
-    return changetype<PaprController__mintAndSellDebtInputOracleInfoSigStruct>(
-      this[1].toTuple()
-    );
+  get minOut(): BigInt {
+    return this[1].toBigInt();
+  }
+
+  get sqrtPriceLimitX96(): BigInt {
+    return this[2].toBigInt();
+  }
+
+  get swapFeeTo(): Address {
+    return this[3].toAddress();
+  }
+
+  get swapFeeBips(): BigInt {
+    return this[4].toBigInt();
   }
 }
 
-export class PaprController__mintAndSellDebtInputOracleInfoMessageStruct extends ethereum.Tuple {
+export class PaprController__increaseDebtAndSellInputParamsStruct extends ethereum.Tuple {
+  get amount(): BigInt {
+    return this[0].toBigInt();
+  }
+
+  get minOut(): BigInt {
+    return this[1].toBigInt();
+  }
+
+  get sqrtPriceLimitX96(): BigInt {
+    return this[2].toBigInt();
+  }
+
+  get swapFeeTo(): Address {
+    return this[3].toAddress();
+  }
+
+  get swapFeeBips(): BigInt {
+    return this[4].toBigInt();
+  }
+}
+
+export class PaprController__increaseDebtAndSellInputOracleInfoStruct extends ethereum.Tuple {
+  get message(): PaprController__increaseDebtAndSellInputOracleInfoMessageStruct {
+    return changetype<
+      PaprController__increaseDebtAndSellInputOracleInfoMessageStruct
+    >(this[0].toTuple());
+  }
+
+  get sig(): PaprController__increaseDebtAndSellInputOracleInfoSigStruct {
+    return changetype<
+      PaprController__increaseDebtAndSellInputOracleInfoSigStruct
+    >(this[1].toTuple());
+  }
+}
+
+export class PaprController__increaseDebtAndSellInputOracleInfoMessageStruct extends ethereum.Tuple {
   get id(): Bytes {
     return this[0].toBytes();
   }
@@ -369,7 +473,7 @@ export class PaprController__mintAndSellDebtInputOracleInfoMessageStruct extends
   }
 }
 
-export class PaprController__mintAndSellDebtInputOracleInfoSigStruct extends ethereum.Tuple {
+export class PaprController__increaseDebtAndSellInputOracleInfoSigStruct extends ethereum.Tuple {
   get v(): i32 {
     return this[0].toI32();
   }
@@ -534,14 +638,14 @@ export class PaprController extends ethereum.SmartContract {
     return new PaprController("PaprController", address);
   }
 
-  PERIOD(): BigInt {
-    let result = super.call("PERIOD", "PERIOD():(uint256)", []);
+  BIPS_ONE(): BigInt {
+    let result = super.call("BIPS_ONE", "BIPS_ONE():(uint256)", []);
 
     return result[0].toBigInt();
   }
 
-  try_PERIOD(): ethereum.CallResult<BigInt> {
-    let result = super.tryCall("PERIOD", "PERIOD():(uint256)", []);
+  try_BIPS_ONE(): ethereum.CallResult<BigInt> {
+    let result = super.tryCall("BIPS_ONE", "BIPS_ONE():(uint256)", []);
     if (result.reverted) {
       return new ethereum.CallResult();
     }
@@ -729,21 +833,15 @@ export class PaprController extends ethereum.SmartContract {
   buyAndReduceDebt(
     account: Address,
     collateralAsset: Address,
-    underlyingAmount: BigInt,
-    minOut: BigInt,
-    sqrtPriceLimitX96: BigInt,
-    proceedsTo: Address
+    params: PaprController__buyAndReduceDebtInputParamsStruct
   ): BigInt {
     let result = super.call(
       "buyAndReduceDebt",
-      "buyAndReduceDebt(address,address,uint256,uint256,uint160,address):(uint256)",
+      "buyAndReduceDebt(address,address,(uint256,uint256,uint160,address,uint256)):(uint256)",
       [
         ethereum.Value.fromAddress(account),
         ethereum.Value.fromAddress(collateralAsset),
-        ethereum.Value.fromUnsignedBigInt(underlyingAmount),
-        ethereum.Value.fromUnsignedBigInt(minOut),
-        ethereum.Value.fromUnsignedBigInt(sqrtPriceLimitX96),
-        ethereum.Value.fromAddress(proceedsTo)
+        ethereum.Value.fromTuple(params)
       ]
     );
 
@@ -753,21 +851,15 @@ export class PaprController extends ethereum.SmartContract {
   try_buyAndReduceDebt(
     account: Address,
     collateralAsset: Address,
-    underlyingAmount: BigInt,
-    minOut: BigInt,
-    sqrtPriceLimitX96: BigInt,
-    proceedsTo: Address
+    params: PaprController__buyAndReduceDebtInputParamsStruct
   ): ethereum.CallResult<BigInt> {
     let result = super.tryCall(
       "buyAndReduceDebt",
-      "buyAndReduceDebt(address,address,uint256,uint256,uint160,address):(uint256)",
+      "buyAndReduceDebt(address,address,(uint256,uint256,uint160,address,uint256)):(uint256)",
       [
         ethereum.Value.fromAddress(account),
         ethereum.Value.fromAddress(collateralAsset),
-        ethereum.Value.fromUnsignedBigInt(underlyingAmount),
-        ethereum.Value.fromUnsignedBigInt(minOut),
-        ethereum.Value.fromUnsignedBigInt(sqrtPriceLimitX96),
-        ethereum.Value.fromAddress(proceedsTo)
+        ethereum.Value.fromTuple(params)
       ]
     );
     if (result.reverted) {
@@ -809,6 +901,68 @@ export class PaprController extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
+  fundingPeriod(): BigInt {
+    let result = super.call("fundingPeriod", "fundingPeriod():(uint256)", []);
+
+    return result[0].toBigInt();
+  }
+
+  try_fundingPeriod(): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "fundingPeriod",
+      "fundingPeriod():(uint256)",
+      []
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  increaseDebtAndSell(
+    proceedsTo: Address,
+    collateralAsset: Address,
+    params: PaprController__increaseDebtAndSellInputParamsStruct,
+    oracleInfo: PaprController__increaseDebtAndSellInputOracleInfoStruct
+  ): BigInt {
+    let result = super.call(
+      "increaseDebtAndSell",
+      "increaseDebtAndSell(address,address,(uint256,uint256,uint160,address,uint256),((bytes32,bytes,uint256,bytes),(uint8,bytes32,bytes32))):(uint256)",
+      [
+        ethereum.Value.fromAddress(proceedsTo),
+        ethereum.Value.fromAddress(collateralAsset),
+        ethereum.Value.fromTuple(params),
+        ethereum.Value.fromTuple(oracleInfo)
+      ]
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_increaseDebtAndSell(
+    proceedsTo: Address,
+    collateralAsset: Address,
+    params: PaprController__increaseDebtAndSellInputParamsStruct,
+    oracleInfo: PaprController__increaseDebtAndSellInputOracleInfoStruct
+  ): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "increaseDebtAndSell",
+      "increaseDebtAndSell(address,address,(uint256,uint256,uint160,address,uint256),((bytes32,bytes,uint256,bytes),(uint8,bytes32,bytes32))):(uint256)",
+      [
+        ethereum.Value.fromAddress(proceedsTo),
+        ethereum.Value.fromAddress(collateralAsset),
+        ethereum.Value.fromTuple(params),
+        ethereum.Value.fromTuple(oracleInfo)
+      ]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
   isAllowed(param0: Address): boolean {
     let result = super.call("isAllowed", "isAllowed(address):(bool)", [
       ethereum.Value.fromAddress(param0)
@@ -829,13 +983,13 @@ export class PaprController extends ethereum.SmartContract {
   }
 
   lastUpdated(): BigInt {
-    let result = super.call("lastUpdated", "lastUpdated():(uint72)", []);
+    let result = super.call("lastUpdated", "lastUpdated():(uint256)", []);
 
     return result[0].toBigInt();
   }
 
   try_lastUpdated(): ethereum.CallResult<BigInt> {
-    let result = super.tryCall("lastUpdated", "lastUpdated():(uint72)", []);
+    let result = super.tryCall("lastUpdated", "lastUpdated():(uint256)", []);
     if (result.reverted) {
       return new ethereum.CallResult();
     }
@@ -889,61 +1043,37 @@ export class PaprController extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  liquidationPrice(
-    account: Address,
-    asset: Address,
-    collateralPrice: BigInt
-  ): BigInt {
+  liquidationsLocked(): boolean {
     let result = super.call(
-      "liquidationPrice",
-      "liquidationPrice(address,address,uint256):(uint256)",
-      [
-        ethereum.Value.fromAddress(account),
-        ethereum.Value.fromAddress(asset),
-        ethereum.Value.fromUnsignedBigInt(collateralPrice)
-      ]
+      "liquidationsLocked",
+      "liquidationsLocked():(bool)",
+      []
     );
 
-    return result[0].toBigInt();
+    return result[0].toBoolean();
   }
 
-  try_liquidationPrice(
-    account: Address,
-    asset: Address,
-    collateralPrice: BigInt
-  ): ethereum.CallResult<BigInt> {
+  try_liquidationsLocked(): ethereum.CallResult<boolean> {
     let result = super.tryCall(
-      "liquidationPrice",
-      "liquidationPrice(address,address,uint256):(uint256)",
-      [
-        ethereum.Value.fromAddress(account),
-        ethereum.Value.fromAddress(asset),
-        ethereum.Value.fromUnsignedBigInt(collateralPrice)
-      ]
+      "liquidationsLocked",
+      "liquidationsLocked():(bool)",
+      []
     );
     if (result.reverted) {
       return new ethereum.CallResult();
     }
     let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
+    return ethereum.CallResult.fromValue(value[0].toBoolean());
   }
 
-  markTwapSinceLastUpdate(): BigInt {
-    let result = super.call(
-      "markTwapSinceLastUpdate",
-      "markTwapSinceLastUpdate():(uint256)",
-      []
-    );
+  mark(): BigInt {
+    let result = super.call("mark", "mark():(uint256)", []);
 
     return result[0].toBigInt();
   }
 
-  try_markTwapSinceLastUpdate(): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "markTwapSinceLastUpdate",
-      "markTwapSinceLastUpdate():(uint256)",
-      []
-    );
+  try_mark(): ethereum.CallResult<BigInt> {
+    let result = super.tryCall("mark", "mark():(uint256)", []);
     if (result.reverted) {
       return new ethereum.CallResult();
     }
@@ -978,91 +1108,6 @@ export class PaprController extends ethereum.SmartContract {
 
   try_maxLTV(): ethereum.CallResult<BigInt> {
     let result = super.tryCall("maxLTV", "maxLTV():(uint256)", []);
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
-  mintAndSellDebt(
-    collateralAsset: Address,
-    debt: BigInt,
-    minOut: BigInt,
-    sqrtPriceLimitX96: BigInt,
-    proceedsTo: Address,
-    oracleInfo: PaprController__mintAndSellDebtInputOracleInfoStruct
-  ): BigInt {
-    let result = super.call(
-      "mintAndSellDebt",
-      "mintAndSellDebt(address,uint256,uint256,uint160,address,((bytes32,bytes,uint256,bytes),(uint8,bytes32,bytes32))):(uint256)",
-      [
-        ethereum.Value.fromAddress(collateralAsset),
-        ethereum.Value.fromUnsignedBigInt(debt),
-        ethereum.Value.fromUnsignedBigInt(minOut),
-        ethereum.Value.fromUnsignedBigInt(sqrtPriceLimitX96),
-        ethereum.Value.fromAddress(proceedsTo),
-        ethereum.Value.fromTuple(oracleInfo)
-      ]
-    );
-
-    return result[0].toBigInt();
-  }
-
-  try_mintAndSellDebt(
-    collateralAsset: Address,
-    debt: BigInt,
-    minOut: BigInt,
-    sqrtPriceLimitX96: BigInt,
-    proceedsTo: Address,
-    oracleInfo: PaprController__mintAndSellDebtInputOracleInfoStruct
-  ): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "mintAndSellDebt",
-      "mintAndSellDebt(address,uint256,uint256,uint160,address,((bytes32,bytes,uint256,bytes),(uint8,bytes32,bytes32))):(uint256)",
-      [
-        ethereum.Value.fromAddress(collateralAsset),
-        ethereum.Value.fromUnsignedBigInt(debt),
-        ethereum.Value.fromUnsignedBigInt(minOut),
-        ethereum.Value.fromUnsignedBigInt(sqrtPriceLimitX96),
-        ethereum.Value.fromAddress(proceedsTo),
-        ethereum.Value.fromTuple(oracleInfo)
-      ]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
-  multicall(data: Array<Bytes>): Array<Bytes> {
-    let result = super.call("multicall", "multicall(bytes[]):(bytes[])", [
-      ethereum.Value.fromBytesArray(data)
-    ]);
-
-    return result[0].toBytesArray();
-  }
-
-  try_multicall(data: Array<Bytes>): ethereum.CallResult<Array<Bytes>> {
-    let result = super.tryCall("multicall", "multicall(bytes[]):(bytes[])", [
-      ethereum.Value.fromBytesArray(data)
-    ]);
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBytesArray());
-  }
-
-  multiplier(): BigInt {
-    let result = super.call("multiplier", "multiplier():(uint256)", []);
-
-    return result[0].toBigInt();
-  }
-
-  try_multiplier(): ethereum.CallResult<BigInt> {
-    let result = super.tryCall("multiplier", "multiplier():(uint256)", []);
     if (result.reverted) {
       return new ethereum.CallResult();
     }
@@ -1158,6 +1203,21 @@ export class PaprController extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
+  papr(): Address {
+    let result = super.call("papr", "papr():(address)", []);
+
+    return result[0].toAddress();
+  }
+
+  try_papr(): ethereum.CallResult<Address> {
+    let result = super.tryCall("papr", "papr():(address)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
   pendingOwner(): Address {
     let result = super.call("pendingOwner", "pendingOwner():(address)", []);
 
@@ -1196,21 +1256,6 @@ export class PaprController extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  perpetual(): Address {
-    let result = super.call("perpetual", "perpetual():(address)", []);
-
-    return result[0].toAddress();
-  }
-
-  try_perpetual(): ethereum.CallResult<Address> {
-    let result = super.tryCall("perpetual", "perpetual():(address)", []);
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toAddress());
-  }
-
   pool(): Address {
     let result = super.call("pool", "pool():(address)", []);
 
@@ -1243,21 +1288,6 @@ export class PaprController extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toAddress());
-  }
-
-  start(): BigInt {
-    let result = super.call("start", "start():(uint256)", []);
-
-    return result[0].toBigInt();
-  }
-
-  try_start(): ethereum.CallResult<BigInt> {
-    let result = super.tryCall("start", "start():(uint256)", []);
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
   startLiquidationAuction(
@@ -1308,13 +1338,59 @@ export class PaprController extends ethereum.SmartContract {
   }
 
   target(): BigInt {
-    let result = super.call("target", "target():(uint128)", []);
+    let result = super.call("target", "target():(uint256)", []);
 
     return result[0].toBigInt();
   }
 
   try_target(): ethereum.CallResult<BigInt> {
-    let result = super.tryCall("target", "target():(uint128)", []);
+    let result = super.tryCall("target", "target():(uint256)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  targetMarkRatioMax(): BigInt {
+    let result = super.call(
+      "targetMarkRatioMax",
+      "targetMarkRatioMax():(uint256)",
+      []
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_targetMarkRatioMax(): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "targetMarkRatioMax",
+      "targetMarkRatioMax():(uint256)",
+      []
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  targetMarkRatioMin(): BigInt {
+    let result = super.call(
+      "targetMarkRatioMin",
+      "targetMarkRatioMin():(uint256)",
+      []
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_targetMarkRatioMin(): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "targetMarkRatioMin",
+      "targetMarkRatioMin():(uint256)",
+      []
+    );
     if (result.reverted) {
       return new ethereum.CallResult();
     }
@@ -1399,22 +1475,14 @@ export class PaprController extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  updateNormalization(): BigInt {
-    let result = super.call(
-      "updateNormalization",
-      "updateNormalization():(uint256)",
-      []
-    );
+  updateTarget(): BigInt {
+    let result = super.call("updateTarget", "updateTarget():(uint256)", []);
 
     return result[0].toBigInt();
   }
 
-  try_updateNormalization(): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "updateNormalization",
-      "updateNormalization():(uint256)",
-      []
-    );
+  try_updateTarget(): ethereum.CallResult<BigInt> {
+    let result = super.tryCall("updateTarget", "updateTarget():(uint256)", []);
     if (result.reverted) {
       return new ethereum.CallResult();
     }
@@ -1512,6 +1580,32 @@ export class ConstructorCall__Outputs {
   }
 }
 
+export class AcceptOwnershipCall extends ethereum.Call {
+  get inputs(): AcceptOwnershipCall__Inputs {
+    return new AcceptOwnershipCall__Inputs(this);
+  }
+
+  get outputs(): AcceptOwnershipCall__Outputs {
+    return new AcceptOwnershipCall__Outputs(this);
+  }
+}
+
+export class AcceptOwnershipCall__Inputs {
+  _call: AcceptOwnershipCall;
+
+  constructor(call: AcceptOwnershipCall) {
+    this._call = call;
+  }
+}
+
+export class AcceptOwnershipCall__Outputs {
+  _call: AcceptOwnershipCall;
+
+  constructor(call: AcceptOwnershipCall) {
+    this._call = call;
+  }
+}
+
 export class AddCollateralCall extends ethereum.Call {
   get inputs(): AddCollateralCall__Inputs {
     return new AddCollateralCall__Inputs(this);
@@ -1529,10 +1623,10 @@ export class AddCollateralCall__Inputs {
     this._call = call;
   }
 
-  get collateral(): AddCollateralCallCollateralStruct {
-    return changetype<AddCollateralCallCollateralStruct>(
-      this._call.inputValues[0].value.toTuple()
-    );
+  get collateralArr(): Array<AddCollateralCallCollateralArrStruct> {
+    return this._call.inputValues[0].value.toTupleArray<
+      AddCollateralCallCollateralArrStruct
+    >();
   }
 }
 
@@ -1544,13 +1638,43 @@ export class AddCollateralCall__Outputs {
   }
 }
 
-export class AddCollateralCallCollateralStruct extends ethereum.Tuple {
+export class AddCollateralCallCollateralArrStruct extends ethereum.Tuple {
   get addr(): Address {
     return this[0].toAddress();
   }
 
   get id(): BigInt {
     return this[1].toBigInt();
+  }
+}
+
+export class BurnPaprFromAuctionFeesCall extends ethereum.Call {
+  get inputs(): BurnPaprFromAuctionFeesCall__Inputs {
+    return new BurnPaprFromAuctionFeesCall__Inputs(this);
+  }
+
+  get outputs(): BurnPaprFromAuctionFeesCall__Outputs {
+    return new BurnPaprFromAuctionFeesCall__Outputs(this);
+  }
+}
+
+export class BurnPaprFromAuctionFeesCall__Inputs {
+  _call: BurnPaprFromAuctionFeesCall;
+
+  constructor(call: BurnPaprFromAuctionFeesCall) {
+    this._call = call;
+  }
+
+  get amount(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+}
+
+export class BurnPaprFromAuctionFeesCall__Outputs {
+  _call: BurnPaprFromAuctionFeesCall;
+
+  constructor(call: BurnPaprFromAuctionFeesCall) {
+    this._call = call;
   }
 }
 
@@ -1579,20 +1703,10 @@ export class BuyAndReduceDebtCall__Inputs {
     return this._call.inputValues[1].value.toAddress();
   }
 
-  get underlyingAmount(): BigInt {
-    return this._call.inputValues[2].value.toBigInt();
-  }
-
-  get minOut(): BigInt {
-    return this._call.inputValues[3].value.toBigInt();
-  }
-
-  get sqrtPriceLimitX96(): BigInt {
-    return this._call.inputValues[4].value.toBigInt();
-  }
-
-  get proceedsTo(): Address {
-    return this._call.inputValues[5].value.toAddress();
+  get params(): BuyAndReduceDebtCallParamsStruct {
+    return changetype<BuyAndReduceDebtCallParamsStruct>(
+      this._call.inputValues[2].value.toTuple()
+    );
   }
 }
 
@@ -1603,34 +1717,30 @@ export class BuyAndReduceDebtCall__Outputs {
     this._call = call;
   }
 
-  get out(): BigInt {
+  get value0(): BigInt {
     return this._call.outputValues[0].value.toBigInt();
   }
 }
 
-export class ClaimOwnershipCall extends ethereum.Call {
-  get inputs(): ClaimOwnershipCall__Inputs {
-    return new ClaimOwnershipCall__Inputs(this);
+export class BuyAndReduceDebtCallParamsStruct extends ethereum.Tuple {
+  get amount(): BigInt {
+    return this[0].toBigInt();
   }
 
-  get outputs(): ClaimOwnershipCall__Outputs {
-    return new ClaimOwnershipCall__Outputs(this);
+  get minOut(): BigInt {
+    return this[1].toBigInt();
   }
-}
 
-export class ClaimOwnershipCall__Inputs {
-  _call: ClaimOwnershipCall;
-
-  constructor(call: ClaimOwnershipCall) {
-    this._call = call;
+  get sqrtPriceLimitX96(): BigInt {
+    return this[2].toBigInt();
   }
-}
 
-export class ClaimOwnershipCall__Outputs {
-  _call: ClaimOwnershipCall;
+  get swapFeeTo(): Address {
+    return this[3].toAddress();
+  }
 
-  constructor(call: ClaimOwnershipCall) {
-    this._call = call;
+  get swapFeeBips(): BigInt {
+    return this[4].toBigInt();
   }
 }
 
@@ -1722,77 +1832,93 @@ export class IncreaseDebtCallOracleInfoSigStruct extends ethereum.Tuple {
   }
 }
 
-export class MintAndSellDebtCall extends ethereum.Call {
-  get inputs(): MintAndSellDebtCall__Inputs {
-    return new MintAndSellDebtCall__Inputs(this);
+export class IncreaseDebtAndSellCall extends ethereum.Call {
+  get inputs(): IncreaseDebtAndSellCall__Inputs {
+    return new IncreaseDebtAndSellCall__Inputs(this);
   }
 
-  get outputs(): MintAndSellDebtCall__Outputs {
-    return new MintAndSellDebtCall__Outputs(this);
+  get outputs(): IncreaseDebtAndSellCall__Outputs {
+    return new IncreaseDebtAndSellCall__Outputs(this);
   }
 }
 
-export class MintAndSellDebtCall__Inputs {
-  _call: MintAndSellDebtCall;
+export class IncreaseDebtAndSellCall__Inputs {
+  _call: IncreaseDebtAndSellCall;
 
-  constructor(call: MintAndSellDebtCall) {
+  constructor(call: IncreaseDebtAndSellCall) {
     this._call = call;
   }
 
-  get collateralAsset(): Address {
+  get proceedsTo(): Address {
     return this._call.inputValues[0].value.toAddress();
   }
 
-  get debt(): BigInt {
-    return this._call.inputValues[1].value.toBigInt();
+  get collateralAsset(): Address {
+    return this._call.inputValues[1].value.toAddress();
   }
 
-  get minOut(): BigInt {
-    return this._call.inputValues[2].value.toBigInt();
+  get params(): IncreaseDebtAndSellCallParamsStruct {
+    return changetype<IncreaseDebtAndSellCallParamsStruct>(
+      this._call.inputValues[2].value.toTuple()
+    );
   }
 
-  get sqrtPriceLimitX96(): BigInt {
-    return this._call.inputValues[3].value.toBigInt();
-  }
-
-  get proceedsTo(): Address {
-    return this._call.inputValues[4].value.toAddress();
-  }
-
-  get oracleInfo(): MintAndSellDebtCallOracleInfoStruct {
-    return changetype<MintAndSellDebtCallOracleInfoStruct>(
-      this._call.inputValues[5].value.toTuple()
+  get oracleInfo(): IncreaseDebtAndSellCallOracleInfoStruct {
+    return changetype<IncreaseDebtAndSellCallOracleInfoStruct>(
+      this._call.inputValues[3].value.toTuple()
     );
   }
 }
 
-export class MintAndSellDebtCall__Outputs {
-  _call: MintAndSellDebtCall;
+export class IncreaseDebtAndSellCall__Outputs {
+  _call: IncreaseDebtAndSellCall;
 
-  constructor(call: MintAndSellDebtCall) {
+  constructor(call: IncreaseDebtAndSellCall) {
     this._call = call;
   }
 
-  get value0(): BigInt {
+  get amountOut(): BigInt {
     return this._call.outputValues[0].value.toBigInt();
   }
 }
 
-export class MintAndSellDebtCallOracleInfoStruct extends ethereum.Tuple {
-  get message(): MintAndSellDebtCallOracleInfoMessageStruct {
-    return changetype<MintAndSellDebtCallOracleInfoMessageStruct>(
+export class IncreaseDebtAndSellCallParamsStruct extends ethereum.Tuple {
+  get amount(): BigInt {
+    return this[0].toBigInt();
+  }
+
+  get minOut(): BigInt {
+    return this[1].toBigInt();
+  }
+
+  get sqrtPriceLimitX96(): BigInt {
+    return this[2].toBigInt();
+  }
+
+  get swapFeeTo(): Address {
+    return this[3].toAddress();
+  }
+
+  get swapFeeBips(): BigInt {
+    return this[4].toBigInt();
+  }
+}
+
+export class IncreaseDebtAndSellCallOracleInfoStruct extends ethereum.Tuple {
+  get message(): IncreaseDebtAndSellCallOracleInfoMessageStruct {
+    return changetype<IncreaseDebtAndSellCallOracleInfoMessageStruct>(
       this[0].toTuple()
     );
   }
 
-  get sig(): MintAndSellDebtCallOracleInfoSigStruct {
-    return changetype<MintAndSellDebtCallOracleInfoSigStruct>(
+  get sig(): IncreaseDebtAndSellCallOracleInfoSigStruct {
+    return changetype<IncreaseDebtAndSellCallOracleInfoSigStruct>(
       this[1].toTuple()
     );
   }
 }
 
-export class MintAndSellDebtCallOracleInfoMessageStruct extends ethereum.Tuple {
+export class IncreaseDebtAndSellCallOracleInfoMessageStruct extends ethereum.Tuple {
   get id(): Bytes {
     return this[0].toBytes();
   }
@@ -1810,7 +1936,7 @@ export class MintAndSellDebtCallOracleInfoMessageStruct extends ethereum.Tuple {
   }
 }
 
-export class MintAndSellDebtCallOracleInfoSigStruct extends ethereum.Tuple {
+export class IncreaseDebtAndSellCallOracleInfoSigStruct extends ethereum.Tuple {
   get v(): i32 {
     return this[0].toI32();
   }
@@ -2085,10 +2211,10 @@ export class RemoveCollateralCall__Inputs {
     return this._call.inputValues[0].value.toAddress();
   }
 
-  get collateral(): RemoveCollateralCallCollateralStruct {
-    return changetype<RemoveCollateralCallCollateralStruct>(
-      this._call.inputValues[1].value.toTuple()
-    );
+  get collateralArr(): Array<RemoveCollateralCallCollateralArrStruct> {
+    return this._call.inputValues[1].value.toTupleArray<
+      RemoveCollateralCallCollateralArrStruct
+    >();
   }
 
   get oracleInfo(): RemoveCollateralCallOracleInfoStruct {
@@ -2106,7 +2232,7 @@ export class RemoveCollateralCall__Outputs {
   }
 }
 
-export class RemoveCollateralCallCollateralStruct extends ethereum.Tuple {
+export class RemoveCollateralCallCollateralArrStruct extends ethereum.Tuple {
   get addr(): Address {
     return this[0].toAddress();
   }
@@ -2162,6 +2288,66 @@ export class RemoveCollateralCallOracleInfoSigStruct extends ethereum.Tuple {
   }
 }
 
+export class RenounceOwnershipCall extends ethereum.Call {
+  get inputs(): RenounceOwnershipCall__Inputs {
+    return new RenounceOwnershipCall__Inputs(this);
+  }
+
+  get outputs(): RenounceOwnershipCall__Outputs {
+    return new RenounceOwnershipCall__Outputs(this);
+  }
+}
+
+export class RenounceOwnershipCall__Inputs {
+  _call: RenounceOwnershipCall;
+
+  constructor(call: RenounceOwnershipCall) {
+    this._call = call;
+  }
+}
+
+export class RenounceOwnershipCall__Outputs {
+  _call: RenounceOwnershipCall;
+
+  constructor(call: RenounceOwnershipCall) {
+    this._call = call;
+  }
+}
+
+export class SendPaprFromAuctionFeesCall extends ethereum.Call {
+  get inputs(): SendPaprFromAuctionFeesCall__Inputs {
+    return new SendPaprFromAuctionFeesCall__Inputs(this);
+  }
+
+  get outputs(): SendPaprFromAuctionFeesCall__Outputs {
+    return new SendPaprFromAuctionFeesCall__Outputs(this);
+  }
+}
+
+export class SendPaprFromAuctionFeesCall__Inputs {
+  _call: SendPaprFromAuctionFeesCall;
+
+  constructor(call: SendPaprFromAuctionFeesCall) {
+    this._call = call;
+  }
+
+  get to(): Address {
+    return this._call.inputValues[0].value.toAddress();
+  }
+
+  get amount(): BigInt {
+    return this._call.inputValues[1].value.toBigInt();
+  }
+}
+
+export class SendPaprFromAuctionFeesCall__Outputs {
+  _call: SendPaprFromAuctionFeesCall;
+
+  constructor(call: SendPaprFromAuctionFeesCall) {
+    this._call = call;
+  }
+}
+
 export class SetAllowedCollateralCall extends ethereum.Call {
   get inputs(): SetAllowedCollateralCall__Inputs {
     return new SetAllowedCollateralCall__Inputs(this);
@@ -2203,6 +2389,96 @@ export class SetAllowedCollateralCallCollateralConfigsStruct extends ethereum.Tu
 
   get allowed(): boolean {
     return this[1].toBoolean();
+  }
+}
+
+export class SetFundingPeriodCall extends ethereum.Call {
+  get inputs(): SetFundingPeriodCall__Inputs {
+    return new SetFundingPeriodCall__Inputs(this);
+  }
+
+  get outputs(): SetFundingPeriodCall__Outputs {
+    return new SetFundingPeriodCall__Outputs(this);
+  }
+}
+
+export class SetFundingPeriodCall__Inputs {
+  _call: SetFundingPeriodCall;
+
+  constructor(call: SetFundingPeriodCall) {
+    this._call = call;
+  }
+
+  get _fundingPeriod(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+}
+
+export class SetFundingPeriodCall__Outputs {
+  _call: SetFundingPeriodCall;
+
+  constructor(call: SetFundingPeriodCall) {
+    this._call = call;
+  }
+}
+
+export class SetLiquidationsLockedCall extends ethereum.Call {
+  get inputs(): SetLiquidationsLockedCall__Inputs {
+    return new SetLiquidationsLockedCall__Inputs(this);
+  }
+
+  get outputs(): SetLiquidationsLockedCall__Outputs {
+    return new SetLiquidationsLockedCall__Outputs(this);
+  }
+}
+
+export class SetLiquidationsLockedCall__Inputs {
+  _call: SetLiquidationsLockedCall;
+
+  constructor(call: SetLiquidationsLockedCall) {
+    this._call = call;
+  }
+
+  get locked(): boolean {
+    return this._call.inputValues[0].value.toBoolean();
+  }
+}
+
+export class SetLiquidationsLockedCall__Outputs {
+  _call: SetLiquidationsLockedCall;
+
+  constructor(call: SetLiquidationsLockedCall) {
+    this._call = call;
+  }
+}
+
+export class SetPoolCall extends ethereum.Call {
+  get inputs(): SetPoolCall__Inputs {
+    return new SetPoolCall__Inputs(this);
+  }
+
+  get outputs(): SetPoolCall__Outputs {
+    return new SetPoolCall__Outputs(this);
+  }
+}
+
+export class SetPoolCall__Inputs {
+  _call: SetPoolCall;
+
+  constructor(call: SetPoolCall) {
+    this._call = call;
+  }
+
+  get _pool(): Address {
+    return this._call.inputValues[0].value.toAddress();
+  }
+}
+
+export class SetPoolCall__Outputs {
+  _call: SetPoolCall;
+
+  constructor(call: SetPoolCall) {
+    this._call = call;
   }
 }
 
@@ -2360,14 +2636,6 @@ export class TransferOwnershipCall__Inputs {
   get newOwner(): Address {
     return this._call.inputValues[0].value.toAddress();
   }
-
-  get direct(): boolean {
-    return this._call.inputValues[1].value.toBoolean();
-  }
-
-  get renounce(): boolean {
-    return this._call.inputValues[2].value.toBoolean();
-  }
 }
 
 export class TransferOwnershipCall__Outputs {
@@ -2506,32 +2774,32 @@ export class UniswapV3SwapCallbackCall__Outputs {
   }
 }
 
-export class UpdateNormalizationCall extends ethereum.Call {
-  get inputs(): UpdateNormalizationCall__Inputs {
-    return new UpdateNormalizationCall__Inputs(this);
+export class UpdateTargetCall extends ethereum.Call {
+  get inputs(): UpdateTargetCall__Inputs {
+    return new UpdateTargetCall__Inputs(this);
   }
 
-  get outputs(): UpdateNormalizationCall__Outputs {
-    return new UpdateNormalizationCall__Outputs(this);
+  get outputs(): UpdateTargetCall__Outputs {
+    return new UpdateTargetCall__Outputs(this);
   }
 }
 
-export class UpdateNormalizationCall__Inputs {
-  _call: UpdateNormalizationCall;
+export class UpdateTargetCall__Inputs {
+  _call: UpdateTargetCall;
 
-  constructor(call: UpdateNormalizationCall) {
+  constructor(call: UpdateTargetCall) {
     this._call = call;
   }
 }
 
-export class UpdateNormalizationCall__Outputs {
-  _call: UpdateNormalizationCall;
+export class UpdateTargetCall__Outputs {
+  _call: UpdateTargetCall;
 
-  constructor(call: UpdateNormalizationCall) {
+  constructor(call: UpdateTargetCall) {
     this._call = call;
   }
 
-  get newTarget(): BigInt {
+  get nTarget(): BigInt {
     return this._call.outputValues[0].value.toBigInt();
   }
 }
