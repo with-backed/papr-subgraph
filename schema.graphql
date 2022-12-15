@@ -114,14 +114,3 @@ type CollateralAllowedChangeEvent @entity {
   controller: PaprController!
   allowed: Boolean!
 }
-
-type User @entity {
-  id: ID!
-  paprDebt: BigInt!
-  paprHoldings: BigInt!
-  phUSDCHoldings: BigInt!
-  blitCount: BigInt!
-  moonbirdCount: BigInt!
-  toadCount: BigInt!
-  dinoCount: BigInt!
-}

@@ -11,8 +11,6 @@ import {
   EndAuction,
 } from "../generated/SlyFox/PaprController";
 
-import { Transfer as ERC20Transfer } from "../generated/PHUSDC/ERC20";
-
 import {
   AddCollateralEvent,
   VaultCollateral,
@@ -27,16 +25,10 @@ import {
   Auction,
   AuctionStartEvent,
   AuctionEndEvent,
-  User
 } from "../generated/schema";
 
 import { PaprController as PaprControllerABI } from "../generated/SlyFox/PaprController";
-import { ERC721 as ERC721ABI, Transfer as ERC721Transfer } from "../generated/SlyFox/ERC721";
-
-const dinos = Address.fromHexString('0xabe17952e7fe468711826c26b04b047c0da53b86');
-const moonbirds = Address.fromHexString('0x0593cd2238d1b143bd1c67cd7fa98eee32a260ea');
-const toads = Address.fromHexString('0xd4e652bbfcf616c966e1b1e8ed37599d81f11889');
-const blits = Address.fromHexString('0x4770646fe8635fa9ed3cb72ed4b7ef6386a06827');
+import { ERC721 as ERC721ABI } from "../generated/SlyFox/ERC721";
 
 function generateCollateralId(addr: Address, tokenId: BigInt): string {
   return `${addr.toHexString()}-${tokenId.toString()}`;
@@ -69,27 +61,24 @@ export function handleAddCollateral(event: AddCollateral): void {
     generateVaultId(
       event.params._event.address,
       event.params.account,
-      event.params.collateral.addr
+      event.params.collateralAddress
     )
   );
   if (!vault) {
     vault = initVault(
       event.params._event.address,
       event.params.account,
-      event.params.collateral.addr
+      event.params.collateralAddress
     );
   }
 
   const collateralAdded = new VaultCollateral(
-    generateCollateralId(
-      event.params.collateral.addr,
-      event.params.collateral.id
-    )
+    generateCollateralId(event.params.collateralAddress, event.params.tokenId)
   );
-  collateralAdded.contractAddress = event.params.collateral.addr;
-  collateralAdded.tokenId = event.params.collateral.id;
+  collateralAdded.contractAddress = event.params.collateralAddress;
+  collateralAdded.tokenId = event.params.tokenId;
   collateralAdded.symbol = ERC721ABI.bind(
-    event.params.collateral.addr
+    event.params.collateralAddress
   ).symbol();
 
   collateralAdded.vault = vault.id;
@@ -114,19 +103,6 @@ export function handleAddCollateral(event: AddCollateral): void {
   addCollateralEvent.controller = event.params._event.address.toHexString();
   addCollateralEvent.vault = vault.id;
   addCollateralEvent.save();
-
-  const user = findOrCreateUser(event.params.account);
-  const collateral = event.params.collateral.addr
-  if (collateral.equals(dinos)) {
-    user.dinoCount = user.dinoCount.plus(BigInt.fromString("1"));
-  } else if (collateral.equals(moonbirds)) {
-    user.moonbirdCount = user.moonbirdCount.plus(BigInt.fromString("1"));
-  } else if (collateral.equals(toads)) {
-    user.toadCount = user.toadCount.plus(BigInt.fromString("1"));
-  } else if (collateral.equals(blits)) {
-    user.blitCount = user.blitCount.plus(BigInt.fromString("1"));
-  }
-  user.save()
 }
 
 export function handleRemoveCollateral(event: RemoveCollateral): void {
@@ -134,16 +110,13 @@ export function handleRemoveCollateral(event: RemoveCollateral): void {
     generateVaultId(
       event.params._event.address,
       event.params.account,
-      event.params.collateral.addr
+      event.params.collateralAddress
     )
   );
   if (!vault) return;
 
   const collateralRemoved = VaultCollateral.load(
-    generateCollateralId(
-      event.params.collateral.addr,
-      event.params.collateral.id
-    )
+    generateCollateralId(event.params.collateralAddress, event.params.tokenId)
   );
   if (!collateralRemoved) return;
 
@@ -168,19 +141,6 @@ export function handleRemoveCollateral(event: RemoveCollateral): void {
   collateralRemovedEvent.controller = vault.controller;
   collateralRemovedEvent.vault = vault.id;
   collateralRemovedEvent.save();
-
-  const user = findOrCreateUser(event.params.account);
-  const collateral = event.params.collateral.addr
-  if (collateral.equals(dinos)) {
-    user.dinoCount = user.dinoCount.minus(BigInt.fromString("1"));
-  } else if (collateral.equals(moonbirds)) {
-    user.moonbirdCount = user.moonbirdCount.minus(BigInt.fromString("1"));
-  } else if (collateral.equals(toads)) {
-    user.toadCount = user.toadCount.minus(BigInt.fromString("1"));
-  } else if (collateral.equals(blits)) {
-    user.blitCount = user.blitCount.minus(BigInt.fromString("1"));
-  }
-  user.save()
 }
 
 export function handleIncreaseDebt(event: IncreaseDebt): void {
@@ -213,10 +173,6 @@ export function handleIncreaseDebt(event: IncreaseDebt): void {
   debtIncreasedEvent.controller = vault.controller;
   debtIncreasedEvent.vault = vault.id;
   debtIncreasedEvent.save();
-
-  const user = findOrCreateUser(event.params.account);
-  user.paprDebt = user.paprDebt.plus(event.params.amount); 
-  user.save();
 }
 
 export function handleReduceDebt(event: ReduceDebt): void {
@@ -250,10 +206,6 @@ export function handleReduceDebt(event: ReduceDebt): void {
   debtDecreasedEvent.controller = vault.controller;
   debtDecreasedEvent.vault = vault.id;
   debtDecreasedEvent.save();
-
-  const user = findOrCreateUser(event.params.account);
-  user.paprDebt = user.paprDebt.minus(event.params.amount);
-  user.save();
 }
 
 export function handleTargetUpdate(event: UpdateTarget): void {
@@ -275,7 +227,7 @@ export function handleTargetUpdate(event: UpdateTarget): void {
     ).underlying();
     controller.paprToken = PaprControllerABI.bind(
       event.params._event.address
-    ).perpetual();
+    ).papr();
   }
 
   const targetUpdate = new TargetUpdate(event.transaction.hash.toHexString());
@@ -288,9 +240,7 @@ export function handleTargetUpdate(event: UpdateTarget): void {
   targetUpdate.save();
 }
 
-export function handleCollateralAllowedChanged(
-  event: AllowCollateral
-): void {
+export function handleCollateralAllowedChanged(event: AllowCollateral): void {
   const controller = PaprController.load(
     event.params._event.address.toHexString()
   );
@@ -352,96 +302,4 @@ export function handleEndAuction(event: EndAuction): void {
   end.save();
   auction.endPrice = event.params.price;
   auction.save();
-}
-
-export function handlePHUSDCTransfer(event: ERC20Transfer): void {
-  if (event.params.from != Address.zero()) {
-    const from = findOrCreateUser(event.params.from);
-    from.phUSDCHoldings = from.phUSDCHoldings.minus(event.params.value);
-    from.save();
-  }
-
-  if (event.params.to != Address.zero()) {
-    const to = findOrCreateUser(event.params.to);
-    to.phUSDCHoldings = to.phUSDCHoldings.plus(event.params.value);
-    to.save();
-  }
-}
-
-export function handlePaprTransfer(event: ERC20Transfer): void {
-  if (event.params.from != Address.zero()) {
-    const from = findOrCreateUser(event.params.from);
-    from.paprHoldings = from.paprHoldings.minus(event.params.value);
-    from.save();
-  }
-
-  if (event.params.to != Address.zero()) {
-    const to = findOrCreateUser(event.params.to);
-    to.paprHoldings = to.paprHoldings.plus(event.params.value);
-    to.save();
-  }
-}
-
-export function handleBlitTransfer(event: ERC721Transfer): void {
-  if (event.params.from != Address.zero()) {
-    const from = findOrCreateUser(event.params.from);
-    from.blitCount = from.blitCount.minus(BigInt.fromString("1"));
-    from.save();
-  }
-
-  if (event.params.to != Address.zero()) {
-    const to = findOrCreateUser(event.params.to);
-    to.blitCount = to.blitCount.plus(BigInt.fromString("1"));
-    to.save();
-  }
-}
-
-export function handleMoonbirdTransfer(event: ERC721Transfer): void {
-  if (event.params.from != Address.zero()) {
-    const from = findOrCreateUser(event.params.from);
-    from.moonbirdCount = from.moonbirdCount.minus(BigInt.fromString("1"));
-    from.save();
-  }
-
-  if (event.params.to != Address.zero()) {
-    const to = findOrCreateUser(event.params.to);
-    to.moonbirdCount = to.moonbirdCount.plus(BigInt.fromString("1"));
-    to.save();
-  }
-}
-
-export function handleDinoTransfer(event: ERC721Transfer): void {
-  if (event.params.from != Address.zero()) {
-    const from = findOrCreateUser(event.params.from);
-    from.dinoCount = from.dinoCount.minus(BigInt.fromString("1"));
-    from.save();
-  }
-
-  if (event.params.to != Address.zero()) {
-    const to = findOrCreateUser(event.params.to);
-    to.dinoCount = to.dinoCount.plus(BigInt.fromString("1"));
-    to.save();
-  }
-}
-
-export function handleToadTransfer(event: ERC721Transfer): void {
-  if (event.params.from != Address.zero()) {
-    const from = findOrCreateUser(event.params.from);
-    from.toadCount = from.toadCount.minus(BigInt.fromString("1"));
-    from.save();
-  }
-
-  if (event.params.to != Address.zero()) {
-    const to = findOrCreateUser(event.params.to);
-    to.toadCount = to.toadCount.plus(BigInt.fromString("1"));
-    to.save();
-  }
-}
-
-function findOrCreateUser(address: Bytes): User {
-  let user = User.load(address.toHexString());
-  if (!user) {
-    user = new User(address.toHexString());
-  }
-  return user; 
 }
