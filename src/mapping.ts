@@ -212,6 +212,14 @@ export function handleTargetUpdate(event: UpdateTarget): void {
   let controller = PaprController.load(
     event.params._event.address.toHexString()
   );
+
+  if (
+    !controller &&
+    !event.params.newTarget.equals(BigInt.fromString("1000000"))
+  ) {
+    return;
+  }
+
   if (!controller) {
     controller = new PaprController(event.params._event.address.toHexString());
     controller.target = event.params.newTarget;
