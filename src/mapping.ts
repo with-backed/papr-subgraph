@@ -289,6 +289,10 @@ export function handleCollateralAllowedChanged(event: AllowCollateral): void {
 }
 
 export function handleStartAuction(event: StartAuction): void {
+  const controller = PaprController.load(
+    event.params._event.address.toHexString()
+  );
+  if (!controller) return;
   const auction = new Auction(event.params.auctionID.toString());
   auction.auctionAssetContract = event.params.auctionAssetContract;
   auction.auctionAssetID = event.params.auctionAssetID;
@@ -302,7 +306,7 @@ export function handleStartAuction(event: StartAuction): void {
     event.params.auctionAssetContract
   );
   auction.nftOwner = event.params.nftOwner;
-  auction.controller = event.params._event.address.toHexString();
+  auction.controller = controller.id
   auction.startedBy = event.transaction.from;
   auction.save();
   const start = new AuctionStartEvent(event.transaction.hash.toHexString());
