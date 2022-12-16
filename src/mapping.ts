@@ -102,6 +102,7 @@ export function handleAddCollateral(event: AddCollateral): void {
   addCollateralEvent.timestamp = event.block.timestamp;
   addCollateralEvent.controller = event.params._event.address.toHexString();
   addCollateralEvent.vault = vault.id;
+  addCollateralEvent.account = vault.account;
   addCollateralEvent.save();
 }
 
@@ -140,6 +141,7 @@ export function handleRemoveCollateral(event: RemoveCollateral): void {
   collateralRemovedEvent.timestamp = event.block.timestamp;
   collateralRemovedEvent.controller = vault.controller;
   collateralRemovedEvent.vault = vault.id;
+  collateralRemovedEvent.account = vault.account;
   collateralRemovedEvent.save();
 }
 
@@ -172,6 +174,7 @@ export function handleIncreaseDebt(event: IncreaseDebt): void {
   debtIncreasedEvent.amount = event.params.amount;
   debtIncreasedEvent.controller = vault.controller;
   debtIncreasedEvent.vault = vault.id;
+  debtIncreasedEvent.account = vault.account;
   debtIncreasedEvent.save();
 }
 
@@ -205,6 +208,7 @@ export function handleReduceDebt(event: ReduceDebt): void {
   debtDecreasedEvent.amount = event.params.amount;
   debtDecreasedEvent.controller = vault.controller;
   debtDecreasedEvent.vault = vault.id;
+  debtDecreasedEvent.account = vault.account;
   debtDecreasedEvent.save();
 }
 
@@ -285,6 +289,10 @@ export function handleCollateralAllowedChanged(event: AllowCollateral): void {
 }
 
 export function handleStartAuction(event: StartAuction): void {
+  const controller = PaprController.load(
+    event.params._event.address.toHexString()
+  );
+  if (!controller) return;
   const auction = new Auction(event.params.auctionID.toString());
   auction.auctionAssetContract = event.params.auctionAssetContract;
   auction.auctionAssetID = event.params.auctionAssetID;
@@ -298,12 +306,14 @@ export function handleStartAuction(event: StartAuction): void {
     event.params.auctionAssetContract
   );
   auction.nftOwner = event.params.nftOwner;
-  auction.controller = event.params._event.address.toHexString();
+  auction.controller = controller.id
   auction.startedBy = event.transaction.from;
   auction.save();
   const start = new AuctionStartEvent(event.transaction.hash.toHexString());
   start.timestamp = event.block.timestamp.toI32();
   start.auction = auction.id;
+  start.controller = auction.controller;
+  start.account = auction.nftOwner;
   start.save();
 }
 
@@ -313,6 +323,8 @@ export function handleEndAuction(event: EndAuction): void {
   const end = new AuctionEndEvent(event.transaction.hash.toHexString());
   end.timestamp = event.block.timestamp.toI32();
   end.auction = auction.id;
+  end.controller = auction.controller;
+  end.account = auction.nftOwner;
   end.save();
   auction.endPrice = event.params.price;
   auction.save();

@@ -470,6 +470,7 @@ export class AddCollateralEvent extends Entity {
     this.set("timestamp", Value.fromBigInt(BigInt.zero()));
     this.set("vault", Value.fromString(""));
     this.set("controller", Value.fromString(""));
+    this.set("account", Value.fromBytes(Bytes.empty()));
     this.set("collateral", Value.fromString(""));
   }
 
@@ -528,6 +529,15 @@ export class AddCollateralEvent extends Entity {
     this.set("controller", Value.fromString(value));
   }
 
+  get account(): Bytes {
+    let value = this.get("account");
+    return value!.toBytes();
+  }
+
+  set account(value: Bytes) {
+    this.set("account", Value.fromBytes(value));
+  }
+
   get collateral(): string {
     let value = this.get("collateral");
     return value!.toString();
@@ -546,6 +556,7 @@ export class RemoveCollateralEvent extends Entity {
     this.set("timestamp", Value.fromBigInt(BigInt.zero()));
     this.set("vault", Value.fromString(""));
     this.set("controller", Value.fromString(""));
+    this.set("account", Value.fromBytes(Bytes.empty()));
     this.set("collateral", Value.fromString(""));
   }
 
@@ -607,6 +618,15 @@ export class RemoveCollateralEvent extends Entity {
     this.set("controller", Value.fromString(value));
   }
 
+  get account(): Bytes {
+    let value = this.get("account");
+    return value!.toBytes();
+  }
+
+  set account(value: Bytes) {
+    this.set("account", Value.fromBytes(value));
+  }
+
   get collateral(): string {
     let value = this.get("collateral");
     return value!.toString();
@@ -625,6 +645,7 @@ export class DebtIncreasedEvent extends Entity {
     this.set("timestamp", Value.fromBigInt(BigInt.zero()));
     this.set("vault", Value.fromString(""));
     this.set("controller", Value.fromString(""));
+    this.set("account", Value.fromBytes(Bytes.empty()));
     this.set("amount", Value.fromBigInt(BigInt.zero()));
   }
 
@@ -683,6 +704,15 @@ export class DebtIncreasedEvent extends Entity {
     this.set("controller", Value.fromString(value));
   }
 
+  get account(): Bytes {
+    let value = this.get("account");
+    return value!.toBytes();
+  }
+
+  set account(value: Bytes) {
+    this.set("account", Value.fromBytes(value));
+  }
+
   get amount(): BigInt {
     let value = this.get("amount");
     return value!.toBigInt();
@@ -701,6 +731,7 @@ export class DebtDecreasedEvent extends Entity {
     this.set("timestamp", Value.fromBigInt(BigInt.zero()));
     this.set("vault", Value.fromString(""));
     this.set("controller", Value.fromString(""));
+    this.set("account", Value.fromBytes(Bytes.empty()));
     this.set("amount", Value.fromBigInt(BigInt.zero()));
   }
 
@@ -757,6 +788,15 @@ export class DebtDecreasedEvent extends Entity {
 
   set controller(value: string) {
     this.set("controller", Value.fromString(value));
+  }
+
+  get account(): Bytes {
+    let value = this.get("account");
+    return value!.toBytes();
+  }
+
+  set account(value: Bytes) {
+    this.set("account", Value.fromBytes(value));
   }
 
   get amount(): BigInt {
@@ -953,6 +993,8 @@ export class AuctionStartEvent extends Entity {
 
     this.set("timestamp", Value.fromI32(0));
     this.set("auction", Value.fromString(""));
+    this.set("account", Value.fromBytes(Bytes.empty()));
+    this.set("controller", Value.fromString(""));
   }
 
   save(): void {
@@ -1000,6 +1042,24 @@ export class AuctionStartEvent extends Entity {
   set auction(value: string) {
     this.set("auction", Value.fromString(value));
   }
+
+  get account(): Bytes {
+    let value = this.get("account");
+    return value!.toBytes();
+  }
+
+  set account(value: Bytes) {
+    this.set("account", Value.fromBytes(value));
+  }
+
+  get controller(): string {
+    let value = this.get("controller");
+    return value!.toString();
+  }
+
+  set controller(value: string) {
+    this.set("controller", Value.fromString(value));
+  }
 }
 
 export class AuctionEndEvent extends Entity {
@@ -1009,6 +1069,8 @@ export class AuctionEndEvent extends Entity {
 
     this.set("timestamp", Value.fromI32(0));
     this.set("auction", Value.fromString(""));
+    this.set("account", Value.fromBytes(Bytes.empty()));
+    this.set("controller", Value.fromString(""));
   }
 
   save(): void {
@@ -1053,6 +1115,24 @@ export class AuctionEndEvent extends Entity {
 
   set auction(value: string) {
     this.set("auction", Value.fromString(value));
+  }
+
+  get account(): Bytes {
+    let value = this.get("account");
+    return value!.toBytes();
+  }
+
+  set account(value: Bytes) {
+    this.set("account", Value.fromBytes(value));
+  }
+
+  get controller(): string {
+    let value = this.get("controller");
+    return value!.toString();
+  }
+
+  set controller(value: string) {
+    this.set("controller", Value.fromString(value));
   }
 }
 
