@@ -50,6 +50,7 @@ type AddCollateralEvent @entity {
   timestamp: BigInt!
   vault: Vault!
   controller: PaprController!
+  account: Bytes!
   collateral: VaultCollateral!
 }
 
@@ -58,6 +59,7 @@ type RemoveCollateralEvent @entity {
   timestamp: BigInt!
   vault: Vault!
   controller: PaprController!
+  account: Bytes!
   collateral: VaultCollateral!
 }
 
@@ -66,6 +68,7 @@ type DebtIncreasedEvent @entity {
   timestamp: BigInt!
   vault: Vault!
   controller: PaprController!
+  account: Bytes!
   amount: BigInt!
 }
 
@@ -74,6 +77,7 @@ type DebtDecreasedEvent @entity {
   timestamp: BigInt!
   vault: Vault!
   controller: PaprController!
+  account: Bytes!
   amount: BigInt!
 }
 
@@ -99,12 +103,17 @@ type AuctionStartEvent @entity {
   id: ID!
   timestamp: Int!
   auction: Auction!
+  account: Bytes!
+  controller: PaprController!
 }
 
 type AuctionEndEvent @entity {
   id: ID!
   timestamp: Int!
   auction: Auction!
+  # the owner of the NFT
+  account: Bytes!
+  controller: PaprController!
 }
 
 type CollateralAllowedChangeEvent @entity {
