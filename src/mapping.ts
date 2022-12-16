@@ -212,22 +212,36 @@ export function handleTargetUpdate(event: UpdateTarget): void {
   let controller = PaprController.load(
     event.params._event.address.toHexString()
   );
+
   if (!controller) {
     controller = new PaprController(event.params._event.address.toHexString());
     controller.target = event.params.newTarget;
     controller.createdAt = event.block.timestamp;
-    controller.poolAddress = PaprControllerABI.bind(
+
+    const poolResult = PaprControllerABI.bind(
       event.params._event.address
-    ).pool();
-    controller.maxLTV = PaprControllerABI.bind(
+    ).try_pool();
+    if (poolResult.reverted) return;
+    controller.poolAddress = poolResult.value;
+
+    const maxLTVResult = PaprControllerABI.bind(
       event.params._event.address
-    ).maxLTV();
-    controller.underlying = PaprControllerABI.bind(
+    ).try_maxLTV();
+    if (maxLTVResult.reverted) return;
+    controller.maxLTV = maxLTVResult.value;
+
+    const underlyingResult = PaprControllerABI.bind(
       event.params._event.address
-    ).underlying();
-    controller.paprToken = PaprControllerABI.bind(
+    ).try_underlying();
+    if (underlyingResult.reverted) return;
+    controller.underlying = underlyingResult.value;
+
+    const paprTokenResult = PaprControllerABI.bind(
       event.params._event.address
-    ).papr();
+    ).try_papr();
+    if (paprTokenResult.reverted) return;
+
+    controller.paprToken = paprTokenResult.value;
   }
 
   const targetUpdate = new TargetUpdate(event.transaction.hash.toHexString());
