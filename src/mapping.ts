@@ -1,4 +1,4 @@
-import { Address, BigInt, Bytes, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt } from "@graphprotocol/graph-ts";
 
 import {
   IncreaseDebt,
@@ -8,7 +8,7 @@ import {
   RemoveCollateral,
   AllowCollateral,
   StartAuction,
-  EndAuction,
+  EndAuction
 } from "../generated/SlyFox/PaprController";
 
 import {
@@ -25,10 +25,13 @@ import {
   Auction,
   AuctionStartEvent,
   AuctionEndEvent,
+  ERC20Token,
+  ERC721Token
 } from "../generated/schema";
 
 import { PaprController as PaprControllerABI } from "../generated/SlyFox/PaprController";
 import { ERC721 as ERC721ABI } from "../generated/SlyFox/ERC721";
+import { ERC20 as ERC20ABI } from "../generated/SlyFox/ERC20";
 
 function generateCollateralId(addr: Address, tokenId: BigInt): string {
   return `${addr.toHexString()}-${tokenId.toString()}`;
@@ -37,50 +40,91 @@ function generateCollateralId(addr: Address, tokenId: BigInt): string {
 function generateVaultId(
   controller: Address,
   account: Address,
-  asset: Address
+  token: ERC721Token
 ): string {
-  return `${controller.toHexString()}-${account.toHexString()}-${asset.toHexString()}`;
+  return `${controller.toHexString()}-${account.toHexString()}-${token.id}`;
 }
 
 function initVault(
   controller: Address,
   account: Address,
-  asset: Address
+  token: ERC721Token
 ): Vault {
-  const vault = new Vault(generateVaultId(controller, account, asset));
+  const vault = new Vault(generateVaultId(controller, account, token));
   vault.controller = controller.toHexString();
   vault.account = account;
-  vault.collateralContract = asset;
+  vault.token = token.id;
   vault.save();
 
   return vault;
 }
 
+function loadOrCreateERC721Token(contractAddress: Address): ERC721Token | null {
+  var token = ERC721Token.load(contractAddress.toHexString());
+  if (token) {return token}
+
+  token = new ERC721Token(contractAddress.toHexString());
+  const contract = ERC721ABI.bind(
+    contractAddress
+  );
+  var callResult = contract.try_symbol();
+  if (callResult.reverted) return null
+  token.symbol = callResult.value;
+
+  callResult = contract.try_name();
+  if (callResult.reverted) return null
+  token.name = callResult.value;
+  return token
+}
+
+function loadOrCreateERC20Token(contractAddress: Address): ERC20Token | null {
+  var token = ERC20Token.load(contractAddress.toHexString());
+  if (token) {return token}
+
+  
+  token = new ERC20Token(contractAddress.toHexString());
+  const contract = ERC20ABI.bind(
+    contractAddress
+  );
+  var callResult = contract.try_symbol();
+  if (callResult.reverted) return null
+  token.symbol = callResult.value;
+
+  callResult = contract.try_name();
+  if (callResult.reverted) return null
+  token.name = callResult.value;
+
+  let callResultDecimals = contract.try_decimals();
+  if (callResultDecimals.reverted) return null
+  token.decimals = callResultDecimals.value;
+  
+  return token 
+}
+
 export function handleAddCollateral(event: AddCollateral): void {
+  const token = loadOrCreateERC721Token(event.params.collateralAddress);
+  if (!token) {return};
+
   let vault: Vault | null = Vault.load(
     generateVaultId(
       event.params._event.address,
       event.params.account,
-      event.params.collateralAddress
+      token
     )
   );
   if (!vault) {
     vault = initVault(
       event.params._event.address,
       event.params.account,
-      event.params.collateralAddress
+      token
     );
   }
 
   const collateralAdded = new VaultCollateral(
     generateCollateralId(event.params.collateralAddress, event.params.tokenId)
   );
-  collateralAdded.contractAddress = event.params.collateralAddress;
-  collateralAdded.tokenId = event.params.tokenId;
-  collateralAdded.symbol = ERC721ABI.bind(
-    event.params.collateralAddress
-  ).symbol();
 
+  collateralAdded.tokenId = event.params.tokenId;
   collateralAdded.vault = vault.id;
   vault.collateralCount++;
 
@@ -107,11 +151,14 @@ export function handleAddCollateral(event: AddCollateral): void {
 }
 
 export function handleRemoveCollateral(event: RemoveCollateral): void {
+  const token = loadOrCreateERC721Token(event.params.collateralAddress);
+  if (!token) {return};
+
   const vault = Vault.load(
     generateVaultId(
       event.params._event.address,
       event.params.account,
-      event.params.collateralAddress
+      token
     )
   );
   if (!vault) return;
@@ -146,20 +193,19 @@ export function handleRemoveCollateral(event: RemoveCollateral): void {
 }
 
 export function handleIncreaseDebt(event: IncreaseDebt): void {
+  const token = loadOrCreateERC721Token(event.params.collateralAddress);
+  if (!token) {return};
+ 
   let vault = Vault.load(
     generateVaultId(
       event.params._event.address,
       event.params.account,
-      event.params.collateralAddress
+      token
     )
   );
-  if (!vault) {
-    vault = initVault(
-      event.params._event.address,
-      event.params.account,
-      event.params.collateralAddress
-    );
-  }
+
+  // vault should exist because this cannot be called unless collateral is added
+  if (!vault) {return}
 
   vault.debt = vault.debt.plus(event.params.amount);
   vault.debtPerCollateral = vault.debt.div(
@@ -179,11 +225,14 @@ export function handleIncreaseDebt(event: IncreaseDebt): void {
 }
 
 export function handleReduceDebt(event: ReduceDebt): void {
+  const token = loadOrCreateERC721Token(event.params.collateralAddress);
+  if (!token) {return};
+
   const vault = Vault.load(
     generateVaultId(
       event.params._event.address,
       event.params.account,
-      event.params.collateralAddress
+      token
     )
   );
   if (!vault) {
@@ -238,14 +287,20 @@ export function handleTargetUpdate(event: UpdateTarget): void {
       event.params._event.address
     ).try_underlying();
     if (underlyingResult.reverted) return;
-    controller.underlying = underlyingResult.value;
+    const underlyingToken = loadOrCreateERC20Token(underlyingResult.value)
+    if (!underlyingToken) return
+
+    controller.underlying = underlyingToken.id;
 
     const paprTokenResult = PaprControllerABI.bind(
       event.params._event.address
     ).try_papr();
     if (paprTokenResult.reverted) return;
 
-    controller.paprToken = paprTokenResult.value;
+    const paprToken = loadOrCreateERC20Token(paprTokenResult.value)
+    if (!paprToken) return
+
+    controller.underlying = paprToken.id;
   }
 
   const targetUpdate = new TargetUpdate(event.transaction.hash.toHexString());
@@ -271,7 +326,10 @@ export function handleCollateralAllowedChanged(event: AllowCollateral): void {
       `${controller.id}-${event.params.collateral.toHexString()}`
     );
   }
-  allowedCollateral.contractAddress = event.params.collateral;
+  const token = loadOrCreateERC721Token(event.params.collateral);
+  if (!token) return;
+
+  allowedCollateral.token = token.id;
   allowedCollateral.allowed = event.params.isAllowed;
   allowedCollateral.controller = controller.id;
 
@@ -294,16 +352,22 @@ export function handleStartAuction(event: StartAuction): void {
   );
   if (!controller) return;
   const auction = new Auction(event.params.auctionID.toString());
-  auction.auctionAssetContract = event.params.auctionAssetContract;
+  const nft = loadOrCreateERC721Token(event.params.auctionAssetContract);
+  if (!nft) return;
+
+  auction.auctionAssetContract = nft.id;
   auction.auctionAssetID = event.params.auctionAssetID;
   auction.startPrice = event.params.startPrice;
   auction.perPeriodDecayPercentWad = event.params.perPeriodDecayPercentWad;
   auction.secondsInPeriod = event.params.secondsInPeriod;
-  auction.paymentAsset = event.params.paymentAsset;
+  const erc20 = loadOrCreateERC20Token(event.params.paymentAsset);
+  if (!erc20) {return};
+
+  auction.paymentAsset = erc20.id;
   auction.vault = generateVaultId(
     event.params._event.address,
     event.params.nftOwner,
-    event.params.auctionAssetContract
+    nft
   );
   auction.nftOwner = event.params.nftOwner;
   auction.controller = controller.id

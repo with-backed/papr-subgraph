@@ -3,8 +3,9 @@ type PaprController @entity {
   createdAt: BigInt!
   # TODO watch for update pool address events
   poolAddress: Bytes!
-  underlying: Bytes!
-  paprToken: Bytes!
+  underlying: ERC20Token!
+  paprToken: ERC20Token!
+  token0IsUnderlying: Boolean!
   maxLTV: BigInt!
   target: BigInt!
   vaults: [Vault!] @derivedFrom(field: "controller")
@@ -15,7 +16,7 @@ type PaprController @entity {
 type Vault @entity {
   id: ID!
   account: Bytes!
-  collateralContract: Bytes!
+  token: ERC721Token!
   controller: PaprController!
   debt: BigInt!
   debtPerCollateral: BigInt!
@@ -32,15 +33,28 @@ type TargetUpdate @entity {
 
 type VaultCollateral @entity {
   id: ID!
-  contractAddress: Bytes!
   tokenId: BigInt!
   vault: Vault
+}
+
+type ERC20Token @entity {
+  # id = contract address
+  id: ID!,
   symbol: String!
+  name: String!
+  decimals: Int!
+}
+
+type ERC721Token @entity {
+  # id = contract address
+  id: ID!,
+  symbol: String!
+  name: String!
 }
 
 type AllowedCollateral @entity {
   id: ID!
-  contractAddress: Bytes!
+  token: ERC721Token!
   controller: PaprController!
   allowed: Boolean!
 }
@@ -92,11 +106,11 @@ type Auction @entity {
   end: AuctionEndEvent @derivedFrom(field: "auction")
   # below are in event
   auctionAssetID: BigInt!
-  auctionAssetContract: Bytes!
+  auctionAssetContract: ERC721Token!
   perPeriodDecayPercentWad: BigInt!
   secondsInPeriod: BigInt!
   startPrice: BigInt!
-  paymentAsset: Bytes!
+  paymentAsset: ERC20Token!
 }
 
 type AuctionStartEvent @entity {
