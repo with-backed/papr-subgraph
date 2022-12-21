@@ -74,6 +74,8 @@ function loadOrCreateERC721Token(contractAddress: Address): ERC721Token | null {
   callResult = contract.try_name();
   if (callResult.reverted) return null
   token.name = callResult.value;
+  token.save();
+
   return token
 }
 
@@ -97,6 +99,7 @@ function loadOrCreateERC20Token(contractAddress: Address): ERC20Token | null {
   let callResultDecimals = contract.try_decimals();
   if (callResultDecimals.reverted) return null
   token.decimals = callResultDecimals.value;
+  token.save();
   
   return token 
 }
@@ -300,7 +303,7 @@ export function handleTargetUpdate(event: UpdateTarget): void {
     const paprToken = loadOrCreateERC20Token(paprTokenResult.value)
     if (!paprToken) return
 
-    controller.underlying = paprToken.id;
+    controller.paprToken = paprToken.id;
   }
 
   const targetUpdate = new TargetUpdate(event.transaction.hash.toHexString());
