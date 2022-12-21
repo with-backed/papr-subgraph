@@ -18,8 +18,9 @@ export class PaprController extends Entity {
 
     this.set("createdAt", Value.fromBigInt(BigInt.zero()));
     this.set("poolAddress", Value.fromBytes(Bytes.empty()));
-    this.set("underlying", Value.fromBytes(Bytes.empty()));
-    this.set("paprToken", Value.fromBytes(Bytes.empty()));
+    this.set("underlying", Value.fromString(""));
+    this.set("paprToken", Value.fromString(""));
+    this.set("token0IsUnderlying", Value.fromBoolean(false));
     this.set("maxLTV", Value.fromBigInt(BigInt.zero()));
     this.set("target", Value.fromBigInt(BigInt.zero()));
   }
@@ -68,22 +69,31 @@ export class PaprController extends Entity {
     this.set("poolAddress", Value.fromBytes(value));
   }
 
-  get underlying(): Bytes {
+  get underlying(): string {
     let value = this.get("underlying");
-    return value!.toBytes();
+    return value!.toString();
   }
 
-  set underlying(value: Bytes) {
-    this.set("underlying", Value.fromBytes(value));
+  set underlying(value: string) {
+    this.set("underlying", Value.fromString(value));
   }
 
-  get paprToken(): Bytes {
+  get paprToken(): string {
     let value = this.get("paprToken");
-    return value!.toBytes();
+    return value!.toString();
   }
 
-  set paprToken(value: Bytes) {
-    this.set("paprToken", Value.fromBytes(value));
+  set paprToken(value: string) {
+    this.set("paprToken", Value.fromString(value));
+  }
+
+  get token0IsUnderlying(): boolean {
+    let value = this.get("token0IsUnderlying");
+    return value!.toBoolean();
+  }
+
+  set token0IsUnderlying(value: boolean) {
+    this.set("token0IsUnderlying", Value.fromBoolean(value));
   }
 
   get maxLTV(): BigInt {
@@ -154,7 +164,7 @@ export class Vault extends Entity {
     this.set("id", Value.fromString(id));
 
     this.set("account", Value.fromBytes(Bytes.empty()));
-    this.set("collateralContract", Value.fromBytes(Bytes.empty()));
+    this.set("token", Value.fromString(""));
     this.set("controller", Value.fromString(""));
     this.set("debt", Value.fromBigInt(BigInt.zero()));
     this.set("debtPerCollateral", Value.fromBigInt(BigInt.zero()));
@@ -196,13 +206,13 @@ export class Vault extends Entity {
     this.set("account", Value.fromBytes(value));
   }
 
-  get collateralContract(): Bytes {
-    let value = this.get("collateralContract");
-    return value!.toBytes();
+  get token(): string {
+    let value = this.get("token");
+    return value!.toString();
   }
 
-  set collateralContract(value: Bytes) {
-    this.set("collateralContract", Value.fromBytes(value));
+  set token(value: string) {
+    this.set("token", Value.fromString(value));
   }
 
   get controller(): string {
@@ -320,9 +330,7 @@ export class VaultCollateral extends Entity {
     super();
     this.set("id", Value.fromString(id));
 
-    this.set("contractAddress", Value.fromBytes(Bytes.empty()));
     this.set("tokenId", Value.fromBigInt(BigInt.zero()));
-    this.set("symbol", Value.fromString(""));
   }
 
   save(): void {
@@ -351,15 +359,6 @@ export class VaultCollateral extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get contractAddress(): Bytes {
-    let value = this.get("contractAddress");
-    return value!.toBytes();
-  }
-
-  set contractAddress(value: Bytes) {
-    this.set("contractAddress", Value.fromBytes(value));
-  }
-
   get tokenId(): BigInt {
     let value = this.get("tokenId");
     return value!.toBigInt();
@@ -385,6 +384,43 @@ export class VaultCollateral extends Entity {
       this.set("vault", Value.fromString(<string>value));
     }
   }
+}
+
+export class ERC20Token extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+
+    this.set("symbol", Value.fromString(""));
+    this.set("name", Value.fromString(""));
+    this.set("decimals", Value.fromI32(0));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save ERC20Token entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        "Cannot save ERC20Token entity with non-string ID. " +
+          'Considering using .toHex() to convert the "id" to a string.'
+      );
+      store.set("ERC20Token", id.toString(), this);
+    }
+  }
+
+  static load(id: string): ERC20Token | null {
+    return changetype<ERC20Token | null>(store.get("ERC20Token", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
 
   get symbol(): string {
     let value = this.get("symbol");
@@ -394,6 +430,78 @@ export class VaultCollateral extends Entity {
   set symbol(value: string) {
     this.set("symbol", Value.fromString(value));
   }
+
+  get name(): string {
+    let value = this.get("name");
+    return value!.toString();
+  }
+
+  set name(value: string) {
+    this.set("name", Value.fromString(value));
+  }
+
+  get decimals(): i32 {
+    let value = this.get("decimals");
+    return value!.toI32();
+  }
+
+  set decimals(value: i32) {
+    this.set("decimals", Value.fromI32(value));
+  }
+}
+
+export class ERC721Token extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+
+    this.set("symbol", Value.fromString(""));
+    this.set("name", Value.fromString(""));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save ERC721Token entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        "Cannot save ERC721Token entity with non-string ID. " +
+          'Considering using .toHex() to convert the "id" to a string.'
+      );
+      store.set("ERC721Token", id.toString(), this);
+    }
+  }
+
+  static load(id: string): ERC721Token | null {
+    return changetype<ERC721Token | null>(store.get("ERC721Token", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get symbol(): string {
+    let value = this.get("symbol");
+    return value!.toString();
+  }
+
+  set symbol(value: string) {
+    this.set("symbol", Value.fromString(value));
+  }
+
+  get name(): string {
+    let value = this.get("name");
+    return value!.toString();
+  }
+
+  set name(value: string) {
+    this.set("name", Value.fromString(value));
+  }
 }
 
 export class AllowedCollateral extends Entity {
@@ -401,7 +509,7 @@ export class AllowedCollateral extends Entity {
     super();
     this.set("id", Value.fromString(id));
 
-    this.set("contractAddress", Value.fromBytes(Bytes.empty()));
+    this.set("token", Value.fromString(""));
     this.set("controller", Value.fromString(""));
     this.set("allowed", Value.fromBoolean(false));
   }
@@ -434,13 +542,13 @@ export class AllowedCollateral extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get contractAddress(): Bytes {
-    let value = this.get("contractAddress");
-    return value!.toBytes();
+  get token(): string {
+    let value = this.get("token");
+    return value!.toString();
   }
 
-  set contractAddress(value: Bytes) {
-    this.set("contractAddress", Value.fromBytes(value));
+  set token(value: string) {
+    this.set("token", Value.fromString(value));
   }
 
   get controller(): string {
@@ -819,11 +927,11 @@ export class Auction extends Entity {
     this.set("nftOwner", Value.fromBytes(Bytes.empty()));
     this.set("controller", Value.fromString(""));
     this.set("auctionAssetID", Value.fromBigInt(BigInt.zero()));
-    this.set("auctionAssetContract", Value.fromBytes(Bytes.empty()));
+    this.set("auctionAssetContract", Value.fromString(""));
     this.set("perPeriodDecayPercentWad", Value.fromBigInt(BigInt.zero()));
     this.set("secondsInPeriod", Value.fromBigInt(BigInt.zero()));
     this.set("startPrice", Value.fromBigInt(BigInt.zero()));
-    this.set("paymentAsset", Value.fromBytes(Bytes.empty()));
+    this.set("paymentAsset", Value.fromString(""));
   }
 
   save(): void {
@@ -940,13 +1048,13 @@ export class Auction extends Entity {
     this.set("auctionAssetID", Value.fromBigInt(value));
   }
 
-  get auctionAssetContract(): Bytes {
+  get auctionAssetContract(): string {
     let value = this.get("auctionAssetContract");
-    return value!.toBytes();
+    return value!.toString();
   }
 
-  set auctionAssetContract(value: Bytes) {
-    this.set("auctionAssetContract", Value.fromBytes(value));
+  set auctionAssetContract(value: string) {
+    this.set("auctionAssetContract", Value.fromString(value));
   }
 
   get perPeriodDecayPercentWad(): BigInt {
@@ -976,13 +1084,13 @@ export class Auction extends Entity {
     this.set("startPrice", Value.fromBigInt(value));
   }
 
-  get paymentAsset(): Bytes {
+  get paymentAsset(): string {
     let value = this.get("paymentAsset");
-    return value!.toBytes();
+    return value!.toString();
   }
 
-  set paymentAsset(value: Bytes) {
-    this.set("paymentAsset", Value.fromBytes(value));
+  set paymentAsset(value: string) {
+    this.set("paymentAsset", Value.fromString(value));
   }
 }
 
