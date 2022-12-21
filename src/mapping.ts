@@ -274,6 +274,13 @@ export function handleTargetUpdate(event: UpdateTarget): void {
     controller.target = event.params.newTarget;
     controller.createdAt = event.block.timestamp;
 
+    const token0IsUnderlyingResult = PaprControllerABI.bind(
+      event.params._event.address
+    ).try_token0IsUnderlying();
+    if (token0IsUnderlyingResult.reverted) return
+
+    controller.token0IsUnderlying = token0IsUnderlyingResult.value
+
     const poolResult = PaprControllerABI.bind(
       event.params._event.address
     ).try_pool();
