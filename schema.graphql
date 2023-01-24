@@ -118,6 +118,7 @@ type AuctionStartEvent @entity {
   timestamp: Int!
   auction: Auction!
   account: Bytes!
+  vault: Vault!
   controller: PaprController!
 }
 
@@ -127,6 +128,7 @@ type AuctionEndEvent @entity {
   auction: Auction!
   # the owner of the NFT
   account: Bytes!
+  vault: Vault!
   controller: PaprController!
 }
 

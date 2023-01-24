@@ -1102,6 +1102,7 @@ export class AuctionStartEvent extends Entity {
     this.set("timestamp", Value.fromI32(0));
     this.set("auction", Value.fromString(""));
     this.set("account", Value.fromBytes(Bytes.empty()));
+    this.set("vault", Value.fromString(""));
     this.set("controller", Value.fromString(""));
   }
 
@@ -1160,6 +1161,15 @@ export class AuctionStartEvent extends Entity {
     this.set("account", Value.fromBytes(value));
   }
 
+  get vault(): string {
+    let value = this.get("vault");
+    return value!.toString();
+  }
+
+  set vault(value: string) {
+    this.set("vault", Value.fromString(value));
+  }
+
   get controller(): string {
     let value = this.get("controller");
     return value!.toString();
@@ -1178,6 +1188,7 @@ export class AuctionEndEvent extends Entity {
     this.set("timestamp", Value.fromI32(0));
     this.set("auction", Value.fromString(""));
     this.set("account", Value.fromBytes(Bytes.empty()));
+    this.set("vault", Value.fromString(""));
     this.set("controller", Value.fromString(""));
   }
 
@@ -1232,6 +1243,15 @@ export class AuctionEndEvent extends Entity {
 
   set account(value: Bytes) {
     this.set("account", Value.fromBytes(value));
+  }
+
+  get vault(): string {
+    let value = this.get("vault");
+    return value!.toString();
+  }
+
+  set vault(value: string) {
+    this.set("vault", Value.fromString(value));
   }
 
   get controller(): string {
