@@ -63,7 +63,7 @@
     },
     {
       "inputs": [],
-      "name": "DebtAmountExceedsUint200",
+      "name": "DebtAmountExceedsUint184",
       "type": "error"
     },
     {
@@ -171,7 +171,23 @@
     },
     {
       "inputs": [],
-      "name": "OracleMessageTooOld",
+      "name": "OracleMessageTimestampInvalid",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "deadline",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "currentTimestamp",
+          "type": "uint256"
+        }
+      ],
+      "name": "PassedDeadline",
       "type": "error"
     },
     {
@@ -235,7 +251,7 @@
       "inputs": [
         {
           "indexed": true,
-          "internalType": "address",
+          "internalType": "contract ERC721",
           "name": "collateral",
           "type": "address"
         },
@@ -473,6 +489,45 @@
         }
       ],
       "name": "StartAuction",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "newPeriod",
+          "type": "uint256"
+        }
+      ],
+      "name": "UpdateFundingPeriod",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "bool",
+          "name": "locked",
+          "type": "bool"
+        }
+      ],
+      "name": "UpdateLiquidationsLocked",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "newPool",
+          "type": "address"
+        }
+      ],
+      "name": "UpdatePool",
       "type": "event"
     },
     {
@@ -730,19 +785,6 @@
     {
       "inputs": [
         {
-          "internalType": "uint256",
-          "name": "amount",
-          "type": "uint256"
-        }
-      ],
-      "name": "burnPaprFromAuctionFees",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
           "internalType": "address",
           "name": "account",
           "type": "address"
@@ -777,6 +819,11 @@
             {
               "internalType": "uint256",
               "name": "swapFeeBips",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "deadline",
               "type": "uint256"
             }
           ],
@@ -950,6 +997,11 @@
               "internalType": "uint256",
               "name": "swapFeeBips",
               "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "deadline",
+              "type": "uint256"
             }
           ],
           "internalType": "struct IPaprController.SwapParams",
@@ -1027,7 +1079,7 @@
     {
       "inputs": [
         {
-          "internalType": "address",
+          "internalType": "contract ERC721",
           "name": "",
           "type": "address"
         }
@@ -1176,12 +1228,12 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "from",
+          "name": "",
           "type": "address"
         },
         {
           "internalType": "address",
-          "name": "",
+          "name": "from",
           "type": "address"
         },
         {
@@ -1532,27 +1584,9 @@
     {
       "inputs": [
         {
-          "internalType": "address",
-          "name": "to",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "amount",
-          "type": "uint256"
-        }
-      ],
-      "name": "sendPaprFromAuctionFees",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
           "components": [
             {
-              "internalType": "address",
+              "internalType": "contract ERC721",
               "name": "collateral",
               "type": "address"
             },
@@ -1895,7 +1929,7 @@
           "type": "uint256"
         }
       ],
-      "stateMutability": "nonpayable",
+      "stateMutability": "view",
       "type": "function"
     },
     {
@@ -1957,14 +1991,19 @@
               "type": "uint16"
             },
             {
+              "internalType": "uint16",
+              "name": "auctionCount",
+              "type": "uint16"
+            },
+            {
               "internalType": "uint40",
               "name": "latestAuctionStartTime",
               "type": "uint40"
             },
             {
-              "internalType": "uint200",
+              "internalType": "uint184",
               "name": "debt",
-              "type": "uint200"
+              "type": "uint184"
             }
           ],
           "internalType": "struct IPaprController.VaultInfo",
