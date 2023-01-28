@@ -364,11 +364,18 @@ export function handleStartAuction(event: StartAuction): void {
   const auction = new Auction(event.params.auctionID.toString());
   const nft = loadOrCreateERC721Token(event.params.auctionAssetContract);
   if (!nft) return;
-  const vaultId = generateVaultId(
-    event.params._event.address,
-    event.params.nftOwner,
-    nft
-  )
+  const vault = Vault.load(
+    generateVaultId(
+      event.params._event.address,
+      event.params.nftOwner,
+      nft
+    )
+  );
+  if (!vault) {
+    return;
+  }
+  vault.latestAuctionStartTime = event.block.timestamp;
+  vault.save();
 
   auction.auctionAssetContract = nft.id;
   auction.auctionAssetID = event.params.auctionAssetID;
@@ -379,7 +386,7 @@ export function handleStartAuction(event: StartAuction): void {
   if (!erc20) {return};
 
   auction.paymentAsset = erc20.id;
-  auction.vault = vaultId;
+  auction.vault = vault.id;
   auction.nftOwner = event.params.nftOwner;
   auction.controller = controller.id
   auction.startedBy = event.transaction.from;
@@ -389,7 +396,7 @@ export function handleStartAuction(event: StartAuction): void {
   start.auction = auction.id;
   start.controller = auction.controller;
   start.account = auction.nftOwner;
-  start.vault = vaultId;
+  start.vault = vault.id;
   start.save();
 }
 

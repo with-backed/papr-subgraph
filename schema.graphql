@@ -22,6 +22,7 @@ type Vault @entity {
   debtPerCollateral: BigInt!
   collateral: [VaultCollateral!]! @derivedFrom(field: "vault")
   collateralCount: Int!
+  latestAuctionStartTime: BigInt!
 }
 
 type TargetUpdate @entity {
