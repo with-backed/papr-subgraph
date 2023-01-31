@@ -936,6 +936,7 @@ export class Auction extends Entity {
     this.set("vault", Value.fromString(""));
     this.set("nftOwner", Value.fromBytes(Bytes.empty()));
     this.set("controller", Value.fromString(""));
+    this.set("start", Value.fromString(""));
     this.set("auctionAssetID", Value.fromBigInt(BigInt.zero()));
     this.set("auctionAssetContract", Value.fromString(""));
     this.set("perPeriodDecayPercentWad", Value.fromBigInt(BigInt.zero()));

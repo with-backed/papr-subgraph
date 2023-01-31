@@ -103,8 +103,8 @@ type Auction @entity {
   vault: Vault!
   nftOwner: Bytes!
   controller: PaprController!
-  start: AuctionStartEvent! @derivedFrom(field: "auction")
-  end: AuctionEndEvent @derivedFrom(field: "auction")
+  start: AuctionStartEvent!
+  end: AuctionEndEvent
   # below are in event
   auctionAssetID: BigInt!
   auctionAssetContract: ERC721Token!

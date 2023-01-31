@@ -390,7 +390,6 @@ export function handleStartAuction(event: StartAuction): void {
   auction.nftOwner = event.params.nftOwner;
   auction.controller = controller.id
   auction.startedBy = event.transaction.from;
-  auction.save();
   const start = new AuctionStartEvent(event.transaction.hash.toHexString());
   start.timestamp = event.block.timestamp.toI32();
   start.auction = auction.id;
@@ -398,14 +397,17 @@ export function handleStartAuction(event: StartAuction): void {
   start.account = auction.nftOwner;
   start.vault = vault.id;
   start.save();
+  auction.start = start.id;
+  auction.save();
 }
 
 export function handleEndAuction(event: EndAuction): void {
   const auction = Auction.load(event.params.auctionID.toString());
   if (!auction) return;
   const start = AuctionStartEvent.load(auction.start);
-  const vault = Vault.load(auction.vault)!
-  if (vault.latestAuctionStartTime = start!.timestamp) {
+  const vault = Vault.load(auction.vault);
+  if (!vault || !start) return;
+  if (vault.latestAuctionStartTime == start.timestamp) {
     vault.latestAuctionStartTime = 0;
     vault.save();
   }
@@ -418,5 +420,6 @@ export function handleEndAuction(event: EndAuction): void {
   end.vault = vault.id;
   end.save();
   auction.endPrice = event.params.price;
+  auction.end = end.id;
   auction.save();
 }
