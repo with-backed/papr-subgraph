@@ -146,7 +146,7 @@ export function handleAddCollateral(event: AddCollateral): void {
     event.transaction.hash.toHexString()
   );
   addCollateralEvent.collateral = collateralAdded.id;
-  addCollateralEvent.timestamp = event.block.timestamp;
+  addCollateralEvent.timestamp = event.block.timestamp.toI32();
   addCollateralEvent.controller = event.params._event.address.toHexString();
   addCollateralEvent.vault = vault.id;
   addCollateralEvent.account = vault.account;
@@ -188,7 +188,7 @@ export function handleRemoveCollateral(event: RemoveCollateral): void {
     event.transaction.hash.toHexString()
   );
   collateralRemovedEvent.collateral = collateralRemoved.id;
-  collateralRemovedEvent.timestamp = event.block.timestamp;
+  collateralRemovedEvent.timestamp = event.block.timestamp.toI32();
   collateralRemovedEvent.controller = vault.controller;
   collateralRemovedEvent.vault = vault.id;
   collateralRemovedEvent.account = vault.account;
@@ -219,7 +219,7 @@ export function handleIncreaseDebt(event: IncreaseDebt): void {
   const debtIncreasedEvent = new DebtIncreasedEvent(
     event.transaction.hash.toHexString()
   );
-  debtIncreasedEvent.timestamp = event.block.timestamp;
+  debtIncreasedEvent.timestamp = event.block.timestamp.toI32();
   debtIncreasedEvent.amount = event.params.amount;
   debtIncreasedEvent.controller = vault.controller;
   debtIncreasedEvent.vault = vault.id;
@@ -256,7 +256,7 @@ export function handleReduceDebt(event: ReduceDebt): void {
   const debtDecreasedEvent = new DebtDecreasedEvent(
     event.transaction.hash.toHexString()
   );
-  debtDecreasedEvent.timestamp = event.block.timestamp;
+  debtDecreasedEvent.timestamp = event.block.timestamp.toI32();
   debtDecreasedEvent.amount = event.params.amount;
   debtDecreasedEvent.controller = vault.controller;
   debtDecreasedEvent.vault = vault.id;
@@ -272,7 +272,7 @@ export function handleTargetUpdate(event: UpdateTarget): void {
   if (!controller) {
     controller = new PaprController(event.params._event.address.toHexString());
     controller.target = event.params.newTarget;
-    controller.createdAt = event.block.timestamp;
+    controller.createdAt = event.block.timestamp.toI32();
 
     const token0IsUnderlyingResult = PaprControllerABI.bind(
       event.params._event.address
@@ -317,7 +317,7 @@ export function handleTargetUpdate(event: UpdateTarget): void {
 
   targetUpdate.controller = controller.id;
   targetUpdate.newTarget = event.params.newTarget;
-  targetUpdate.timestamp = event.block.timestamp;
+  targetUpdate.timestamp = event.block.timestamp.toI32();
 
   controller.save();
   targetUpdate.save();
@@ -346,7 +346,7 @@ export function handleCollateralAllowedChanged(event: AllowCollateral): void {
   const allowedCollateralChangeEvent = new CollateralAllowedChangeEvent(
     event.transaction.hash.toHexString()
   );
-  allowedCollateralChangeEvent.timestamp = event.block.timestamp;
+  allowedCollateralChangeEvent.timestamp = event.block.timestamp.toI32();
   allowedCollateralChangeEvent.collateralAddress = event.params.collateral;
   allowedCollateralChangeEvent.allowed = event.params.isAllowed;
   allowedCollateralChangeEvent.controller = controller.id;
@@ -374,7 +374,7 @@ export function handleStartAuction(event: StartAuction): void {
   if (!vault) {
     return;
   }
-  vault.latestAuctionStartTime = event.block.timestamp;
+  vault.latestAuctionStartTime = event.block.timestamp.toI32();
   vault.save();
 
   auction.auctionAssetContract = nft.id;
@@ -403,19 +403,19 @@ export function handleStartAuction(event: StartAuction): void {
 export function handleEndAuction(event: EndAuction): void {
   const auction = Auction.load(event.params.auctionID.toString());
   if (!auction) return;
-  const nft = ERC721Token.load(auction.auctionAssetContract)!;
+  const start = AuctionStartEvent.load(auction.start);
   const vault = Vault.load(auction.vault)!
-  const vaultId = generateVaultId(
-    event.params._event.address,
-    Address.fromString(vault.account.toHexString()),
-    nft
-  )
+  if (vault.latestAuctionStartTime = start!.timestamp) {
+    vault.latestAuctionStartTime = 0;
+    vault.save();
+  }
+  
   const end = new AuctionEndEvent(event.transaction.hash.toHexString());
   end.timestamp = event.block.timestamp.toI32();
   end.auction = auction.id;
   end.controller = auction.controller;
   end.account = auction.nftOwner;
-  end.vault = vaultId;
+  end.vault = vault.id;
   end.save();
   auction.endPrice = event.params.price;
   auction.save();

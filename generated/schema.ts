@@ -16,7 +16,7 @@ export class PaprController extends Entity {
     super();
     this.set("id", Value.fromString(id));
 
-    this.set("createdAt", Value.fromBigInt(BigInt.zero()));
+    this.set("createdAt", Value.fromI32(0));
     this.set("poolAddress", Value.fromBytes(Bytes.empty()));
     this.set("underlying", Value.fromString(""));
     this.set("paprToken", Value.fromString(""));
@@ -51,13 +51,13 @@ export class PaprController extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get createdAt(): BigInt {
+  get createdAt(): i32 {
     let value = this.get("createdAt");
-    return value!.toBigInt();
+    return value!.toI32();
   }
 
-  set createdAt(value: BigInt) {
-    this.set("createdAt", Value.fromBigInt(value));
+  set createdAt(value: i32) {
+    this.set("createdAt", Value.fromI32(value));
   }
 
   get poolAddress(): Bytes {
@@ -169,7 +169,7 @@ export class Vault extends Entity {
     this.set("debt", Value.fromBigInt(BigInt.zero()));
     this.set("debtPerCollateral", Value.fromBigInt(BigInt.zero()));
     this.set("collateralCount", Value.fromI32(0));
-    this.set("latestAuctionStartTime", Value.fromBigInt(BigInt.zero()));
+    this.set("latestAuctionStartTime", Value.fromI32(0));
   }
 
   save(): void {
@@ -261,13 +261,13 @@ export class Vault extends Entity {
     this.set("collateralCount", Value.fromI32(value));
   }
 
-  get latestAuctionStartTime(): BigInt {
+  get latestAuctionStartTime(): i32 {
     let value = this.get("latestAuctionStartTime");
-    return value!.toBigInt();
+    return value!.toI32();
   }
 
-  set latestAuctionStartTime(value: BigInt) {
-    this.set("latestAuctionStartTime", Value.fromBigInt(value));
+  set latestAuctionStartTime(value: i32) {
+    this.set("latestAuctionStartTime", Value.fromI32(value));
   }
 }
 
@@ -276,7 +276,7 @@ export class TargetUpdate extends Entity {
     super();
     this.set("id", Value.fromString(id));
 
-    this.set("timestamp", Value.fromBigInt(BigInt.zero()));
+    this.set("timestamp", Value.fromI32(0));
     this.set("newTarget", Value.fromBigInt(BigInt.zero()));
     this.set("controller", Value.fromString(""));
   }
@@ -307,13 +307,13 @@ export class TargetUpdate extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get timestamp(): BigInt {
+  get timestamp(): i32 {
     let value = this.get("timestamp");
-    return value!.toBigInt();
+    return value!.toI32();
   }
 
-  set timestamp(value: BigInt) {
-    this.set("timestamp", Value.fromBigInt(value));
+  set timestamp(value: i32) {
+    this.set("timestamp", Value.fromI32(value));
   }
 
   get newTarget(): BigInt {
@@ -585,7 +585,7 @@ export class AddCollateralEvent extends Entity {
     super();
     this.set("id", Value.fromString(id));
 
-    this.set("timestamp", Value.fromBigInt(BigInt.zero()));
+    this.set("timestamp", Value.fromI32(0));
     this.set("vault", Value.fromString(""));
     this.set("controller", Value.fromString(""));
     this.set("account", Value.fromBytes(Bytes.empty()));
@@ -620,13 +620,13 @@ export class AddCollateralEvent extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get timestamp(): BigInt {
+  get timestamp(): i32 {
     let value = this.get("timestamp");
-    return value!.toBigInt();
+    return value!.toI32();
   }
 
-  set timestamp(value: BigInt) {
-    this.set("timestamp", Value.fromBigInt(value));
+  set timestamp(value: i32) {
+    this.set("timestamp", Value.fromI32(value));
   }
 
   get vault(): string {
@@ -671,7 +671,7 @@ export class RemoveCollateralEvent extends Entity {
     super();
     this.set("id", Value.fromString(id));
 
-    this.set("timestamp", Value.fromBigInt(BigInt.zero()));
+    this.set("timestamp", Value.fromI32(0));
     this.set("vault", Value.fromString(""));
     this.set("controller", Value.fromString(""));
     this.set("account", Value.fromBytes(Bytes.empty()));
@@ -709,13 +709,13 @@ export class RemoveCollateralEvent extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get timestamp(): BigInt {
+  get timestamp(): i32 {
     let value = this.get("timestamp");
-    return value!.toBigInt();
+    return value!.toI32();
   }
 
-  set timestamp(value: BigInt) {
-    this.set("timestamp", Value.fromBigInt(value));
+  set timestamp(value: i32) {
+    this.set("timestamp", Value.fromI32(value));
   }
 
   get vault(): string {
@@ -760,7 +760,7 @@ export class DebtIncreasedEvent extends Entity {
     super();
     this.set("id", Value.fromString(id));
 
-    this.set("timestamp", Value.fromBigInt(BigInt.zero()));
+    this.set("timestamp", Value.fromI32(0));
     this.set("vault", Value.fromString(""));
     this.set("controller", Value.fromString(""));
     this.set("account", Value.fromBytes(Bytes.empty()));
@@ -795,13 +795,13 @@ export class DebtIncreasedEvent extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get timestamp(): BigInt {
+  get timestamp(): i32 {
     let value = this.get("timestamp");
-    return value!.toBigInt();
+    return value!.toI32();
   }
 
-  set timestamp(value: BigInt) {
-    this.set("timestamp", Value.fromBigInt(value));
+  set timestamp(value: i32) {
+    this.set("timestamp", Value.fromI32(value));
   }
 
   get vault(): string {
@@ -846,7 +846,7 @@ export class DebtDecreasedEvent extends Entity {
     super();
     this.set("id", Value.fromString(id));
 
-    this.set("timestamp", Value.fromBigInt(BigInt.zero()));
+    this.set("timestamp", Value.fromI32(0));
     this.set("vault", Value.fromString(""));
     this.set("controller", Value.fromString(""));
     this.set("account", Value.fromBytes(Bytes.empty()));
@@ -881,13 +881,13 @@ export class DebtDecreasedEvent extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get timestamp(): BigInt {
+  get timestamp(): i32 {
     let value = this.get("timestamp");
-    return value!.toBigInt();
+    return value!.toI32();
   }
 
-  set timestamp(value: BigInt) {
-    this.set("timestamp", Value.fromBigInt(value));
+  set timestamp(value: i32) {
+    this.set("timestamp", Value.fromI32(value));
   }
 
   get vault(): string {
@@ -1279,7 +1279,7 @@ export class CollateralAllowedChangeEvent extends Entity {
     super();
     this.set("id", Value.fromString(id));
 
-    this.set("timestamp", Value.fromBigInt(BigInt.zero()));
+    this.set("timestamp", Value.fromI32(0));
     this.set("collateralAddress", Value.fromBytes(Bytes.empty()));
     this.set("controller", Value.fromString(""));
     this.set("allowed", Value.fromBoolean(false));
@@ -1316,13 +1316,13 @@ export class CollateralAllowedChangeEvent extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get timestamp(): BigInt {
+  get timestamp(): i32 {
     let value = this.get("timestamp");
-    return value!.toBigInt();
+    return value!.toI32();
   }
 
-  set timestamp(value: BigInt) {
-    this.set("timestamp", Value.fromBigInt(value));
+  set timestamp(value: i32) {
+    this.set("timestamp", Value.fromI32(value));
   }
 
   get collateralAddress(): Bytes {

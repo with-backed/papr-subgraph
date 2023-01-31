@@ -1,6 +1,6 @@
 type PaprController @entity {
   id: ID!
-  createdAt: BigInt!
+  createdAt: Int!
   # TODO watch for update pool address events
   poolAddress: Bytes!
   underlying: ERC20Token!
@@ -22,12 +22,12 @@ type Vault @entity {
   debtPerCollateral: BigInt!
   collateral: [VaultCollateral!]! @derivedFrom(field: "vault")
   collateralCount: Int!
-  latestAuctionStartTime: BigInt!
+  latestAuctionStartTime: Int!
 }
 
 type TargetUpdate @entity {
   id: ID!
-  timestamp: BigInt!
+  timestamp: Int!
   newTarget: BigInt!
   controller: PaprController!
 }
@@ -62,7 +62,7 @@ type AllowedCollateral @entity {
 
 type AddCollateralEvent @entity {
   id: ID!
-  timestamp: BigInt!
+  timestamp: Int!
   vault: Vault!
   controller: PaprController!
   account: Bytes!
@@ -71,7 +71,7 @@ type AddCollateralEvent @entity {
 
 type RemoveCollateralEvent @entity {
   id: ID!
-  timestamp: BigInt!
+  timestamp: Int!
   vault: Vault!
   controller: PaprController!
   account: Bytes!
@@ -80,7 +80,7 @@ type RemoveCollateralEvent @entity {
 
 type DebtIncreasedEvent @entity {
   id: ID!
-  timestamp: BigInt!
+  timestamp: Int!
   vault: Vault!
   controller: PaprController!
   account: Bytes!
@@ -89,7 +89,7 @@ type DebtIncreasedEvent @entity {
 
 type DebtDecreasedEvent @entity {
   id: ID!
-  timestamp: BigInt!
+  timestamp: Int!
   vault: Vault!
   controller: PaprController!
   account: Bytes!
@@ -135,7 +135,7 @@ type AuctionEndEvent @entity {
 
 type CollateralAllowedChangeEvent @entity {
   id: ID!
-  timestamp: BigInt!
+  timestamp: Int!
   collateralAddress: Bytes!
   controller: PaprController!
   allowed: Boolean!
