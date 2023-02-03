@@ -7,7 +7,7 @@ dataSources:
     network: goerli
     source:
       abi: PaprController
-      startBlock: 8140465
+      startBlock:  8405259 # 8140465
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -50,7 +50,7 @@ templates:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ./src/mapping.ts
+      file: ./src/swaps.ts
       entities:
         - PaprController
       abis:

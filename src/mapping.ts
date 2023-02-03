@@ -1,4 +1,4 @@
-import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigInt, DataSourceContext } from "@graphprotocol/graph-ts";
 
 import {
   IncreaseDebt,
@@ -26,13 +26,9 @@ import {
   AuctionStartEvent,
   AuctionEndEvent,
   ERC20Token,
-  ERC721Token,
-  Pool
+  ERC721Token
 } from "../generated/schema";
 
-import {
-  Swap as SwapEvent
-} from '../generated/templates/Pool/Pool'
 import { Pool as PoolTemplate } from '../generated/templates'
 
 import { PaprController as PaprControllerABI } from "../generated/SlyFox/PaprController";
@@ -291,10 +287,11 @@ export function handleTargetUpdate(event: UpdateTarget): void {
     ).try_pool();
     if (poolResult.reverted) return;
 
-    let pool = new Pool(poolResult.value.toHexString());
-    pool.controller = controller.id;
-    pool.save();
-    PoolTemplate.create(poolResult.value);
+    controller.poolAddress = poolResult.value;
+
+    let context = new DataSourceContext()
+    context.setString('controller', controller.id)
+    PoolTemplate.createWithContext(poolResult.value, context);
 
     const maxLTVResult = PaprControllerABI.bind(
       event.params._event.address
@@ -433,24 +430,4 @@ export function handleEndAuction(event: EndAuction): void {
   auction.save();
 }
 
-export function handleSwap(event: SwapEvent): void {
-  const pool = Pool.load(event.params._event.address.toHexString());
-  if (!pool) return;
 
-  const controller = PaprController.load(pool.controller);
-  if (!controller) return;
-
-  const newTargetResult = PaprControllerABI.bind(
-    event.params._event.address
-  ).try_newTarget();
-  if (newTargetResult.reverted) return;
-
-  // not sure how I feel about faking this...
-  const targetUpdate = new TargetUpdate(event.transaction.hash.toHexString());
-
-  targetUpdate.controller = controller.id;
-  targetUpdate.newTarget = newTargetResult.value;
-  targetUpdate.timestamp = event.block.timestamp.toI32();
-
-  targetUpdate.save();  
-}
