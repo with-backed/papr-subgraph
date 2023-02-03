@@ -2,15 +2,19 @@ type PaprController @entity {
   id: ID!
   createdAt: Int!
   # TODO watch for update pool address events
-  poolAddress: Bytes!
+  pool: Pool! @derivedFrom(field: "controller")
   underlying: ERC20Token!
   paprToken: ERC20Token!
   token0IsUnderlying: Boolean!
   maxLTV: BigInt!
-  target: BigInt!
   vaults: [Vault!] @derivedFrom(field: "controller")
   allowedCollateral: [AllowedCollateral!]! @derivedFrom(field: "controller")
   targetUpdates: [TargetUpdate!] @derivedFrom(field: "controller")
+}
+
+type Pool @entity {
+  id: ID!
+  controller: PaprController!
 }
 
 type Vault @entity {

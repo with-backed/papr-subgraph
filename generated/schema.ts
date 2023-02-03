@@ -17,7 +17,6 @@ export class PaprController extends Entity {
     this.set("id", Value.fromString(id));
 
     this.set("createdAt", Value.fromI32(0));
-    this.set("poolAddress", Value.fromBytes(Bytes.empty()));
     this.set("underlying", Value.fromString(""));
     this.set("paprToken", Value.fromString(""));
     this.set("token0IsUnderlying", Value.fromBoolean(false));
@@ -60,13 +59,13 @@ export class PaprController extends Entity {
     this.set("createdAt", Value.fromI32(value));
   }
 
-  get poolAddress(): Bytes {
-    let value = this.get("poolAddress");
-    return value!.toBytes();
+  get pool(): string {
+    let value = this.get("pool");
+    return value!.toString();
   }
 
-  set poolAddress(value: Bytes) {
-    this.set("poolAddress", Value.fromBytes(value));
+  set pool(value: string) {
+    this.set("pool", Value.fromString(value));
   }
 
   get underlying(): string {
@@ -155,6 +154,50 @@ export class PaprController extends Entity {
     } else {
       this.set("targetUpdates", Value.fromStringArray(<Array<string>>value));
     }
+  }
+}
+
+export class Pool extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+
+    this.set("controller", Value.fromString(""));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save Pool entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        "Cannot save Pool entity with non-string ID. " +
+          'Considering using .toHex() to convert the "id" to a string.'
+      );
+      store.set("Pool", id.toString(), this);
+    }
+  }
+
+  static load(id: string): Pool | null {
+    return changetype<Pool | null>(store.get("Pool", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get controller(): string {
+    let value = this.get("controller");
+    return value!.toString();
+  }
+
+  set controller(value: string) {
+    this.set("controller", Value.fromString(value));
   }
 }
 
