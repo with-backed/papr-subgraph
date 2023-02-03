@@ -21,9 +21,16 @@ export function handleSwap(event: SwapEvent): void {
        Address.fromString(controller)
     ).try_newTarget();
     if (newTargetResult.reverted) return;
+
+    // check if target update event emitted in this tx already
+    // true if this was an increaseAndSwap call
+    let targetUpdate = TargetUpdate.load(event.transaction.hash.toHexString());
+
+    if (targetUpdate != null) return;
   
-    // not sure how I feel about faking this...
-    const targetUpdate = new TargetUpdate(event.transaction.hash.toHexString());
+    // not sure how I feel about faking this, but I do not think 
+    // we link to these events anywhere
+    targetUpdate = new TargetUpdate(event.transaction.hash.toHexString());
   
     targetUpdate.controller = controller;
     targetUpdate.newTarget = newTargetResult.value;
