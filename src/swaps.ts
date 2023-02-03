@@ -8,12 +8,10 @@ import {
     Swap as SwapEvent
   } from '../generated/templates/Pool/Pool'
 
-  import { PaprController as PaprControllerABI } from "../generated/SlyFox/PaprController";
+import { PaprController as PaprControllerABI } from "../generated/SlyFox/PaprController";
 
-// Indexing seemed slow so I split this into its own file,
-// worried that we were somehow indexing all swap events,
-// indexing did improve through the course of changes, but not sure that 
-// separate file has to do with it. But keeping here because it is distinct
+// Thought I'd separate this as it is kind of distinct from the
+// handlers for the papr controller events
 export function handleSwap(event: SwapEvent): void {
     let context = dataSource.context()
     let controller = context.getString('controller')
@@ -32,4 +30,4 @@ export function handleSwap(event: SwapEvent): void {
     targetUpdate.timestamp = event.block.timestamp.toI32();
   
     targetUpdate.save();  
-  }
+}
