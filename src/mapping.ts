@@ -1,4 +1,4 @@
-import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigInt, DataSourceContext } from "@graphprotocol/graph-ts";
 
 import {
   IncreaseDebt,
@@ -28,6 +28,8 @@ import {
   ERC20Token,
   ERC721Token
 } from "../generated/schema";
+
+import { Pool as PoolTemplate } from '../generated/templates'
 
 import { PaprController as PaprControllerABI } from "../generated/SlyFox/PaprController";
 import { ERC721 as ERC721ABI } from "../generated/SlyFox/ERC721";
@@ -271,7 +273,6 @@ export function handleTargetUpdate(event: UpdateTarget): void {
 
   if (!controller) {
     controller = new PaprController(event.params._event.address.toHexString());
-    controller.target = event.params.newTarget;
     controller.createdAt = event.block.timestamp.toI32();
 
     const token0IsUnderlyingResult = PaprControllerABI.bind(
@@ -285,7 +286,12 @@ export function handleTargetUpdate(event: UpdateTarget): void {
       event.params._event.address
     ).try_pool();
     if (poolResult.reverted) return;
+
     controller.poolAddress = poolResult.value;
+
+    let context = new DataSourceContext()
+    context.setString('controller', controller.id)
+    PoolTemplate.createWithContext(poolResult.value, context);
 
     const maxLTVResult = PaprControllerABI.bind(
       event.params._event.address
@@ -423,3 +429,5 @@ export function handleEndAuction(event: EndAuction): void {
   auction.end = end.id;
   auction.save();
 }
+
+
