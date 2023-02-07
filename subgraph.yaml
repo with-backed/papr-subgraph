@@ -4,10 +4,10 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: SlyFox
-    network: goerli
+    network: mainnet
     source:
       abi: PaprController
-      startBlock: 8375926
+      startBlock: 16579400
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -43,7 +43,7 @@ dataSources:
 templates:
   - kind: ethereum/contract
     name: Pool
-    network: goerli
+    network: mainnet
     source:
       abi: Pool
     mapping:
