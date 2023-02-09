@@ -1,4 +1,5 @@
-import { Address, BigInt, DataSourceContext } from "@graphprotocol/graph-ts";
+import { Address, DataSourceContext, BigInt } from "@graphprotocol/graph-ts";
+import { BigInt as AsBigInt } from "as-bigint"
 
 import {
   IncreaseDebt,
@@ -275,13 +276,6 @@ export function handleTargetUpdate(event: UpdateTarget): void {
     controller = new PaprController(event.params._event.address.toHexString());
     controller.createdAt = event.block.timestamp.toI32();
 
-    const token0IsUnderlyingResult = PaprControllerABI.bind(
-      event.params._event.address
-    ).try_token0IsUnderlying();
-    if (token0IsUnderlyingResult.reverted) return
-
-    controller.token0IsUnderlying = token0IsUnderlyingResult.value
-
     const poolResult = PaprControllerABI.bind(
       event.params._event.address
     ).try_pool();
@@ -317,6 +311,10 @@ export function handleTargetUpdate(event: UpdateTarget): void {
     if (!paprToken) return
 
     controller.paprToken = paprToken.id;
+
+    underlyingResult.value.toHex()
+
+    controller.token0IsUnderlying = AsBigInt.fromString(underlyingResult.value.toHexString()).lt(AsBigInt.fromString(paprTokenResult.value.toHexString()))
   }
 
   const targetUpdate = new TargetUpdate(event.transaction.hash.toHexString());
