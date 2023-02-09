@@ -17,16 +17,6 @@
         "type": "uint256"
       },
       {
-        "internalType": "uint256",
-        "name": "indexMarkRatioMax",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "indexMarkRatioMin",
-        "type": "uint256"
-      },
-      {
         "internalType": "contract ERC20",
         "name": "underlying",
         "type": "address"
@@ -35,6 +25,11 @@
         "internalType": "address",
         "name": "oracleSigner",
         "type": "address"
+      },
+      {
+        "internalType": "contract ERC721[]",
+        "name": "startingCollateral",
+        "type": "address[]"
       }
     ],
     "stateMutability": "nonpayable",
@@ -48,6 +43,11 @@
   {
     "inputs": [],
     "name": "AlreadyInitialized",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "AssetNotProposed",
     "type": "error"
   },
   {
@@ -195,6 +195,11 @@
     "type": "error"
   },
   {
+    "inputs": [],
+    "name": "ProposalPeriodNotComplete",
+    "type": "error"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -262,6 +267,19 @@
       }
     ],
     "name": "AllowCollateral",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "contract ERC721",
+        "name": "asset",
+        "type": "address"
+      }
+    ],
+    "name": "CancelProposedAllowedCollateral",
     "type": "event"
   },
   {
@@ -344,6 +362,19 @@
       }
     ],
     "name": "OwnershipTransferred",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "contract ERC721",
+        "name": "asset",
+        "type": "address"
+      }
+    ],
+    "name": "ProposeAllowedCollateral",
     "type": "event"
   },
   {
@@ -507,19 +538,6 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
-        "internalType": "bool",
-        "name": "locked",
-        "type": "bool"
-      }
-    ],
-    "name": "UpdateLiquidationsLocked",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
         "indexed": true,
         "internalType": "address",
         "name": "newPool",
@@ -544,7 +562,7 @@
   },
   {
     "inputs": [],
-    "name": "BIPS_ONE",
+    "name": "MAX_PER_SECOND_PRICE_CHANGE",
     "outputs": [
       {
         "internalType": "uint256",
@@ -558,6 +576,19 @@
   {
     "inputs": [],
     "name": "acceptOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract ERC721",
+        "name": "asset",
+        "type": "address"
+      }
+    ],
+    "name": "acceptProposedCollateral",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -657,19 +688,6 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "auctionDecayPeriod",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [
       {
         "components": [
@@ -723,19 +741,6 @@
       }
     ],
     "stateMutability": "pure",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "auctionStartPriceMultiplier",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -839,6 +844,43 @@
         "type": "uint256"
       }
     ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract ERC721",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "cachedPriceForAsset",
+    "outputs": [
+      {
+        "internalType": "uint40",
+        "name": "timestamp",
+        "type": "uint40"
+      },
+      {
+        "internalType": "uint216",
+        "name": "price",
+        "type": "uint216"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract ERC721",
+        "name": "asset",
+        "type": "address"
+      }
+    ],
+    "name": "cancelProposedCollateral",
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
@@ -1095,6 +1137,30 @@
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "contract ERC721",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "lastAuctionStartPrice",
+    "outputs": [
+      {
+        "internalType": "uint40",
+        "name": "timestamp",
+        "type": "uint40"
+      },
+      {
+        "internalType": "uint216",
+        "name": "price",
+        "type": "uint216"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "lastUpdated",
     "outputs": [
@@ -1115,32 +1181,6 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "liquidationPenaltyBips",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "liquidationsLocked",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
       }
     ],
     "stateMutability": "view",
@@ -1311,19 +1351,6 @@
   },
   {
     "inputs": [],
-    "name": "perPeriodAuctionDecayWAD",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "pool",
     "outputs": [
       {
@@ -1333,6 +1360,19 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract ERC721",
+        "name": "asset",
+        "type": "address"
+      }
+    ],
+    "name": "proposeAllowedCollateral",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -1452,19 +1492,6 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "quoteCurrency",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [
       {
         "internalType": "address",
@@ -1483,6 +1510,19 @@
       }
     ],
     "name": "reduceDebt",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract ERC721[]",
+        "name": "assets",
+        "type": "address[]"
+      }
+    ],
+    "name": "removeAllowedCollateral",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1583,50 +1623,12 @@
   {
     "inputs": [
       {
-        "components": [
-          {
-            "internalType": "contract ERC721",
-            "name": "collateral",
-            "type": "address"
-          },
-          {
-            "internalType": "bool",
-            "name": "allowed",
-            "type": "bool"
-          }
-        ],
-        "internalType": "struct IPaprController.CollateralAllowedConfig[]",
-        "name": "collateralConfigs",
-        "type": "tuple[]"
-      }
-    ],
-    "name": "setAllowedCollateral",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "uint256",
         "name": "_fundingPeriod",
         "type": "uint256"
       }
     ],
     "name": "setFundingPeriod",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bool",
-        "name": "locked",
-        "type": "bool"
-      }
-    ],
-    "name": "setLiquidationsLocked",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1787,45 +1789,6 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "targetMarkRatioMax",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "targetMarkRatioMin",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "token0IsUnderlying",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [
       {
         "internalType": "address",
@@ -1918,6 +1881,11 @@
         "internalType": "struct ReservoirOracleUnderwriter.OracleInfo",
         "name": "oracleInfo",
         "type": "tuple"
+      },
+      {
+        "internalType": "bool",
+        "name": "guard",
+        "type": "bool"
       }
     ],
     "name": "underwritePriceForCollateral",
@@ -1928,7 +1896,7 @@
         "type": "uint256"
       }
     ],
-    "stateMutability": "view",
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
