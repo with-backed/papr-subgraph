@@ -1,4 +1,5 @@
-import { Address, BigInt, DataSourceContext } from "@graphprotocol/graph-ts";
+import { Address, DataSourceContext, BigInt } from "@graphprotocol/graph-ts";
+import { BigInt as AsBigInt } from "as-bigint"
 
 import {
   IncreaseDebt,
@@ -311,7 +312,9 @@ export function handleTargetUpdate(event: UpdateTarget): void {
 
     controller.paprToken = paprToken.id;
 
-    controller.token0IsUnderlying = BigInt.fromByteArray(underlyingResult.value).lt(BigInt.fromByteArray(paprTokenResult.value))
+    underlyingResult.value.toHex()
+
+    controller.token0IsUnderlying = AsBigInt.fromString(underlyingResult.value.toHexString()).lt(AsBigInt.fromString(paprTokenResult.value.toHexString()))
   }
 
   const targetUpdate = new TargetUpdate(event.transaction.hash.toHexString());
