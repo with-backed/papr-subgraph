@@ -268,6 +268,12 @@ export function handleReduceDebt(event: ReduceDebt): void {
 }
 
 export function handleTargetUpdate(event: UpdateTarget): void {
+  // check if target update event emitted in this tx already
+    // true if this was an increaseAndSwap call
+  let targetUpdate = TargetUpdate.load(event.block.timestamp.toString());
+
+  if (targetUpdate != null) return;
+  
   let controller = PaprController.load(
     event.params._event.address.toHexString()
   );
@@ -317,8 +323,9 @@ export function handleTargetUpdate(event: UpdateTarget): void {
     controller.token0IsUnderlying = AsBigInt.fromString(underlyingResult.value.toHexString()).lt(AsBigInt.fromString(paprTokenResult.value.toHexString()))
   }
 
-  const targetUpdate = new TargetUpdate(event.transaction.hash.toHexString());
+  targetUpdate = new TargetUpdate(event.block.timestamp.toString());
 
+  targetUpdate.txHash = event.transaction.hash;
   targetUpdate.controller = controller.id;
   targetUpdate.newTarget = event.params.newTarget;
   targetUpdate.timestamp = event.block.timestamp.toI32();

@@ -22,16 +22,15 @@ export function handleSwap(event: SwapEvent): void {
     ).try_newTarget();
     if (newTargetResult.reverted) return;
 
-    // check if target update event emitted in this tx already
-    // true if this was an increaseAndSwap call
-    let targetUpdate = TargetUpdate.load(event.transaction.hash.toHexString());
+    // note that we could possibly miss target updates from the contract because 
+    // a swap has occurred in the same block and we store that one instead
+    let targetUpdate = TargetUpdate.load(event.block.timestamp.toString());
 
     if (targetUpdate != null) return;
   
-    // not sure how I feel about faking this, but I do not think 
-    // we link to these events anywhere
-    targetUpdate = new TargetUpdate(event.transaction.hash.toHexString());
-  
+    targetUpdate = new TargetUpdate(event.block.timestamp.toString());
+
+    targetUpdate.txHash = event.transaction.hash;
     targetUpdate.controller = controller;
     targetUpdate.newTarget = newTargetResult.value;
     targetUpdate.timestamp = event.block.timestamp.toI32();

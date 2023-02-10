@@ -277,6 +277,7 @@ export class TargetUpdate extends Entity {
     this.set("id", Value.fromString(id));
 
     this.set("timestamp", Value.fromI32(0));
+    this.set("txHash", Value.fromBytes(Bytes.empty()));
     this.set("newTarget", Value.fromBigInt(BigInt.zero()));
     this.set("controller", Value.fromString(""));
   }
@@ -314,6 +315,15 @@ export class TargetUpdate extends Entity {
 
   set timestamp(value: i32) {
     this.set("timestamp", Value.fromI32(value));
+  }
+
+  get txHash(): Bytes {
+    let value = this.get("txHash");
+    return value!.toBytes();
+  }
+
+  set txHash(value: Bytes) {
+    this.set("txHash", Value.fromBytes(value));
   }
 
   get newTarget(): BigInt {
