@@ -28,6 +28,7 @@ type Vault @entity {
 type TargetUpdate @entity {
   id: ID!
   timestamp: Int!
+  txHash: Bytes!
   newTarget: BigInt!
   controller: PaprController!
 }
