@@ -35,6 +35,7 @@ import { Pool as PoolTemplate } from '../generated/templates'
 import { PaprController as PaprControllerABI } from "../generated/SlyFox/PaprController";
 import { ERC721 as ERC721ABI } from "../generated/SlyFox/ERC721";
 import { ERC20 as ERC20ABI } from "../generated/SlyFox/ERC20";
+import { updateTargetHourData } from "./intervalUpdates";
 
 function generateCollateralId(addr: Address, tokenId: BigInt): string {
   return `${addr.toHexString()}-${tokenId.toString()}`;
@@ -332,6 +333,8 @@ export function handleTargetUpdate(event: UpdateTarget): void {
 
   controller.save();
   targetUpdate.save();
+
+  updateTargetHourData(event);
 }
 
 export function handleCollateralAllowedChanged(event: AllowCollateral): void {

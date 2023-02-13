@@ -33,6 +33,19 @@ type TargetUpdate @entity {
   controller: PaprController!
 }
 
+type TargetHourData @entity {
+  # format: <controller address>-<timestamp>
+  id: ID!
+  # unix timestamp for start of hour
+  periodStartUnix: Int!
+  # pointer to controller
+  controller: PaprController!
+  # current target tracker at end of period (as an average)
+  target: BigInt!
+  # total number of target updates so far in period
+  numTargetUpdates: Int!
+}
+
 type VaultCollateral @entity {
   id: ID!
   tokenId: BigInt!
@@ -41,7 +54,7 @@ type VaultCollateral @entity {
 
 type ERC20Token @entity {
   # id = contract address
-  id: ID!,
+  id: ID!
   symbol: String!
   name: String!
   decimals: Int!
@@ -49,7 +62,7 @@ type ERC20Token @entity {
 
 type ERC721Token @entity {
   # id = contract address
-  id: ID!,
+  id: ID!
   symbol: String!
   name: String!
 }
