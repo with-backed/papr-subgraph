@@ -334,7 +334,7 @@ export function handleTargetUpdate(event: UpdateTarget): void {
   controller.save();
   targetUpdate.save();
 
-  updateTargetHourData(event);
+  updateTargetHourData(event.block.timestamp, controller.id, event.params.newTarget);
 }
 
 export function handleCollateralAllowedChanged(event: AllowCollateral): void {
