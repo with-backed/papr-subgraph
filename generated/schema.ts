@@ -345,6 +345,80 @@ export class TargetUpdate extends Entity {
   }
 }
 
+export class TargetHourData extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+
+    this.set("periodStartUnix", Value.fromI32(0));
+    this.set("controller", Value.fromString(""));
+    this.set("target", Value.fromBigInt(BigInt.zero()));
+    this.set("numTargetUpdates", Value.fromI32(0));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save TargetHourData entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        "Cannot save TargetHourData entity with non-string ID. " +
+          'Considering using .toHex() to convert the "id" to a string.'
+      );
+      store.set("TargetHourData", id.toString(), this);
+    }
+  }
+
+  static load(id: string): TargetHourData | null {
+    return changetype<TargetHourData | null>(store.get("TargetHourData", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get periodStartUnix(): i32 {
+    let value = this.get("periodStartUnix");
+    return value!.toI32();
+  }
+
+  set periodStartUnix(value: i32) {
+    this.set("periodStartUnix", Value.fromI32(value));
+  }
+
+  get controller(): string {
+    let value = this.get("controller");
+    return value!.toString();
+  }
+
+  set controller(value: string) {
+    this.set("controller", Value.fromString(value));
+  }
+
+  get target(): BigInt {
+    let value = this.get("target");
+    return value!.toBigInt();
+  }
+
+  set target(value: BigInt) {
+    this.set("target", Value.fromBigInt(value));
+  }
+
+  get numTargetUpdates(): i32 {
+    let value = this.get("numTargetUpdates");
+    return value!.toI32();
+  }
+
+  set numTargetUpdates(value: i32) {
+    this.set("numTargetUpdates", Value.fromI32(value));
+  }
+}
+
 export class VaultCollateral extends Entity {
   constructor(id: string) {
     super();
