@@ -299,6 +299,11 @@ export function handleTargetUpdate(event: UpdateTarget): void {
     ).try_maxLTV();
     if (maxLTVResult.reverted) return;
     controller.maxLTV = maxLTVResult.value;
+    const fundingPeriodResult = PaprControllerABI.bind(
+      event.params._event.address
+    ).try_fundingPeriod()
+    if (fundingPeriodResult.reverted) return;
+    controller.fundingPeriod = fundingPeriodResult.value;
 
     const underlyingResult = PaprControllerABI.bind(
       event.params._event.address

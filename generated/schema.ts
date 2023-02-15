@@ -22,6 +22,7 @@ export class PaprController extends Entity {
     this.set("paprToken", Value.fromString(""));
     this.set("token0IsUnderlying", Value.fromBoolean(false));
     this.set("maxLTV", Value.fromBigInt(BigInt.zero()));
+    this.set("fundingPeriod", Value.fromBigInt(BigInt.zero()));
     this.set("target", Value.fromBigInt(BigInt.zero()));
   }
 
@@ -103,6 +104,15 @@ export class PaprController extends Entity {
 
   set maxLTV(value: BigInt) {
     this.set("maxLTV", Value.fromBigInt(value));
+  }
+
+  get fundingPeriod(): BigInt {
+    let value = this.get("fundingPeriod");
+    return value!.toBigInt();
+  }
+
+  set fundingPeriod(value: BigInt) {
+    this.set("fundingPeriod", Value.fromBigInt(value));
   }
 
   get target(): BigInt {
