@@ -9,7 +9,8 @@ import {
   RemoveCollateral,
   AllowCollateral,
   StartAuction,
-  EndAuction
+  EndAuction,
+  SetFundingPeriod
 } from "../generated/SlyFox/PaprController";
 
 import {
@@ -340,6 +341,16 @@ export function handleTargetUpdate(event: UpdateTarget): void {
   targetUpdate.save();
 
   updateTargetHourData(event.block.timestamp, controller.id, event.params.newTarget);
+}
+
+export function handleFundingPeriodUpdated(event: SetFundingPeriod): void {
+  const controller = PaprController.load(
+    event.params._event.address.toHexString()
+  );
+  if (!controller) return;
+
+  controller.fundingPeriod = event.params.fundingPeriod;
+  controller.save();
 }
 
 export function handleCollateralAllowedChanged(event: AllowCollateral): void {
