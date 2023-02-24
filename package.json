@@ -6,7 +6,8 @@
     "build:compile": "graph build subgraph.yaml",
     "build:all": "yarn build:codegen && yarn build:compile",
     "deploy": "yarn build:all && goldsky subgraph deploy",
-    "deploy:thegraph": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ adamgobes/sly-fox --access-token"
+    "deploy:thegraph": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ adamgobes/sly-fox --access-token",
+    "create:webhook:goerli": "goldsky subgraph webhook create papr-goerli/0.1.95"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.23.1",

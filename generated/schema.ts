@@ -24,6 +24,7 @@ export class PaprController extends Entity {
     this.set("maxLTV", Value.fromBigInt(BigInt.zero()));
     this.set("fundingPeriod", Value.fromBigInt(BigInt.zero()));
     this.set("target", Value.fromBigInt(BigInt.zero()));
+    this.set("lastUpdated", Value.fromI32(0));
   }
 
   save(): void {
@@ -122,6 +123,15 @@ export class PaprController extends Entity {
 
   set target(value: BigInt) {
     this.set("target", Value.fromBigInt(value));
+  }
+
+  get lastUpdated(): i32 {
+    let value = this.get("lastUpdated");
+    return value!.toI32();
+  }
+
+  set lastUpdated(value: i32) {
+    this.set("lastUpdated", Value.fromI32(value));
   }
 
   get vaults(): Array<string> | null {
