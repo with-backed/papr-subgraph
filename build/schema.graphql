@@ -9,6 +9,7 @@ type PaprController @entity {
   maxLTV: BigInt!
   fundingPeriod: BigInt!
   target: BigInt!
+  lastUpdated: Int!
   vaults: [Vault!] @derivedFrom(field: "controller")
   allowedCollateral: [AllowedCollateral!]! @derivedFrom(field: "controller")
   targetUpdates: [TargetUpdate!] @derivedFrom(field: "controller")
