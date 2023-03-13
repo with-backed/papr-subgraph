@@ -337,8 +337,7 @@ export function handleTargetUpdate(event: UpdateTarget): void {
   targetUpdate.newTarget = event.params.newTarget;
   targetUpdate.timestamp = event.block.timestamp.toI32();
 
-  updateControllerTarget(event.params._event.address.toHexString(), event.params.newTarget)
-  controller.lastUpdated = event.block.timestamp.toI32();
+  updateControllerTarget(event.params._event.address.toHexString(), event.params.newTarget, event.block.timestamp)
 
   controller.save();
   targetUpdate.save();

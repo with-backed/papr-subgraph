@@ -38,5 +38,5 @@ export function handleSwap(event: SwapEvent): void {
   
     targetUpdate.save();
     updateTargetHourData(event.block.timestamp, controller, newTargetResult.value);
-    updateControllerTarget(controller, newTargetResult.value);
+    updateControllerTarget(controller, newTargetResult.value, event.block.timestamp);
 }

@@ -32,10 +32,12 @@ export function updateTargetHourData(
 
 export function updateControllerTarget(
   controllerAddress: string,
-  target: BigInt
+  target: BigInt,
+  timestamp: BigInt,
 ): void {
   let controller = PaprController.load(controllerAddress);
   if (!controller) return;
-  controller.target = target;
+  controller.currentTarget = target;
+  controller.currentTargetUpdated = timestamp.toI32()
   controller.save();
 }

@@ -23,8 +23,8 @@ export class PaprController extends Entity {
     this.set("token0IsUnderlying", Value.fromBoolean(false));
     this.set("maxLTV", Value.fromBigInt(BigInt.zero()));
     this.set("fundingPeriod", Value.fromBigInt(BigInt.zero()));
-    this.set("target", Value.fromBigInt(BigInt.zero()));
-    this.set("lastUpdated", Value.fromI32(0));
+    this.set("currentTarget", Value.fromBigInt(BigInt.zero()));
+    this.set("currentTargetUpdated", Value.fromI32(0));
   }
 
   save(): void {
@@ -116,22 +116,22 @@ export class PaprController extends Entity {
     this.set("fundingPeriod", Value.fromBigInt(value));
   }
 
-  get target(): BigInt {
-    let value = this.get("target");
+  get currentTarget(): BigInt {
+    let value = this.get("currentTarget");
     return value!.toBigInt();
   }
 
-  set target(value: BigInt) {
-    this.set("target", Value.fromBigInt(value));
+  set currentTarget(value: BigInt) {
+    this.set("currentTarget", Value.fromBigInt(value));
   }
 
-  get lastUpdated(): i32 {
-    let value = this.get("lastUpdated");
+  get currentTargetUpdated(): i32 {
+    let value = this.get("currentTargetUpdated");
     return value!.toI32();
   }
 
-  set lastUpdated(value: i32) {
-    this.set("lastUpdated", Value.fromI32(value));
+  set currentTargetUpdated(value: i32) {
+    this.set("currentTargetUpdated", Value.fromI32(value));
   }
 
   get vaults(): Array<string> | null {
