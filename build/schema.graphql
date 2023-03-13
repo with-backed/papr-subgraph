@@ -8,8 +8,8 @@ type PaprController @entity {
   token0IsUnderlying: Boolean!
   maxLTV: BigInt!
   fundingPeriod: BigInt!
-  target: BigInt!
-  lastUpdated: Int!
+  currentTarget: BigInt!
+  currentTargetUpdated: Int!
   vaults: [Vault!] @derivedFrom(field: "controller")
   allowedCollateral: [AllowedCollateral!]! @derivedFrom(field: "controller")
   targetUpdates: [TargetUpdate!] @derivedFrom(field: "controller")
