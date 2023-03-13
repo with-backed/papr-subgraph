@@ -1,5 +1,5 @@
 import { BigInt } from "@graphprotocol/graph-ts";
-import { TargetHourData } from "../generated/schema";
+import { PaprController, TargetHourData } from "../generated/schema";
 
 export function updateTargetHourData(
   blockTimestamp: BigInt,
@@ -28,4 +28,14 @@ export function updateTargetHourData(
   targetHourData.save();
 
   return targetHourData;
+}
+
+export function updateControllerTarget(
+  controllerAddress: string,
+  target: BigInt
+): void {
+  let controller = PaprController.load(controllerAddress);
+  if (!controller) return;
+  controller.target = target;
+  controller.save();
 }
