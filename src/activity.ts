@@ -2,7 +2,7 @@ import { Address, BigInt, dataSource } from "@graphprotocol/graph-ts";
 import { Activity, PaprController } from "../generated/schema";
 import { Pool as PoolABI } from "../generated/templates/Pool/Pool";
 import { Swap as SwapEvent } from "../generated/templates/Pool/Pool";
-import { loadOrCreateERC20Token } from "./mapping";
+import { loadOrCreateERC20Token } from "./utils";
 
 function getSqrtPricePool(pool: PoolABI): BigInt {
   const context = dataSource.context();
