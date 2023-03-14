@@ -1548,8 +1548,8 @@ export class Activity extends Entity {
     }
   }
 
-  get paprPrice(): BigInt | null {
-    let value = this.get("paprPrice");
+  get paprPriceInUnderlying(): BigInt | null {
+    let value = this.get("paprPriceInUnderlying");
     if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -1557,11 +1557,11 @@ export class Activity extends Entity {
     }
   }
 
-  set paprPrice(value: BigInt | null) {
+  set paprPriceInUnderlying(value: BigInt | null) {
     if (!value) {
-      this.unset("paprPrice");
+      this.unset("paprPriceInUnderlying");
     } else {
-      this.set("paprPrice", Value.fromBigInt(<BigInt>value));
+      this.set("paprPriceInUnderlying", Value.fromBigInt(<BigInt>value));
     }
   }
 }
