@@ -178,7 +178,7 @@ type Activity @entity {
   description: String!
   type: ActivityType!
   timestamp: Int!
-  vault: Vault!
-  ethPrice: BigInt!
   metadata: String!
+  vault: Vault
+  ethPrice: BigInt
 }

@@ -1466,8 +1466,6 @@ export class Activity extends Entity {
     this.set("description", Value.fromString(""));
     this.set("type", Value.fromString(""));
     this.set("timestamp", Value.fromI32(0));
-    this.set("vault", Value.fromString(""));
-    this.set("ethPrice", Value.fromBigInt(BigInt.zero()));
     this.set("metadata", Value.fromString(""));
   }
 
@@ -1524,24 +1522,6 @@ export class Activity extends Entity {
     this.set("timestamp", Value.fromI32(value));
   }
 
-  get vault(): string {
-    let value = this.get("vault");
-    return value!.toString();
-  }
-
-  set vault(value: string) {
-    this.set("vault", Value.fromString(value));
-  }
-
-  get ethPrice(): BigInt {
-    let value = this.get("ethPrice");
-    return value!.toBigInt();
-  }
-
-  set ethPrice(value: BigInt) {
-    this.set("ethPrice", Value.fromBigInt(value));
-  }
-
   get metadata(): string {
     let value = this.get("metadata");
     return value!.toString();
@@ -1549,5 +1529,39 @@ export class Activity extends Entity {
 
   set metadata(value: string) {
     this.set("metadata", Value.fromString(value));
+  }
+
+  get vault(): string | null {
+    let value = this.get("vault");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set vault(value: string | null) {
+    if (!value) {
+      this.unset("vault");
+    } else {
+      this.set("vault", Value.fromString(<string>value));
+    }
+  }
+
+  get ethPrice(): BigInt | null {
+    let value = this.get("ethPrice");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set ethPrice(value: BigInt | null) {
+    if (!value) {
+      this.unset("ethPrice");
+    } else {
+      this.set("ethPrice", Value.fromBigInt(<BigInt>value));
+    }
   }
 }
