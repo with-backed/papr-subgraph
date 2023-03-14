@@ -84,7 +84,7 @@ function loadOrCreateERC721Token(contractAddress: Address): ERC721Token | null {
   return token
 }
 
-function loadOrCreateERC20Token(contractAddress: Address): ERC20Token | null {
+export function loadOrCreateERC20Token(contractAddress: Address): ERC20Token | null {
   var token = ERC20Token.load(contractAddress.toHexString());
   if (token) {return token}
 

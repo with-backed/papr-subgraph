@@ -1466,7 +1466,8 @@ export class Activity extends Entity {
     this.set("description", Value.fromString(""));
     this.set("type", Value.fromString(""));
     this.set("timestamp", Value.fromI32(0));
-    this.set("metadata", Value.fromString(""));
+    this.set("controller", Value.fromString(""));
+    this.set("user", Value.fromBytes(Bytes.empty()));
   }
 
   save(): void {
@@ -1522,13 +1523,22 @@ export class Activity extends Entity {
     this.set("timestamp", Value.fromI32(value));
   }
 
-  get metadata(): string {
-    let value = this.get("metadata");
+  get controller(): string {
+    let value = this.get("controller");
     return value!.toString();
   }
 
-  set metadata(value: string) {
-    this.set("metadata", Value.fromString(value));
+  set controller(value: string) {
+    this.set("controller", Value.fromString(value));
+  }
+
+  get user(): Bytes {
+    let value = this.get("user");
+    return value!.toBytes();
+  }
+
+  set user(value: Bytes) {
+    this.set("user", Value.fromBytes(value));
   }
 
   get vault(): string | null {
@@ -1548,8 +1558,8 @@ export class Activity extends Entity {
     }
   }
 
-  get paprPriceInUnderlying(): BigInt | null {
-    let value = this.get("paprPriceInUnderlying");
+  get sqrtPricePool(): BigInt | null {
+    let value = this.get("sqrtPricePool");
     if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -1557,11 +1567,116 @@ export class Activity extends Entity {
     }
   }
 
-  set paprPriceInUnderlying(value: BigInt | null) {
+  set sqrtPricePool(value: BigInt | null) {
     if (!value) {
-      this.unset("paprPriceInUnderlying");
+      this.unset("sqrtPricePool");
     } else {
-      this.set("paprPriceInUnderlying", Value.fromBigInt(<BigInt>value));
+      this.set("sqrtPricePool", Value.fromBigInt(<BigInt>value));
+    }
+  }
+
+  get amountIn(): BigInt | null {
+    let value = this.get("amountIn");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set amountIn(value: BigInt | null) {
+    if (!value) {
+      this.unset("amountIn");
+    } else {
+      this.set("amountIn", Value.fromBigInt(<BigInt>value));
+    }
+  }
+
+  get amountOut(): BigInt | null {
+    let value = this.get("amountOut");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set amountOut(value: BigInt | null) {
+    if (!value) {
+      this.unset("amountOut");
+    } else {
+      this.set("amountOut", Value.fromBigInt(<BigInt>value));
+    }
+  }
+
+  get clientFee(): BigInt | null {
+    let value = this.get("clientFee");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set clientFee(value: BigInt | null) {
+    if (!value) {
+      this.unset("clientFee");
+    } else {
+      this.set("clientFee", Value.fromBigInt(<BigInt>value));
+    }
+  }
+
+  get tokenIn(): string | null {
+    let value = this.get("tokenIn");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set tokenIn(value: string | null) {
+    if (!value) {
+      this.unset("tokenIn");
+    } else {
+      this.set("tokenIn", Value.fromString(<string>value));
+    }
+  }
+
+  get tokenOut(): string | null {
+    let value = this.get("tokenOut");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set tokenOut(value: string | null) {
+    if (!value) {
+      this.unset("tokenOut");
+    } else {
+      this.set("tokenOut", Value.fromString(<string>value));
+    }
+  }
+
+  get collateralTokenIds(): Array<BigInt> | null {
+    let value = this.get("collateralTokenIds");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigIntArray();
+    }
+  }
+
+  set collateralTokenIds(value: Array<BigInt> | null) {
+    if (!value) {
+      this.unset("collateralTokenIds");
+    } else {
+      this.set(
+        "collateralTokenIds",
+        Value.fromBigIntArray(<Array<BigInt>>value)
+      );
     }
   }
 }

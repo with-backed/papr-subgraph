@@ -178,7 +178,14 @@ type Activity @entity {
   description: String!
   type: ActivityType!
   timestamp: Int!
-  metadata: String!
+  controller: PaprController!
+  user: Bytes!
   vault: Vault
-  paprPriceInUnderlying: BigInt
+  sqrtPricePool: BigInt
+  amountIn: BigInt
+  amountOut: BigInt
+  clientFee: BigInt
+  tokenIn: ERC20Token
+  tokenOut: ERC20Token
+  collateralTokenIds: [BigInt!]
 }
