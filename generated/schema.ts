@@ -1548,8 +1548,8 @@ export class Activity extends Entity {
     }
   }
 
-  get ethPrice(): BigInt | null {
-    let value = this.get("ethPrice");
+  get paprPrice(): BigInt | null {
+    let value = this.get("paprPrice");
     if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -1557,11 +1557,11 @@ export class Activity extends Entity {
     }
   }
 
-  set ethPrice(value: BigInt | null) {
+  set paprPrice(value: BigInt | null) {
     if (!value) {
-      this.unset("ethPrice");
+      this.unset("paprPrice");
     } else {
-      this.set("ethPrice", Value.fromBigInt(<BigInt>value));
+      this.set("paprPrice", Value.fromBigInt(<BigInt>value));
     }
   }
 }

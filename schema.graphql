@@ -180,5 +180,5 @@ type Activity @entity {
   timestamp: Int!
   metadata: String!
   vault: Vault
-  ethPrice: BigInt
+  paprPrice: BigInt
 }
