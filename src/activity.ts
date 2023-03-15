@@ -4,18 +4,6 @@ import { Pool as PoolABI } from "../generated/templates/Pool/Pool";
 import { Swap as SwapEvent } from "../generated/templates/Pool/Pool";
 import { loadOrCreateERC20Token } from "./utils";
 
-function getSqrtPricePool(pool: PoolABI): BigInt {
-  const context = dataSource.context();
-  const controllerId = context.getString("controller");
-  const controller = PaprController.load(controllerId);
-  if (!controller) return BigInt.fromI32(0);
-
-  const slot0 = pool.try_slot0();
-  if (slot0.reverted) return BigInt.fromI32(0);
-
-  return slot0.value.value0;
-}
-
 class TokenAmounts {
   amountIn: BigInt | null;
   amountOut: BigInt | null;
@@ -52,7 +40,7 @@ function getTokenAmountsForSwap(
   };
 }
 
-export function createSwapActivityEntity(event: SwapEvent): void {
+export function handleSwapActivityEntity(event: SwapEvent): void {
   let activity = Activity.load(event.transaction.hash.toHex());
 
   // add collateral event already exists, and user is doing a mint + swap
@@ -67,7 +55,7 @@ export function createSwapActivityEntity(event: SwapEvent): void {
   const pool = PoolABI.bind(event.params._event.address);
 
   activity.user = event.transaction.from;
-  activity.sqrtPricePool = getSqrtPricePool(pool);
+  activity.sqrtPricePool = event.params.sqrtPriceX96;
 
   const tokenAmounts = getTokenAmountsForSwap(
     event.params.amount0,

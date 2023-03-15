@@ -10,7 +10,7 @@ import {
 
 import { PaprController as PaprControllerABI } from "../generated/SlyFox/PaprController";
 import { updateControllerTarget, updateTargetHourData } from "./intervalUpdates";
-import { createSwapActivityEntity } from "./activity";
+import { handleSwapActivityEntity } from "./activity";
 
 // Thought I'd separate this as it is kind of distinct from the
 // handlers for the papr controller events
@@ -18,6 +18,8 @@ export function handleSwap(event: SwapEvent): void {
     let context = dataSource.context()
     let controller = context.getString('controller')
     if (!controller) return;
+    
+    handleSwapActivityEntity(event);
   
     const newTargetResult = PaprControllerABI.bind(
        Address.fromString(controller)
@@ -40,5 +42,4 @@ export function handleSwap(event: SwapEvent): void {
     targetUpdate.save();
     updateTargetHourData(event.block.timestamp, controller, newTargetResult.value);
     updateControllerTarget(controller, newTargetResult.value, event.block.timestamp);
-    createSwapActivityEntity(event);
 }
