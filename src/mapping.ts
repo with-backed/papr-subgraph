@@ -37,18 +37,11 @@ import { PaprController as PaprControllerABI } from "../generated/SlyFox/PaprCon
 import { ERC721 as ERC721ABI } from "../generated/SlyFox/ERC721";
 import { ERC20 as ERC20ABI } from "../generated/SlyFox/ERC20";
 import { updateControllerTarget, updateTargetHourData } from "./intervalUpdates";
-import { loadOrCreateERC20Token, loadOrCreateERC721Token } from "./utils";
+import { generateVaultId, loadOrCreateERC20Token, loadOrCreateERC721Token } from "./utils";
+import { handleAddCollateralActivityEntity } from "./activity";
 
 function generateCollateralId(addr: Address, tokenId: BigInt): string {
   return `${addr.toHexString()}-${tokenId.toString()}`;
-}
-
-function generateVaultId(
-  controller: Address,
-  account: Address,
-  token: ERC721Token
-): string {
-  return `${controller.toHexString()}-${account.toHexString()}-${token.id}`;
 }
 
 function initVault(
@@ -112,6 +105,7 @@ export function handleAddCollateral(event: AddCollateral): void {
   addCollateralEvent.vault = vault.id;
   addCollateralEvent.account = vault.account;
   addCollateralEvent.save();
+  handleAddCollateralActivityEntity(event, event.params._event.address.toHexString());
 }
 
 export function handleRemoveCollateral(event: RemoveCollateral): void {

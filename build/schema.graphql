@@ -173,9 +173,22 @@ enum ActivityType {
   REDUCE_DEBT_SWAP
 }
 
+type ActivityAddedCollateral @entity {
+  id: ID!
+  collateral: ERC721Token!
+  tokenId: BigInt!
+  activity: Activity!
+}
+
+type ActivityRemovedCollateral @entity {
+  id: ID!
+  collateral: ERC721Token!
+  tokenId: BigInt!
+  activity: Activity!
+}
+
 type Activity @entity {
   id: ID! # tx hash of activity
-  description: String!
   type: ActivityType!
   timestamp: Int!
   controller: PaprController!
@@ -187,5 +200,7 @@ type Activity @entity {
   clientFee: BigInt
   tokenIn: ERC20Token
   tokenOut: ERC20Token
-  collateralTokenIds: [BigInt!]
+  addedCollateral: [ActivityAddedCollateral!]! @derivedFrom(field: "activity")
+  removedCollateral: [ActivityRemovedCollateral!]!
+    @derivedFrom(field: "activity")
 }
