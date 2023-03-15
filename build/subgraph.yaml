@@ -61,6 +61,8 @@ templates:
           file: Pool/abis/Pool.json
         - name: PaprController
           file: Pool/abis/PaprController.json
+        - name: ERC20
+          file: Pool/abis/ERC20.json
       eventHandlers:
         - event: Swap(indexed address,indexed address,int256,int256,uint160,uint128,int24)
           handler: handleSwap

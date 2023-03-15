@@ -156,3 +156,36 @@ type CollateralAllowedChangeEvent @entity {
   controller: PaprController!
   allowed: Boolean!
 }
+
+enum ActivityType {
+  ADD_COLLATERAL
+  REMOVE_COLLATERAL
+  INCREASE_DEBT
+  REDUCE_DEBT
+  SWAP
+  START_AUCTION
+  END_AUCTION
+  ADD_COLLATERAL_INCREASE_DEBT
+  ADD_COLLATERAL_INCREASE_DEBT_SWAP
+  REMOVE_COLLATERAL_REDUCE_DEBT
+  REMOVE_COLLATERAL_REDUCE_DEBT_SWAP
+  INCREASE_DEBT_SWAP
+  REDUCE_DEBT_SWAP
+}
+
+type Activity @entity {
+  id: ID! # tx hash of activity
+  description: String!
+  type: ActivityType!
+  timestamp: Int!
+  controller: PaprController!
+  user: Bytes!
+  vault: Vault
+  sqrtPricePool: BigInt
+  amountIn: BigInt
+  amountOut: BigInt
+  clientFee: BigInt
+  tokenIn: ERC20Token
+  tokenOut: ERC20Token
+  collateralTokenIds: [BigInt!]
+}
