@@ -50,3 +50,11 @@ export function loadOrCreateERC20Token(
 
   return token;
 }
+
+export function generateVaultId(
+  controller: Address,
+  account: Address,
+  token: ERC721Token
+): string {
+  return `${controller.toHexString()}-${account.toHexString()}-${token.id}`;
+}

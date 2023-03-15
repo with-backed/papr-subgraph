@@ -1,8 +1,17 @@
 import { Address, BigInt, dataSource } from "@graphprotocol/graph-ts";
-import { Activity, PaprController } from "../generated/schema";
+import {
+  Activity,
+  ActivityAddedCollateral,
+  PaprController,
+} from "../generated/schema";
+import { AddCollateral as AddCollateralEvent } from "../generated/SlyFox/PaprController";
 import { Pool as PoolABI } from "../generated/templates/Pool/Pool";
 import { Swap as SwapEvent } from "../generated/templates/Pool/Pool";
-import { loadOrCreateERC20Token } from "./utils";
+import {
+  generateVaultId,
+  loadOrCreateERC20Token,
+  loadOrCreateERC721Token,
+} from "./utils";
 
 class TokenAmounts {
   amountIn: BigInt | null;
@@ -41,6 +50,10 @@ function getTokenAmountsForSwap(
 }
 
 export function handleSwapActivityEntity(event: SwapEvent): void {
+  const context = dataSource.context();
+  const controller = context.getString("controller");
+  if (!controller) return;
+
   let activity = Activity.load(event.transaction.hash.toHex());
 
   // add collateral event already exists, and user is doing a mint + swap
@@ -54,6 +67,8 @@ export function handleSwapActivityEntity(event: SwapEvent): void {
 
   const pool = PoolABI.bind(event.params._event.address);
 
+  activity.timestamp = event.block.timestamp.toI32();
+  activity.controller = controller;
   activity.user = event.transaction.from;
   activity.sqrtPricePool = event.params.sqrtPriceX96;
 
@@ -71,4 +86,48 @@ export function handleSwapActivityEntity(event: SwapEvent): void {
   if (tokenOutERC20) activity.tokenOut = tokenOutERC20.id;
 
   activity.save();
+}
+
+export function handleAddCollateralActivityEntity(
+  event: AddCollateralEvent,
+  controllerId: string
+): void {
+  const token = loadOrCreateERC721Token(event.params.collateralAddress);
+  if (!token) return;
+
+  let activity = Activity.load(event.transaction.hash.toHex());
+  if (!activity) {
+    activity = new Activity(event.transaction.hash.toHex());
+    activity.type = "ADD_COLLATERAL";
+    activity.timestamp = event.block.timestamp.toI32();
+    activity.controller = controllerId;
+    activity.user = event.transaction.from;
+    activity.vault = generateVaultId(
+      event.params._event.address,
+      event.params.account,
+      token
+    );
+  }
+
+  const activityAddedCollateral = new ActivityAddedCollateral(
+    generateActivityCollateralId(
+      activity,
+      token.id,
+      event.params.tokenId.toString()
+    )
+  );
+  activityAddedCollateral.activity = activity.id;
+  activityAddedCollateral.collateral = token.id;
+  activityAddedCollateral.tokenId = event.params.tokenId;
+  activityAddedCollateral.save();
+
+  activity.save();
+}
+
+function generateActivityCollateralId(
+  activity: Activity,
+  collateralAddress: string,
+  tokenId: string
+): string {
+  return `${activity.id}-${collateralAddress}-${tokenId}`;
 }
