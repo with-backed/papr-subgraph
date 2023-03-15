@@ -53,17 +53,19 @@ function getTokenAmountsForSwap(
 }
 
 export function createSwapActivityEntity(event: SwapEvent): void {
-  const addCollateralEvent = Activity.load(event.transaction.hash.toHex());
+  let activity = Activity.load(event.transaction.hash.toHex());
 
   // add collateral event already exists, and user is doing a mint + swap
-  // this entity will now be created in the mint handler
-  if (!!addCollateralEvent) return;
+  // this entity will be updated with the swap details and re-typed to a ADD_COLLATERAL_INCREASE_DEBT_SWAP
+  if (!!activity) {
+    activity.type = "ADD_COLLATERAL_INCREASE_DEBT_SWAP";
+  } else {
+    activity = new Activity(event.transaction.hash.toHex());
+    activity.type = "SWAP";
+  }
 
   const pool = PoolABI.bind(event.params._event.address);
 
-  const activity = new Activity(event.transaction.hash.toHex());
-
-  activity.type = "SWAP";
   activity.user = event.transaction.from;
   activity.sqrtPricePool = getSqrtPricePool(pool);
 
