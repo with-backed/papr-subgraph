@@ -1703,6 +1703,23 @@ export class Activity extends Entity {
     }
   }
 
+  get amountBorrowedOrRepaid(): BigInt | null {
+    let value = this.get("amountBorrowedOrRepaid");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set amountBorrowedOrRepaid(value: BigInt | null) {
+    if (!value) {
+      this.unset("amountBorrowedOrRepaid");
+    } else {
+      this.set("amountBorrowedOrRepaid", Value.fromBigInt(<BigInt>value));
+    }
+  }
+
   get amountIn(): BigInt | null {
     let value = this.get("amountIn");
     if (!value || value.kind == ValueKind.NULL) {
