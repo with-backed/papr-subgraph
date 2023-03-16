@@ -1761,8 +1761,8 @@ export class Activity extends Entity {
     }
   }
 
-  get clientFee(): BigInt | null {
-    let value = this.get("clientFee");
+  get clientFeeBips(): BigInt | null {
+    let value = this.get("clientFeeBips");
     if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -1770,11 +1770,11 @@ export class Activity extends Entity {
     }
   }
 
-  set clientFee(value: BigInt | null) {
+  set clientFeeBips(value: BigInt | null) {
     if (!value) {
-      this.unset("clientFee");
+      this.unset("clientFeeBips");
     } else {
-      this.set("clientFee", Value.fromBigInt(<BigInt>value));
+      this.set("clientFeeBips", Value.fromBigInt(<BigInt>value));
     }
   }
 

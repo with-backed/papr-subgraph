@@ -42,13 +42,13 @@ function getTokenAmountsForSwap(
   let tokenOut: Address;
 
   if (amount0.lt(BigInt.fromI32(0))) {
-    amountIn = amount1;
-    amountOut = amount0;
+    amountIn = amount1.abs();
+    amountOut = amount0.abs();
     tokenIn = pool.token1();
     tokenOut = pool.token0();
   } else {
-    amountIn = amount0;
-    amountOut = amount1;
+    amountIn = amount0.abs();
+    amountOut = amount1.abs();
     tokenIn = pool.token0();
     tokenOut = pool.token1();
   }
@@ -259,4 +259,15 @@ function generateActivityCollateralId(
   tokenId: string
 ): string {
   return `${activity.id}-${collateralAddress}-${tokenId}`;
+}
+
+export function addClientFeeToActivity(
+  activityId: string,
+  feeBips: BigInt
+): void {
+  const activity = Activity.load(activityId);
+  if (!activity) return;
+
+  activity.clientFeeBips = feeBips;
+  activity.save();
 }

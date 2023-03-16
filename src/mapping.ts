@@ -10,7 +10,9 @@ import {
   AllowCollateral,
   StartAuction,
   EndAuction,
-  SetFundingPeriod
+  SetFundingPeriod,
+  IncreaseDebtAndSellCall,
+  BuyAndReduceDebtCall
 } from "../generated/SlyFox/PaprController";
 
 import {
@@ -38,7 +40,7 @@ import { ERC721 as ERC721ABI } from "../generated/SlyFox/ERC721";
 import { ERC20 as ERC20ABI } from "../generated/SlyFox/ERC20";
 import { updateControllerTarget, updateTargetHourData } from "./intervalUpdates";
 import { generateVaultId, loadOrCreateERC20Token, loadOrCreateERC721Token } from "./utils";
-import { handleAddCollateralActivity, handleAuctionEndActivity, handleAuctionStartActivity, handleIncreaseDebtActivity, handleReduceDebtActivity, handleRemoveCollateralActivity } from "./activity";
+import { addClientFeeToActivity, handleAddCollateralActivity, handleAuctionEndActivity, handleAuctionStartActivity, handleIncreaseDebtActivity, handleReduceDebtActivity, handleRemoveCollateralActivity } from "./activity";
 
 function generateCollateralId(addr: Address, tokenId: BigInt): string {
   return `${addr.toHexString()}-${tokenId.toString()}`;
@@ -411,4 +413,10 @@ export function handleEndAuction(event: EndAuction): void {
   handleAuctionEndActivity(event, auction.controller);
 }
 
+export function handleIncreaseDebtAndSell(call: IncreaseDebtAndSellCall): void {
+  addClientFeeToActivity(call.transaction.hash.toHexString(), call.inputs.params.swapFeeBips);
+}
 
+export function handleBuyAndReduceDebt(call: BuyAndReduceDebtCall): void {
+  addClientFeeToActivity(call.transaction.hash.toHexString(), call.inputs.params.swapFeeBips);
+}
