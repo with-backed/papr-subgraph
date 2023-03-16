@@ -38,7 +38,7 @@ import { ERC721 as ERC721ABI } from "../generated/SlyFox/ERC721";
 import { ERC20 as ERC20ABI } from "../generated/SlyFox/ERC20";
 import { updateControllerTarget, updateTargetHourData } from "./intervalUpdates";
 import { generateVaultId, loadOrCreateERC20Token, loadOrCreateERC721Token } from "./utils";
-import { handleAddCollateralActivityEntity } from "./activity";
+import { handleAddCollateralActivityEntity, handleIncreaseDebtActivity } from "./activity";
 
 function generateCollateralId(addr: Address, tokenId: BigInt): string {
   return `${addr.toHexString()}-${tokenId.toString()}`;
@@ -180,6 +180,7 @@ export function handleIncreaseDebt(event: IncreaseDebt): void {
   debtIncreasedEvent.vault = vault.id;
   debtIncreasedEvent.account = vault.account;
   debtIncreasedEvent.save();
+  handleIncreaseDebtActivity(event, event.params._event.address.toHexString());
 }
 
 export function handleReduceDebt(event: ReduceDebt): void {

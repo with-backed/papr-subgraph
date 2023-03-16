@@ -195,6 +195,7 @@ type Activity @entity {
   user: Bytes!
   vault: Vault
   sqrtPricePool: BigInt
+  amountBorrowedOrRepaid: BigInt
   amountIn: BigInt
   amountOut: BigInt
   clientFee: BigInt

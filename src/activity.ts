@@ -1,10 +1,13 @@
-import { Address, BigInt, dataSource } from "@graphprotocol/graph-ts";
+import { Address, BigInt, dataSource, ethereum } from "@graphprotocol/graph-ts";
 import {
   Activity,
   ActivityAddedCollateral,
   PaprController,
 } from "../generated/schema";
-import { AddCollateral as AddCollateralEvent } from "../generated/SlyFox/PaprController";
+import {
+  AddCollateral as AddCollateralEvent,
+  IncreaseDebt as IncreaseDebtEvent,
+} from "../generated/SlyFox/PaprController";
 import { Pool as PoolABI } from "../generated/templates/Pool/Pool";
 import { Swap as SwapEvent } from "../generated/templates/Pool/Pool";
 import {
@@ -23,8 +26,10 @@ class TokenAmounts {
 function getTokenAmountsForSwap(
   amount0: BigInt,
   amount1: BigInt,
-  pool: PoolABI
+  poolAddress: Address
 ): TokenAmounts {
+  const pool = PoolABI.bind(poolAddress);
+
   let amountIn: BigInt | null = null;
   let amountOut: BigInt | null = null;
   let tokenIn: Address;
@@ -56,26 +61,20 @@ export function handleSwapActivityEntity(event: SwapEvent): void {
 
   let activity = Activity.load(event.transaction.hash.toHex());
 
-  // add collateral event already exists, and user is doing a mint + swap
-  // this entity will be updated with the swap details and re-typed to a ADD_COLLATERAL_INCREASE_DEBT_SWAP
-  if (!!activity) {
-    activity.type = "ADD_COLLATERAL_INCREASE_DEBT_SWAP";
+  if (!activity) {
+    activity = initializeActivityEntity("SWAP", event, controller);
   } else {
-    activity = new Activity(event.transaction.hash.toHex());
-    activity.type = "SWAP";
+    // add collateral event already exists, and user is doing a mint + swap
+    // this entity will be updated with the swap details and re-typed to a ADD_COLLATERAL_INCREASE_DEBT_SWAP
+    activity.type = "ADD_COLLATERAL_INCREASE_DEBT_SWAP";
   }
 
-  const pool = PoolABI.bind(event.params._event.address);
-
-  activity.timestamp = event.block.timestamp.toI32();
-  activity.controller = controller;
-  activity.user = event.transaction.from;
   activity.sqrtPricePool = event.params.sqrtPriceX96;
 
   const tokenAmounts = getTokenAmountsForSwap(
     event.params.amount0,
     event.params.amount1,
-    pool
+    event.params._event.address
   );
   activity.amountIn = tokenAmounts.amountIn;
   activity.amountOut = tokenAmounts.amountOut;
@@ -98,10 +97,7 @@ export function handleAddCollateralActivityEntity(
   let activity = Activity.load(event.transaction.hash.toHex());
   if (!activity) {
     activity = new Activity(event.transaction.hash.toHex());
-    activity.type = "ADD_COLLATERAL";
-    activity.timestamp = event.block.timestamp.toI32();
-    activity.controller = controllerId;
-    activity.user = event.transaction.from;
+    activity = initializeActivityEntity("ADD_COLLATERAL", event, controllerId);
     activity.vault = generateVaultId(
       event.params._event.address,
       event.params.account,
@@ -122,6 +118,49 @@ export function handleAddCollateralActivityEntity(
   activityAddedCollateral.save();
 
   activity.save();
+}
+
+export function handleIncreaseDebtActivity(
+  event: IncreaseDebtEvent,
+  controllerId: string
+): void {
+  const token = loadOrCreateERC721Token(event.params.collateralAddress);
+  if (!token) return;
+
+  let activity = Activity.load(event.transaction.hash.toHex());
+  if (!activity) {
+    activity = initializeActivityEntity("INCREASE_DEBT", event, controllerId);
+    activity.vault = generateVaultId(
+      event.params._event.address,
+      event.params.account,
+      token
+    );
+  } else {
+    if (activity.type == "ADD_COLLATERAL") {
+      // swap always comes after add collateral, so if previous type is add collateral, then this is a mint only
+      activity.type = "ADD_COLLATERAL_INCREASE_DEBT";
+    } else if (activity.type == "SWAP") {
+      // swap always comes after add collateral, so if previous type is swap, then this is a mint + swap
+      activity.type = "ADD_COLLATERAL_INCREASE_DEBT_SWAP";
+    }
+  }
+
+  activity.amountBorrowedOrRepaid = event.params.amount;
+  activity.save();
+}
+
+function initializeActivityEntity(
+  type: string,
+  event: ethereum.Event,
+  controllerId: string
+): Activity {
+  let activity = new Activity(event.transaction.hash.toHex());
+  activity.type = type;
+  activity.timestamp = event.block.timestamp.toI32();
+  activity.controller = controllerId;
+  activity.user = event.transaction.from;
+  activity.save();
+  return activity;
 }
 
 function generateActivityCollateralId(
