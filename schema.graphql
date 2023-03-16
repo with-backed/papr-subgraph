@@ -188,4 +188,7 @@ type Activity @entity {
   addedCollateral: [ActivityAddedCollateral!]! @derivedFrom(field: "activity")
   removedCollateral: [ActivityRemovedCollateral!]!
     @derivedFrom(field: "activity")
+  auctionCollateral: ERC721Token
+  auctionTokenId: BigInt
+  auctionEndPrice: BigInt
 }

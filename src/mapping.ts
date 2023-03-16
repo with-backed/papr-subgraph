@@ -38,7 +38,7 @@ import { ERC721 as ERC721ABI } from "../generated/SlyFox/ERC721";
 import { ERC20 as ERC20ABI } from "../generated/SlyFox/ERC20";
 import { updateControllerTarget, updateTargetHourData } from "./intervalUpdates";
 import { generateVaultId, loadOrCreateERC20Token, loadOrCreateERC721Token } from "./utils";
-import { handleAddCollateralActivity, handleIncreaseDebtActivity, handleReduceDebtActivity, handleRemoveCollateralActivity } from "./activity";
+import { handleAddCollateralActivity, handleAuctionEndActivity, handleAuctionStartActivity, handleIncreaseDebtActivity, handleReduceDebtActivity, handleRemoveCollateralActivity } from "./activity";
 
 function generateCollateralId(addr: Address, tokenId: BigInt): string {
   return `${addr.toHexString()}-${tokenId.toString()}`;
@@ -384,6 +384,7 @@ export function handleStartAuction(event: StartAuction): void {
   start.save();
   auction.start = start.id;
   auction.save();
+  handleAuctionStartActivity(event, controller.id);
 }
 
 export function handleEndAuction(event: EndAuction): void {
@@ -407,6 +408,7 @@ export function handleEndAuction(event: EndAuction): void {
   auction.endPrice = event.params.price;
   auction.end = end.id;
   auction.save();
+  handleAuctionEndActivity(event, auction.controller);
 }
 
 
