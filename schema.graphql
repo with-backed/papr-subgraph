@@ -157,22 +157,6 @@ type CollateralAllowedChangeEvent @entity {
   allowed: Boolean!
 }
 
-enum ActivityType {
-  ADD_COLLATERAL
-  REMOVE_COLLATERAL
-  INCREASE_DEBT
-  REDUCE_DEBT
-  SWAP
-  START_AUCTION
-  END_AUCTION
-  ADD_COLLATERAL_INCREASE_DEBT
-  ADD_COLLATERAL_INCREASE_DEBT_SWAP
-  REMOVE_COLLATERAL_REDUCE_DEBT
-  REMOVE_COLLATERAL_REDUCE_DEBT_SWAP
-  INCREASE_DEBT_SWAP
-  REDUCE_DEBT_SWAP
-}
-
 type ActivityAddedCollateral @entity {
   id: ID!
   collateral: ERC721Token!
@@ -189,13 +173,13 @@ type ActivityRemovedCollateral @entity {
 
 type Activity @entity {
   id: ID! # tx hash of activity
-  type: ActivityType!
   timestamp: Int!
   controller: PaprController!
   user: Bytes!
   vault: Vault
   sqrtPricePool: BigInt
-  amountBorrowedOrRepaid: BigInt
+  amountBorrowed: BigInt
+  amountRepaid: BigInt
   amountIn: BigInt
   amountOut: BigInt
   clientFee: BigInt

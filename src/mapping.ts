@@ -38,7 +38,7 @@ import { ERC721 as ERC721ABI } from "../generated/SlyFox/ERC721";
 import { ERC20 as ERC20ABI } from "../generated/SlyFox/ERC20";
 import { updateControllerTarget, updateTargetHourData } from "./intervalUpdates";
 import { generateVaultId, loadOrCreateERC20Token, loadOrCreateERC721Token } from "./utils";
-import { handleAddCollateralActivityEntity, handleIncreaseDebtActivity } from "./activity";
+import { handleAddCollateralActivity, handleIncreaseDebtActivity, handleReduceDebtActivity, handleRemoveCollateralActivity } from "./activity";
 
 function generateCollateralId(addr: Address, tokenId: BigInt): string {
   return `${addr.toHexString()}-${tokenId.toString()}`;
@@ -105,7 +105,7 @@ export function handleAddCollateral(event: AddCollateral): void {
   addCollateralEvent.vault = vault.id;
   addCollateralEvent.account = vault.account;
   addCollateralEvent.save();
-  handleAddCollateralActivityEntity(event, event.params._event.address.toHexString());
+  handleAddCollateralActivity(event, event.params._event.address.toHexString());
 }
 
 export function handleRemoveCollateral(event: RemoveCollateral): void {
@@ -148,6 +148,7 @@ export function handleRemoveCollateral(event: RemoveCollateral): void {
   collateralRemovedEvent.vault = vault.id;
   collateralRemovedEvent.account = vault.account;
   collateralRemovedEvent.save();
+  handleRemoveCollateralActivity(event, vault.controller);
 }
 
 export function handleIncreaseDebt(event: IncreaseDebt): void {
@@ -218,6 +219,7 @@ export function handleReduceDebt(event: ReduceDebt): void {
   debtDecreasedEvent.vault = vault.id;
   debtDecreasedEvent.account = vault.account;
   debtDecreasedEvent.save();
+  handleReduceDebtActivity(event, event.params._event.address.toHexString());
 }
 
 export function handleTargetUpdate(event: UpdateTarget): void {

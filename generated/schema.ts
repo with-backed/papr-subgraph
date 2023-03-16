@@ -1601,7 +1601,6 @@ export class Activity extends Entity {
     super();
     this.set("id", Value.fromString(id));
 
-    this.set("type", Value.fromString(""));
     this.set("timestamp", Value.fromI32(0));
     this.set("controller", Value.fromString(""));
     this.set("user", Value.fromBytes(Bytes.empty()));
@@ -1631,15 +1630,6 @@ export class Activity extends Entity {
 
   set id(value: string) {
     this.set("id", Value.fromString(value));
-  }
-
-  get type(): string {
-    let value = this.get("type");
-    return value!.toString();
-  }
-
-  set type(value: string) {
-    this.set("type", Value.fromString(value));
   }
 
   get timestamp(): i32 {
@@ -1703,8 +1693,8 @@ export class Activity extends Entity {
     }
   }
 
-  get amountBorrowedOrRepaid(): BigInt | null {
-    let value = this.get("amountBorrowedOrRepaid");
+  get amountBorrowed(): BigInt | null {
+    let value = this.get("amountBorrowed");
     if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -1712,11 +1702,28 @@ export class Activity extends Entity {
     }
   }
 
-  set amountBorrowedOrRepaid(value: BigInt | null) {
+  set amountBorrowed(value: BigInt | null) {
     if (!value) {
-      this.unset("amountBorrowedOrRepaid");
+      this.unset("amountBorrowed");
     } else {
-      this.set("amountBorrowedOrRepaid", Value.fromBigInt(<BigInt>value));
+      this.set("amountBorrowed", Value.fromBigInt(<BigInt>value));
+    }
+  }
+
+  get amountRepaid(): BigInt | null {
+    let value = this.get("amountRepaid");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set amountRepaid(value: BigInt | null) {
+    if (!value) {
+      this.unset("amountRepaid");
+    } else {
+      this.set("amountRepaid", Value.fromBigInt(<BigInt>value));
     }
   }
 
