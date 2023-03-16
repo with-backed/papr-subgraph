@@ -2,11 +2,14 @@ import { Address, BigInt, dataSource, ethereum } from "@graphprotocol/graph-ts";
 import {
   Activity,
   ActivityAddedCollateral,
+  ActivityRemovedCollateral,
   PaprController,
 } from "../generated/schema";
 import {
   AddCollateral as AddCollateralEvent,
   IncreaseDebt as IncreaseDebtEvent,
+  ReduceDebt as ReduceDebtEvent,
+  RemoveCollateral as RemoveCollateralEvent,
 } from "../generated/SlyFox/PaprController";
 import { Pool as PoolABI } from "../generated/templates/Pool/Pool";
 import { Swap as SwapEvent } from "../generated/templates/Pool/Pool";
@@ -54,7 +57,7 @@ function getTokenAmountsForSwap(
   };
 }
 
-export function handleSwapActivityEntity(event: SwapEvent): void {
+export function handleSwapActivity(event: SwapEvent): void {
   const context = dataSource.context();
   const controller = context.getString("controller");
   if (!controller) return;
@@ -62,11 +65,7 @@ export function handleSwapActivityEntity(event: SwapEvent): void {
   let activity = Activity.load(event.transaction.hash.toHex());
 
   if (!activity) {
-    activity = initializeActivityEntity("SWAP", event, controller);
-  } else {
-    // add collateral event already exists, and user is doing a mint + swap
-    // this entity will be updated with the swap details and re-typed to a ADD_COLLATERAL_INCREASE_DEBT_SWAP
-    activity.type = "ADD_COLLATERAL_INCREASE_DEBT_SWAP";
+    activity = initializeActivityEntity(event, controller);
   }
 
   activity.sqrtPricePool = event.params.sqrtPriceX96;
@@ -87,7 +86,7 @@ export function handleSwapActivityEntity(event: SwapEvent): void {
   activity.save();
 }
 
-export function handleAddCollateralActivityEntity(
+export function handleAddCollateralActivity(
   event: AddCollateralEvent,
   controllerId: string
 ): void {
@@ -97,7 +96,7 @@ export function handleAddCollateralActivityEntity(
   let activity = Activity.load(event.transaction.hash.toHex());
   if (!activity) {
     activity = new Activity(event.transaction.hash.toHex());
-    activity = initializeActivityEntity("ADD_COLLATERAL", event, controllerId);
+    activity = initializeActivityEntity(event, controllerId);
     activity.vault = generateVaultId(
       event.params._event.address,
       event.params.account,
@@ -120,6 +119,39 @@ export function handleAddCollateralActivityEntity(
   activity.save();
 }
 
+export function handleRemoveCollateralActivity(
+  event: RemoveCollateralEvent,
+  controllerId: string
+): void {
+  const token = loadOrCreateERC721Token(event.params.collateralAddress);
+  if (!token) return;
+
+  let activity = Activity.load(event.transaction.hash.toHex());
+  if (!activity) {
+    activity = new Activity(event.transaction.hash.toHex());
+    activity = initializeActivityEntity(event, controllerId);
+    activity.vault = generateVaultId(
+      event.params._event.address,
+      event.params.account,
+      token
+    );
+  }
+
+  const activityRemovedCollateral = new ActivityRemovedCollateral(
+    generateActivityCollateralId(
+      activity,
+      token.id,
+      event.params.tokenId.toString()
+    )
+  );
+  activityRemovedCollateral.activity = activity.id;
+  activityRemovedCollateral.collateral = token.id;
+  activityRemovedCollateral.tokenId = event.params.tokenId;
+  activityRemovedCollateral.save();
+
+  activity.save();
+}
+
 export function handleIncreaseDebtActivity(
   event: IncreaseDebtEvent,
   controllerId: string
@@ -129,33 +161,44 @@ export function handleIncreaseDebtActivity(
 
   let activity = Activity.load(event.transaction.hash.toHex());
   if (!activity) {
-    activity = initializeActivityEntity("INCREASE_DEBT", event, controllerId);
+    activity = initializeActivityEntity(event, controllerId);
     activity.vault = generateVaultId(
       event.params._event.address,
       event.params.account,
       token
     );
-  } else {
-    if (activity.type == "ADD_COLLATERAL") {
-      // swap always comes after add collateral, so if previous type is add collateral, then this is a mint only
-      activity.type = "ADD_COLLATERAL_INCREASE_DEBT";
-    } else if (activity.type == "SWAP") {
-      // swap always comes after add collateral, so if previous type is swap, then this is a mint + swap
-      activity.type = "ADD_COLLATERAL_INCREASE_DEBT_SWAP";
-    }
   }
 
-  activity.amountBorrowedOrRepaid = event.params.amount;
+  activity.amountBorrowed = event.params.amount;
+  activity.save();
+}
+
+export function handleReduceDebtActivity(
+  event: ReduceDebtEvent,
+  controllerId: string
+): void {
+  const token = loadOrCreateERC721Token(event.params.collateralAddress);
+  if (!token) return;
+
+  let activity = Activity.load(event.transaction.hash.toHex());
+  if (!activity) {
+    activity = initializeActivityEntity(event, controllerId);
+    activity.vault = generateVaultId(
+      event.params._event.address,
+      event.params.account,
+      token
+    );
+  }
+
+  activity.amountRepaid = event.params.amount;
   activity.save();
 }
 
 function initializeActivityEntity(
-  type: string,
   event: ethereum.Event,
   controllerId: string
 ): Activity {
   let activity = new Activity(event.transaction.hash.toHex());
-  activity.type = type;
   activity.timestamp = event.block.timestamp.toI32();
   activity.controller = controllerId;
   activity.user = event.transaction.from;
