@@ -1829,4 +1829,55 @@ export class Activity extends Entity {
   set removedCollateral(value: Array<string>) {
     this.set("removedCollateral", Value.fromStringArray(value));
   }
+
+  get auctionCollateral(): string | null {
+    let value = this.get("auctionCollateral");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set auctionCollateral(value: string | null) {
+    if (!value) {
+      this.unset("auctionCollateral");
+    } else {
+      this.set("auctionCollateral", Value.fromString(<string>value));
+    }
+  }
+
+  get auctionTokenId(): BigInt | null {
+    let value = this.get("auctionTokenId");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set auctionTokenId(value: BigInt | null) {
+    if (!value) {
+      this.unset("auctionTokenId");
+    } else {
+      this.set("auctionTokenId", Value.fromBigInt(<BigInt>value));
+    }
+  }
+
+  get auctionEndPrice(): BigInt | null {
+    let value = this.get("auctionEndPrice");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set auctionEndPrice(value: BigInt | null) {
+    if (!value) {
+      this.unset("auctionEndPrice");
+    } else {
+      this.set("auctionEndPrice", Value.fromBigInt(<BigInt>value));
+    }
+  }
 }

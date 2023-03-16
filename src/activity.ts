@@ -3,13 +3,16 @@ import {
   Activity,
   ActivityAddedCollateral,
   ActivityRemovedCollateral,
+  Auction,
   PaprController,
 } from "../generated/schema";
 import {
   AddCollateral as AddCollateralEvent,
+  EndAuction as EndAuctionEvent,
   IncreaseDebt as IncreaseDebtEvent,
   ReduceDebt as ReduceDebtEvent,
   RemoveCollateral as RemoveCollateralEvent,
+  StartAuction as StartAuctionEvent,
 } from "../generated/SlyFox/PaprController";
 import { Pool as PoolABI } from "../generated/templates/Pool/Pool";
 import { Swap as SwapEvent } from "../generated/templates/Pool/Pool";
@@ -191,6 +194,50 @@ export function handleReduceDebtActivity(
   }
 
   activity.amountRepaid = event.params.amount;
+  activity.save();
+}
+
+export function handleAuctionStartActivity(
+  event: StartAuctionEvent,
+  controllerId: string
+): void {
+  const token = loadOrCreateERC721Token(event.params.auctionAssetContract);
+  if (!token) return;
+
+  let activity = Activity.load(event.transaction.hash.toHex());
+  if (!activity) {
+    activity = initializeActivityEntity(event, controllerId);
+    activity.vault = generateVaultId(
+      event.params._event.address,
+      event.params.nftOwner,
+      token
+    );
+  }
+  activity.auctionCollateral = token.id;
+  activity.auctionTokenId = event.params.auctionAssetID;
+
+  activity.save();
+}
+
+export function handleAuctionEndActivity(
+  event: EndAuctionEvent,
+  controllerId: string
+): void {
+  const auction = Auction.load(event.params.auctionID.toString());
+  if (!auction) return;
+
+  const auctionStartActivity = Activity.load(auction.start);
+  if (!auctionStartActivity) return;
+
+  let activity = Activity.load(event.transaction.hash.toHex());
+  if (!activity) {
+    activity = initializeActivityEntity(event, controllerId);
+    activity.vault = auction.vault;
+  }
+  activity.auctionCollateral = auctionStartActivity.auctionCollateral;
+  activity.auctionTokenId = auctionStartActivity.auctionTokenId;
+  activity.auctionEndPrice = event.params.price;
+
   activity.save();
 }
 
