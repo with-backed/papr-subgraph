@@ -182,7 +182,7 @@ type Activity @entity {
   amountRepaid: BigInt
   amountIn: BigInt
   amountOut: BigInt
-  clientFee: BigInt
+  clientFeeBips: BigInt
   tokenIn: ERC20Token
   tokenOut: ERC20Token
   addedCollateral: [ActivityAddedCollateral!]! @derivedFrom(field: "activity")
