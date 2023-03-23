@@ -4,6 +4,7 @@ import {
   ActivityAddedCollateral,
   ActivityRemovedCollateral,
   Auction,
+  ERC20Token,
   PaprController,
 } from "../generated/schema";
 import {
@@ -241,14 +242,39 @@ export function handleAuctionEndActivity(
   activity.save();
 }
 
+export function handleSyntheticSwapFromLP(
+  event: ethereum.Event,
+  amountIn: BigInt,
+  amountOut: BigInt,
+  tokenIn: ERC20Token | null,
+  tokenOut: ERC20Token | null,
+  controller: PaprController
+): void {
+  if (amountIn.equals(BigInt.fromI32(0)) || amountOut.equals(BigInt.fromI32(0)))
+    return;
+
+  const activity = initializeActivityEntity(event, controller.id);
+
+  activity.amountIn = amountIn;
+  activity.amountOut = amountOut;
+  activity.tokenIn = tokenIn ? tokenIn.id : null;
+  activity.tokenOut = tokenOut ? tokenOut.id : null;
+  activity.isSyntheticSwap = true;
+
+  activity.save();
+}
+
 function initializeActivityEntity(
   event: ethereum.Event,
   controllerId: string
 ): Activity {
   let activity = new Activity(event.transaction.hash.toHex());
+
   activity.timestamp = event.block.timestamp.toI32();
   activity.controller = controllerId;
   activity.user = event.transaction.from;
+  activity.isSyntheticSwap = false;
+
   activity.save();
   return activity;
 }

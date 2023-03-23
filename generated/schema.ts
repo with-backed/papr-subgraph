@@ -1458,6 +1458,110 @@ export class CollateralAllowedChangeEvent extends Entity {
   }
 }
 
+export class Position extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+
+    this.set("owner", Value.fromBytes(Bytes.empty()));
+    this.set("token0", Value.fromString(""));
+    this.set("token1", Value.fromString(""));
+    this.set("amountToken0", Value.fromBigInt(BigInt.zero()));
+    this.set("amountToken1", Value.fromBigInt(BigInt.zero()));
+    this.set("collectedFeesToken0", Value.fromBigInt(BigInt.zero()));
+    this.set("collectedFeesToken1", Value.fromBigInt(BigInt.zero()));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save Position entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        "Cannot save Position entity with non-string ID. " +
+          'Considering using .toHex() to convert the "id" to a string.'
+      );
+      store.set("Position", id.toString(), this);
+    }
+  }
+
+  static load(id: string): Position | null {
+    return changetype<Position | null>(store.get("Position", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get owner(): Bytes {
+    let value = this.get("owner");
+    return value!.toBytes();
+  }
+
+  set owner(value: Bytes) {
+    this.set("owner", Value.fromBytes(value));
+  }
+
+  get token0(): string {
+    let value = this.get("token0");
+    return value!.toString();
+  }
+
+  set token0(value: string) {
+    this.set("token0", Value.fromString(value));
+  }
+
+  get token1(): string {
+    let value = this.get("token1");
+    return value!.toString();
+  }
+
+  set token1(value: string) {
+    this.set("token1", Value.fromString(value));
+  }
+
+  get amountToken0(): BigInt {
+    let value = this.get("amountToken0");
+    return value!.toBigInt();
+  }
+
+  set amountToken0(value: BigInt) {
+    this.set("amountToken0", Value.fromBigInt(value));
+  }
+
+  get amountToken1(): BigInt {
+    let value = this.get("amountToken1");
+    return value!.toBigInt();
+  }
+
+  set amountToken1(value: BigInt) {
+    this.set("amountToken1", Value.fromBigInt(value));
+  }
+
+  get collectedFeesToken0(): BigInt {
+    let value = this.get("collectedFeesToken0");
+    return value!.toBigInt();
+  }
+
+  set collectedFeesToken0(value: BigInt) {
+    this.set("collectedFeesToken0", Value.fromBigInt(value));
+  }
+
+  get collectedFeesToken1(): BigInt {
+    let value = this.get("collectedFeesToken1");
+    return value!.toBigInt();
+  }
+
+  set collectedFeesToken1(value: BigInt) {
+    this.set("collectedFeesToken1", Value.fromBigInt(value));
+  }
+}
+
 export class ActivityAddedCollateral extends Entity {
   constructor(id: string) {
     super();
@@ -1604,6 +1708,7 @@ export class Activity extends Entity {
     this.set("timestamp", Value.fromI32(0));
     this.set("controller", Value.fromString(""));
     this.set("user", Value.fromBytes(Bytes.empty()));
+    this.set("isSyntheticSwap", Value.fromBoolean(false));
   }
 
   save(): void {
@@ -1879,5 +1984,14 @@ export class Activity extends Entity {
     } else {
       this.set("auctionEndPrice", Value.fromBigInt(<BigInt>value));
     }
+  }
+
+  get isSyntheticSwap(): boolean {
+    let value = this.get("isSyntheticSwap");
+    return value!.toBoolean();
+  }
+
+  set isSyntheticSwap(value: boolean) {
+    this.set("isSyntheticSwap", Value.fromBoolean(value));
   }
 }

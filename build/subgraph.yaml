@@ -49,6 +49,35 @@ dataSources:
         - function: buyAndReduceDebt(address,address,(uint256,uint256,uint160,address,uint256,uint256))
           handler: handleBuyAndReduceDebt
       file: SlyFox/SlyFox.wasm
+  - kind: ethereum/contract
+    name: NonfungiblePositionManager
+    network: mainnet
+    source:
+      address: "0xC36442b4a4522E871399CD717aBDD847Ab11FE88"
+      abi: NonfungiblePositionManager
+      startBlock: 16592385
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: NonfungiblePositionManager/NonfungiblePositionManager.wasm
+      entities:
+        - Position
+        - ERC20Token
+      abis:
+        - name: NonfungiblePositionManager
+          file: NonfungiblePositionManager/abis/NonfungiblePositionManager.json
+        - name: Pool
+          file: NonfungiblePositionManager/abis/pool.json
+        - name: ERC20
+          file: NonfungiblePositionManager/abis/ERC20.json
+      eventHandlers:
+        - event: IncreaseLiquidity(indexed uint256,uint128,uint256,uint256)
+          handler: handleIncreaseLiquidity
+        - event: DecreaseLiquidity(indexed uint256,uint128,uint256,uint256)
+          handler: handleDecreaseLiquidity
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
 templates:
   - kind: ethereum/contract
     name: Pool
