@@ -100,12 +100,12 @@ export function handleAddCollateralActivity(
   if (!activity) {
     activity = new Activity(event.transaction.hash.toHex());
     activity = initializeActivityEntity(event, controllerId);
-    activity.vault = generateVaultId(
-      event.params._event.address,
-      event.params.account,
-      token
-    );
   }
+  activity.vault = generateVaultId(
+    event.params._event.address,
+    event.params.account,
+    token
+  );
 
   const activityAddedCollateral = new ActivityAddedCollateral(
     generateActivityCollateralId(
@@ -133,12 +133,12 @@ export function handleRemoveCollateralActivity(
   if (!activity) {
     activity = new Activity(event.transaction.hash.toHex());
     activity = initializeActivityEntity(event, controllerId);
-    activity.vault = generateVaultId(
-      event.params._event.address,
-      event.params.account,
-      token
-    );
   }
+  activity.vault = generateVaultId(
+    event.params._event.address,
+    event.params.account,
+    token
+  );
 
   const activityRemovedCollateral = new ActivityRemovedCollateral(
     generateActivityCollateralId(
@@ -165,12 +165,12 @@ export function handleIncreaseDebtActivity(
   let activity = Activity.load(event.transaction.hash.toHex());
   if (!activity) {
     activity = initializeActivityEntity(event, controllerId);
-    activity.vault = generateVaultId(
-      event.params._event.address,
-      event.params.account,
-      token
-    );
   }
+  activity.vault = generateVaultId(
+    event.params._event.address,
+    event.params.account,
+    token
+  );
 
   activity.amountBorrowed = event.params.amount;
   activity.save();
@@ -186,12 +186,12 @@ export function handleReduceDebtActivity(
   let activity = Activity.load(event.transaction.hash.toHex());
   if (!activity) {
     activity = initializeActivityEntity(event, controllerId);
-    activity.vault = generateVaultId(
-      event.params._event.address,
-      event.params.account,
-      token
-    );
   }
+  activity.vault = generateVaultId(
+    event.params._event.address,
+    event.params.account,
+    token
+  );
 
   activity.amountRepaid = event.params.amount;
   activity.save();
@@ -207,12 +207,12 @@ export function handleAuctionStartActivity(
   let activity = Activity.load(event.transaction.hash.toHex());
   if (!activity) {
     activity = initializeActivityEntity(event, controllerId);
-    activity.vault = generateVaultId(
-      event.params._event.address,
-      event.params.nftOwner,
-      token
-    );
   }
+  activity.vault = generateVaultId(
+    event.params._event.address,
+    event.params.nftOwner,
+    token
+  );
   activity.auctionCollateral = token.id;
   activity.auctionTokenId = event.params.auctionAssetID;
 
@@ -232,8 +232,8 @@ export function handleAuctionEndActivity(
   let activity = Activity.load(event.transaction.hash.toHex());
   if (!activity) {
     activity = initializeActivityEntity(event, controllerId);
-    activity.vault = auction.vault;
   }
+  activity.vault = auction.vault;
   activity.auctionCollateral = auctionStartActivity.auctionCollateral;
   activity.auctionTokenId = auctionStartActivity.auctionTokenId;
   activity.auctionEndPrice = event.params.price;
