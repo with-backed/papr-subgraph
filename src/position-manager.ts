@@ -7,6 +7,10 @@ import {
   Transfer,
 } from "../generated/NonfungiblePositionManager/NonfungiblePositionManager";
 import { ERC20Token, PaprController, Position } from "../generated/schema";
+import {
+  Burn as BurnEvent,
+  Mint as MintEvent,
+} from "../generated/templates/Pool/Pool";
 import { handleSyntheticSwapFromLP } from "./activity";
 import { loadOrCreateERC20Token } from "./utils";
 
@@ -79,14 +83,14 @@ function createOrUpdatePosition(
   return position;
 }
 
-export function handleIncreaseLiquidity(event: IncreaseLiquidity): void {
+export function handleIncreaseLiquidity(event: MintEvent): void {
   const controller = PaprController.load(paprControllerAddress.toLowerCase());
   if (!controller) return;
 
   createOrUpdatePosition(event, event.params.tokenId, controller);
 }
 
-export function handleDecreaseLiquidity(event: DecreaseLiquidity): void {
+export function handleDecreaseLiquidity(event: BurnEvent): void {
   const controller = PaprController.load(paprControllerAddress.toLowerCase());
   if (!controller) return;
 

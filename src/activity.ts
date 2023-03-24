@@ -15,7 +15,7 @@ import {
   RemoveCollateral as RemoveCollateralEvent,
   StartAuction as StartAuctionEvent,
 } from "../generated/SlyFox/PaprController";
-import { Pool as PoolABI } from "../generated/templates/Pool/Pool";
+import { Mint, Pool as PoolABI } from "../generated/templates/Pool/Pool";
 import { Swap as SwapEvent } from "../generated/templates/Pool/Pool";
 import {
   generateVaultId,
@@ -242,27 +242,10 @@ export function handleAuctionEndActivity(
   activity.save();
 }
 
-export function handleSyntheticSwapFromLP(
-  event: ethereum.Event,
-  amountIn: BigInt,
-  amountOut: BigInt,
-  tokenIn: ERC20Token | null,
-  tokenOut: ERC20Token | null,
-  controller: PaprController
-): void {
-  if (amountIn.equals(BigInt.fromI32(0)) || amountOut.equals(BigInt.fromI32(0)))
-    return;
-
-  const activity = initializeActivityEntity(event, controller.id);
-
-  activity.amountIn = amountIn;
-  activity.amountOut = amountOut;
-  activity.tokenIn = tokenIn ? tokenIn.id : null;
-  activity.tokenOut = tokenOut ? tokenOut.id : null;
-  activity.isSyntheticSwap = true;
-
-  activity.save();
-}
+export function handleLPIncreaseActivity(
+  event: MintEvent,
+  controllerId: string
+): void {}
 
 function initializeActivityEntity(
   event: ethereum.Event,
