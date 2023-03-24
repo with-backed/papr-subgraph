@@ -157,20 +157,6 @@ type CollateralAllowedChangeEvent @entity {
   allowed: Boolean!
 }
 
-type Position @entity {
-  # Positions created through NonfungiblePositionManager
-  # NFT token id
-  id: ID!
-  # owner of the NFT
-  owner: Bytes!
-  token0: ERC20Token!
-  token1: ERC20Token!
-  amountToken0: BigInt!
-  amountToken1: BigInt!
-  collectedFeesToken0: BigInt!
-  collectedFeesToken1: BigInt!
-}
-
 type ActivityAddedCollateral @entity {
   id: ID!
   collateral: ERC721Token!
