@@ -15,7 +15,11 @@ import {
   RemoveCollateral as RemoveCollateralEvent,
   StartAuction as StartAuctionEvent,
 } from "../generated/SlyFox/PaprController";
-import { Mint, Pool as PoolABI } from "../generated/templates/Pool/Pool";
+import {
+  Burn as BurnEvent,
+  Mint as MintEvent,
+  Pool as PoolABI,
+} from "../generated/templates/Pool/Pool";
 import { Swap as SwapEvent } from "../generated/templates/Pool/Pool";
 import {
   generateVaultId,
@@ -245,7 +249,38 @@ export function handleAuctionEndActivity(
 export function handleLPIncreaseActivity(
   event: MintEvent,
   controllerId: string
-): void {}
+): void {
+  let activity = Activity.load(event.transaction.hash.toHex());
+  if (!activity) {
+    activity = initializeActivityEntity(event, controllerId);
+  }
+  activity.user = event.transaction.from;
+  activity.totalLiquidityAdded = event.params.amount;
+  activity.liquidityAdded0 = event.params.amount0;
+  activity.liquidityAdded1 = event.params.amount1;
+  activity.positionTickLower = event.params.tickLower;
+  activity.positionTickUpper = event.params.tickUpper;
+
+  activity.save();
+}
+
+export function handleLPDecreaseActivity(
+  event: BurnEvent,
+  controllerId: string
+): void {
+  let activity = Activity.load(event.transaction.hash.toHex());
+  if (!activity) {
+    activity = initializeActivityEntity(event, controllerId);
+  }
+  activity.user = event.transaction.from;
+  activity.totalLiquidityAdded = event.params.amount.times(BigInt.fromI32(-1));
+  activity.liquidityAdded0 = event.params.amount0;
+  activity.liquidityAdded1 = event.params.amount1;
+  activity.positionTickLower = event.params.tickLower;
+  activity.positionTickUpper = event.params.tickUpper;
+
+  activity.save();
+}
 
 function initializeActivityEntity(
   event: ethereum.Event,
@@ -256,7 +291,6 @@ function initializeActivityEntity(
   activity.timestamp = event.block.timestamp.toI32();
   activity.controller = controllerId;
   activity.user = event.transaction.from;
-  activity.isSyntheticSwap = false;
 
   activity.save();
   return activity;

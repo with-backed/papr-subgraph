@@ -1708,7 +1708,8 @@ export class Activity extends Entity {
     this.set("timestamp", Value.fromI32(0));
     this.set("controller", Value.fromString(""));
     this.set("user", Value.fromBytes(Bytes.empty()));
-    this.set("isSyntheticSwap", Value.fromBoolean(false));
+    this.set("positionTickUpper", Value.fromI32(0));
+    this.set("positionTickLower", Value.fromI32(0));
   }
 
   save(): void {
@@ -1986,12 +1987,72 @@ export class Activity extends Entity {
     }
   }
 
-  get isSyntheticSwap(): boolean {
-    let value = this.get("isSyntheticSwap");
-    return value!.toBoolean();
+  get totalLiquidityAdded(): BigInt | null {
+    let value = this.get("totalLiquidityAdded");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
   }
 
-  set isSyntheticSwap(value: boolean) {
-    this.set("isSyntheticSwap", Value.fromBoolean(value));
+  set totalLiquidityAdded(value: BigInt | null) {
+    if (!value) {
+      this.unset("totalLiquidityAdded");
+    } else {
+      this.set("totalLiquidityAdded", Value.fromBigInt(<BigInt>value));
+    }
+  }
+
+  get liquidityAdded0(): BigInt | null {
+    let value = this.get("liquidityAdded0");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set liquidityAdded0(value: BigInt | null) {
+    if (!value) {
+      this.unset("liquidityAdded0");
+    } else {
+      this.set("liquidityAdded0", Value.fromBigInt(<BigInt>value));
+    }
+  }
+
+  get liquidityAdded1(): BigInt | null {
+    let value = this.get("liquidityAdded1");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set liquidityAdded1(value: BigInt | null) {
+    if (!value) {
+      this.unset("liquidityAdded1");
+    } else {
+      this.set("liquidityAdded1", Value.fromBigInt(<BigInt>value));
+    }
+  }
+
+  get positionTickUpper(): i32 {
+    let value = this.get("positionTickUpper");
+    return value!.toI32();
+  }
+
+  set positionTickUpper(value: i32) {
+    this.set("positionTickUpper", Value.fromI32(value));
+  }
+
+  get positionTickLower(): i32 {
+    let value = this.get("positionTickLower");
+    return value!.toI32();
+  }
+
+  set positionTickLower(value: i32) {
+    this.set("positionTickLower", Value.fromI32(value));
   }
 }

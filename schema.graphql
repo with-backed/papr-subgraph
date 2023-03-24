@@ -205,7 +205,9 @@ type Activity @entity {
   auctionCollateral: ERC721Token
   auctionTokenId: BigInt
   auctionEndPrice: BigInt
-  positionLiquidity: BigInt
-  positionTickUpper: BigInt
-  positionTickLower: BigInt
+  totalLiquidityAdded: BigInt
+  liquidityAdded0: BigInt
+  liquidityAdded1: BigInt
+  positionTickUpper: Int
+  positionTickLower: Int
 }

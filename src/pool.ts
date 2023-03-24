@@ -13,13 +13,17 @@ import {
   updateControllerTarget,
   updateTargetHourData,
 } from "./intervalUpdates";
-import { handleSwapActivity } from "./activity";
+import {
+  handleLPDecreaseActivity,
+  handleLPIncreaseActivity,
+  handleSwapActivity,
+} from "./activity";
 
 // Thought I'd separate this as it is kind of distinct from the
 // handlers for the papr controller events
 export function handleSwap(event: SwapEvent): void {
-  let context = dataSource.context();
-  let controller = context.getString("controller");
+  const context = dataSource.context();
+  const controller = context.getString("controller");
   if (!controller) return;
 
   handleSwapActivity(event);
@@ -56,15 +60,17 @@ export function handleSwap(event: SwapEvent): void {
 }
 
 export function handleIncreaseLiquidity(event: MintEvent): void {
-  const controller = PaprController.load(paprControllerAddress.toLowerCase());
+  const context = dataSource.context();
+  const controller = context.getString("controller");
   if (!controller) return;
 
-  createOrUpdatePosition(event, event.params.tokenId, controller);
+  handleLPIncreaseActivity(event, controller);
 }
 
 export function handleDecreaseLiquidity(event: BurnEvent): void {
-  const controller = PaprController.load(paprControllerAddress.toLowerCase());
+  const context = dataSource.context();
+  const controller = context.getString("controller");
   if (!controller) return;
 
-  createOrUpdatePosition(event, event.params.tokenId, controller);
+  handleLPDecreaseActivity(event, controller);
 }
