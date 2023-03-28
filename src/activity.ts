@@ -276,19 +276,19 @@ export function handleLPIncreaseActivity(
   }
   activity.user = event.transaction.from;
   activity.uniswapLiquidityPosition = position.id;
-  activity.liquidityAdded = event.params.amount;
-  activity.liquidityAdded0 = event.params.amount0;
-  activity.liquidityAdded1 = event.params.amount1;
+  activity.liquidityDelta = event.params.amount;
+  activity.token0Delta = event.params.amount0;
+  activity.token1Delta = event.params.amount1;
   activity.sqrtPricePool = sqrtPricePool;
   activity.tickCurrent = tickCurrent;
 
-  activity.cumulativeLiquidityAdded = position.cumulativeLiquidity.plus(
+  activity.cumulativeLiquidity = position.cumulativeLiquidity.plus(
     event.params.amount
   );
-  activity.cumulativeLiquidity0 = position.cumulativeAmount0.plus(
+  activity.cumulativeToken0 = position.cumulativeAmount0.plus(
     event.params.amount0
   );
-  activity.cumulativeLiquidity1 = position.cumulativeAmount1.plus(
+  activity.cumulativeToken1 = position.cumulativeAmount1.plus(
     event.params.amount1
   );
 
@@ -326,19 +326,19 @@ export function handleLPDecreaseActivity(
   }
   activity.user = event.transaction.from;
   activity.uniswapLiquidityPosition = position.id;
-  activity.liquidityAdded = event.params.amount.times(BigInt.fromI32(-1));
-  activity.liquidityAdded0 = event.params.amount0;
-  activity.liquidityAdded1 = event.params.amount1;
+  activity.liquidityDelta = event.params.amount.times(BigInt.fromI32(-1));
+  activity.token0Delta = event.params.amount0;
+  activity.token1Delta = event.params.amount1;
   activity.sqrtPricePool = sqrtPricePool;
   activity.tickCurrent = tickCurrent;
 
-  activity.cumulativeLiquidityAdded = position.cumulativeLiquidity.minus(
+  activity.cumulativeLiquidity = position.cumulativeLiquidity.minus(
     event.params.amount
   );
-  activity.cumulativeLiquidity0 = position.cumulativeAmount0.minus(
+  activity.cumulativeToken0 = position.cumulativeAmount0.minus(
     event.params.amount0
   );
-  activity.cumulativeLiquidity1 = position.cumulativeAmount1.minus(
+  activity.cumulativeToken1 = position.cumulativeAmount1.minus(
     event.params.amount1
   );
 

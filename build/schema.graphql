@@ -203,10 +203,10 @@ type Activity @entity {
   auctionTokenId: BigInt
   auctionEndPrice: BigInt
   uniswapLiquidityPosition: UniswapLiquidityPosition
-  cumulativeLiquidityAdded: BigInt
-  cumulativeLiquidity0: BigInt
-  cumulativeLiquidity1: BigInt
-  liquidityAdded: BigInt
-  liquidityAdded0: BigInt
-  liquidityAdded1: BigInt
+  cumulativeLiquidity: BigInt
+  cumulativeToken0: BigInt
+  cumulativeToken1: BigInt
+  liquidityDelta: BigInt
+  token0Delta: BigInt
+  token1Delta: BigInt
 }

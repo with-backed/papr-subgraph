@@ -2007,8 +2007,8 @@ export class Activity extends Entity {
     }
   }
 
-  get cumulativeLiquidityAdded(): BigInt | null {
-    let value = this.get("cumulativeLiquidityAdded");
+  get cumulativeLiquidity(): BigInt | null {
+    let value = this.get("cumulativeLiquidity");
     if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -2016,16 +2016,16 @@ export class Activity extends Entity {
     }
   }
 
-  set cumulativeLiquidityAdded(value: BigInt | null) {
+  set cumulativeLiquidity(value: BigInt | null) {
     if (!value) {
-      this.unset("cumulativeLiquidityAdded");
+      this.unset("cumulativeLiquidity");
     } else {
-      this.set("cumulativeLiquidityAdded", Value.fromBigInt(<BigInt>value));
+      this.set("cumulativeLiquidity", Value.fromBigInt(<BigInt>value));
     }
   }
 
-  get cumulativeLiquidity0(): BigInt | null {
-    let value = this.get("cumulativeLiquidity0");
+  get cumulativeToken0(): BigInt | null {
+    let value = this.get("cumulativeToken0");
     if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -2033,16 +2033,16 @@ export class Activity extends Entity {
     }
   }
 
-  set cumulativeLiquidity0(value: BigInt | null) {
+  set cumulativeToken0(value: BigInt | null) {
     if (!value) {
-      this.unset("cumulativeLiquidity0");
+      this.unset("cumulativeToken0");
     } else {
-      this.set("cumulativeLiquidity0", Value.fromBigInt(<BigInt>value));
+      this.set("cumulativeToken0", Value.fromBigInt(<BigInt>value));
     }
   }
 
-  get cumulativeLiquidity1(): BigInt | null {
-    let value = this.get("cumulativeLiquidity1");
+  get cumulativeToken1(): BigInt | null {
+    let value = this.get("cumulativeToken1");
     if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -2050,16 +2050,16 @@ export class Activity extends Entity {
     }
   }
 
-  set cumulativeLiquidity1(value: BigInt | null) {
+  set cumulativeToken1(value: BigInt | null) {
     if (!value) {
-      this.unset("cumulativeLiquidity1");
+      this.unset("cumulativeToken1");
     } else {
-      this.set("cumulativeLiquidity1", Value.fromBigInt(<BigInt>value));
+      this.set("cumulativeToken1", Value.fromBigInt(<BigInt>value));
     }
   }
 
-  get liquidityAdded(): BigInt | null {
-    let value = this.get("liquidityAdded");
+  get liquidityDelta(): BigInt | null {
+    let value = this.get("liquidityDelta");
     if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -2067,16 +2067,16 @@ export class Activity extends Entity {
     }
   }
 
-  set liquidityAdded(value: BigInt | null) {
+  set liquidityDelta(value: BigInt | null) {
     if (!value) {
-      this.unset("liquidityAdded");
+      this.unset("liquidityDelta");
     } else {
-      this.set("liquidityAdded", Value.fromBigInt(<BigInt>value));
+      this.set("liquidityDelta", Value.fromBigInt(<BigInt>value));
     }
   }
 
-  get liquidityAdded0(): BigInt | null {
-    let value = this.get("liquidityAdded0");
+  get token0Delta(): BigInt | null {
+    let value = this.get("token0Delta");
     if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -2084,16 +2084,16 @@ export class Activity extends Entity {
     }
   }
 
-  set liquidityAdded0(value: BigInt | null) {
+  set token0Delta(value: BigInt | null) {
     if (!value) {
-      this.unset("liquidityAdded0");
+      this.unset("token0Delta");
     } else {
-      this.set("liquidityAdded0", Value.fromBigInt(<BigInt>value));
+      this.set("token0Delta", Value.fromBigInt(<BigInt>value));
     }
   }
 
-  get liquidityAdded1(): BigInt | null {
-    let value = this.get("liquidityAdded1");
+  get token1Delta(): BigInt | null {
+    let value = this.get("token1Delta");
     if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -2101,11 +2101,11 @@ export class Activity extends Entity {
     }
   }
 
-  set liquidityAdded1(value: BigInt | null) {
+  set token1Delta(value: BigInt | null) {
     if (!value) {
-      this.unset("liquidityAdded1");
+      this.unset("token1Delta");
     } else {
-      this.set("liquidityAdded1", Value.fromBigInt(<BigInt>value));
+      this.set("token1Delta", Value.fromBigInt(<BigInt>value));
     }
   }
 }
