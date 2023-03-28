@@ -1596,7 +1596,7 @@ export class ActivityRemovedCollateral extends Entity {
   }
 }
 
-export class Position extends Entity {
+export class UniswapLiquidityPosition extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
@@ -1604,26 +1604,31 @@ export class Position extends Entity {
     this.set("user", Value.fromBytes(Bytes.empty()));
     this.set("tickLower", Value.fromI32(0));
     this.set("tickUpper", Value.fromI32(0));
-    this.set("liquidity", Value.fromBigInt(BigInt.zero()));
-    this.set("amount0", Value.fromBigInt(BigInt.zero()));
-    this.set("amount1", Value.fromBigInt(BigInt.zero()));
+    this.set("cumulativeLiquidity", Value.fromBigInt(BigInt.zero()));
+    this.set("cumulativeAmount0", Value.fromBigInt(BigInt.zero()));
+    this.set("cumulativeAmount1", Value.fromBigInt(BigInt.zero()));
   }
 
   save(): void {
     let id = this.get("id");
-    assert(id != null, "Cannot save Position entity without an ID");
+    assert(
+      id != null,
+      "Cannot save UniswapLiquidityPosition entity without an ID"
+    );
     if (id) {
       assert(
         id.kind == ValueKind.STRING,
-        "Cannot save Position entity with non-string ID. " +
+        "Cannot save UniswapLiquidityPosition entity with non-string ID. " +
           'Considering using .toHex() to convert the "id" to a string.'
       );
-      store.set("Position", id.toString(), this);
+      store.set("UniswapLiquidityPosition", id.toString(), this);
     }
   }
 
-  static load(id: string): Position | null {
-    return changetype<Position | null>(store.get("Position", id));
+  static load(id: string): UniswapLiquidityPosition | null {
+    return changetype<UniswapLiquidityPosition | null>(
+      store.get("UniswapLiquidityPosition", id)
+    );
   }
 
   get id(): string {
@@ -1662,31 +1667,31 @@ export class Position extends Entity {
     this.set("tickUpper", Value.fromI32(value));
   }
 
-  get liquidity(): BigInt {
-    let value = this.get("liquidity");
+  get cumulativeLiquidity(): BigInt {
+    let value = this.get("cumulativeLiquidity");
     return value!.toBigInt();
   }
 
-  set liquidity(value: BigInt) {
-    this.set("liquidity", Value.fromBigInt(value));
+  set cumulativeLiquidity(value: BigInt) {
+    this.set("cumulativeLiquidity", Value.fromBigInt(value));
   }
 
-  get amount0(): BigInt {
-    let value = this.get("amount0");
+  get cumulativeAmount0(): BigInt {
+    let value = this.get("cumulativeAmount0");
     return value!.toBigInt();
   }
 
-  set amount0(value: BigInt) {
-    this.set("amount0", Value.fromBigInt(value));
+  set cumulativeAmount0(value: BigInt) {
+    this.set("cumulativeAmount0", Value.fromBigInt(value));
   }
 
-  get amount1(): BigInt {
-    let value = this.get("amount1");
+  get cumulativeAmount1(): BigInt {
+    let value = this.get("cumulativeAmount1");
     return value!.toBigInt();
   }
 
-  set amount1(value: BigInt) {
-    this.set("amount1", Value.fromBigInt(value));
+  set cumulativeAmount1(value: BigInt) {
+    this.set("cumulativeAmount1", Value.fromBigInt(value));
   }
 }
 
@@ -1699,8 +1704,6 @@ export class Activity extends Entity {
     this.set("controller", Value.fromString(""));
     this.set("user", Value.fromBytes(Bytes.empty()));
     this.set("tickCurrent", Value.fromI32(0));
-    this.set("positionTickUpper", Value.fromI32(0));
-    this.set("positionTickLower", Value.fromI32(0));
   }
 
   save(): void {
@@ -1987,8 +1990,8 @@ export class Activity extends Entity {
     }
   }
 
-  get position(): string | null {
-    let value = this.get("position");
+  get uniswapLiquidityPosition(): string | null {
+    let value = this.get("uniswapLiquidityPosition");
     if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -1996,16 +1999,16 @@ export class Activity extends Entity {
     }
   }
 
-  set position(value: string | null) {
+  set uniswapLiquidityPosition(value: string | null) {
     if (!value) {
-      this.unset("position");
+      this.unset("uniswapLiquidityPosition");
     } else {
-      this.set("position", Value.fromString(<string>value));
+      this.set("uniswapLiquidityPosition", Value.fromString(<string>value));
     }
   }
 
-  get totalLiquidityAdded(): BigInt | null {
-    let value = this.get("totalLiquidityAdded");
+  get cumulativeLiquidityAdded(): BigInt | null {
+    let value = this.get("cumulativeLiquidityAdded");
     if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -2013,16 +2016,16 @@ export class Activity extends Entity {
     }
   }
 
-  set totalLiquidityAdded(value: BigInt | null) {
+  set cumulativeLiquidityAdded(value: BigInt | null) {
     if (!value) {
-      this.unset("totalLiquidityAdded");
+      this.unset("cumulativeLiquidityAdded");
     } else {
-      this.set("totalLiquidityAdded", Value.fromBigInt(<BigInt>value));
+      this.set("cumulativeLiquidityAdded", Value.fromBigInt(<BigInt>value));
     }
   }
 
-  get totalLiquidity0(): BigInt | null {
-    let value = this.get("totalLiquidity0");
+  get cumulativeLiquidity0(): BigInt | null {
+    let value = this.get("cumulativeLiquidity0");
     if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -2030,16 +2033,16 @@ export class Activity extends Entity {
     }
   }
 
-  set totalLiquidity0(value: BigInt | null) {
+  set cumulativeLiquidity0(value: BigInt | null) {
     if (!value) {
-      this.unset("totalLiquidity0");
+      this.unset("cumulativeLiquidity0");
     } else {
-      this.set("totalLiquidity0", Value.fromBigInt(<BigInt>value));
+      this.set("cumulativeLiquidity0", Value.fromBigInt(<BigInt>value));
     }
   }
 
-  get totalLiquidity1(): BigInt | null {
-    let value = this.get("totalLiquidity1");
+  get cumulativeLiquidity1(): BigInt | null {
+    let value = this.get("cumulativeLiquidity1");
     if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -2047,11 +2050,11 @@ export class Activity extends Entity {
     }
   }
 
-  set totalLiquidity1(value: BigInt | null) {
+  set cumulativeLiquidity1(value: BigInt | null) {
     if (!value) {
-      this.unset("totalLiquidity1");
+      this.unset("cumulativeLiquidity1");
     } else {
-      this.set("totalLiquidity1", Value.fromBigInt(<BigInt>value));
+      this.set("cumulativeLiquidity1", Value.fromBigInt(<BigInt>value));
     }
   }
 
@@ -2104,23 +2107,5 @@ export class Activity extends Entity {
     } else {
       this.set("liquidityAdded1", Value.fromBigInt(<BigInt>value));
     }
-  }
-
-  get positionTickUpper(): i32 {
-    let value = this.get("positionTickUpper");
-    return value!.toI32();
-  }
-
-  set positionTickUpper(value: i32) {
-    this.set("positionTickUpper", Value.fromI32(value));
-  }
-
-  get positionTickLower(): i32 {
-    let value = this.get("positionTickLower");
-    return value!.toI32();
-  }
-
-  set positionTickLower(value: i32) {
-    this.set("positionTickLower", Value.fromI32(value));
   }
 }

@@ -6,7 +6,7 @@ import {
   Auction,
   ERC20Token,
   PaprController,
-  Position,
+  UniswapLiquidityPosition,
 } from "../generated/schema";
 import {
   AddCollateral as AddCollateralEvent,
@@ -253,16 +253,20 @@ export function handleLPIncreaseActivity(
   tickCurrent: i32,
   controllerId: string
 ): void {
-  const positionId = `${event.transaction.from}-${event.params.tickLower}-${event.params.tickUpper}`;
-  let position = Position.load(positionId);
+  const positionId = generatePositionId(
+    event.transaction.from,
+    event.params.tickLower,
+    event.params.tickUpper
+  );
+  let position = UniswapLiquidityPosition.load(positionId);
   if (!position) {
-    position = new Position(positionId);
+    position = new UniswapLiquidityPosition(positionId);
     position.user = event.transaction.from;
     position.tickLower = event.params.tickLower;
     position.tickUpper = event.params.tickUpper;
-    position.liquidity = BigInt.fromI32(0);
-    position.amount0 = BigInt.fromI32(0);
-    position.amount1 = BigInt.fromI32(0);
+    position.cumulativeLiquidity = BigInt.fromI32(0);
+    position.cumulativeAmount0 = BigInt.fromI32(0);
+    position.cumulativeAmount1 = BigInt.fromI32(0);
     position.save();
   }
 
@@ -271,17 +275,22 @@ export function handleLPIncreaseActivity(
     activity = initializeActivityEntity(event, controllerId);
   }
   activity.user = event.transaction.from;
+  activity.uniswapLiquidityPosition = position.id;
   activity.liquidityAdded = event.params.amount;
   activity.liquidityAdded0 = event.params.amount0;
   activity.liquidityAdded1 = event.params.amount1;
-  activity.positionTickLower = event.params.tickLower;
-  activity.positionTickUpper = event.params.tickUpper;
   activity.sqrtPricePool = sqrtPricePool;
   activity.tickCurrent = tickCurrent;
 
-  activity.totalLiquidityAdded = position.liquidity.plus(event.params.amount);
-  activity.totalLiquidity0 = position.amount0.plus(event.params.amount0);
-  activity.totalLiquidity1 = position.amount1.plus(event.params.amount1);
+  activity.cumulativeLiquidityAdded = position.cumulativeLiquidity.plus(
+    event.params.amount
+  );
+  activity.cumulativeLiquidity0 = position.cumulativeAmount0.plus(
+    event.params.amount0
+  );
+  activity.cumulativeLiquidity1 = position.cumulativeAmount1.plus(
+    event.params.amount1
+  );
 
   activity.save();
 }
@@ -292,13 +301,23 @@ export function handleLPDecreaseActivity(
   tickCurrent: i32,
   controllerId: string
 ): void {
-  const position = Position.load(
-    `${event.transaction.from}-${event.params.tickLower}-${event.params.tickUpper}`
+  const position = UniswapLiquidityPosition.load(
+    generatePositionId(
+      event.transaction.from,
+      event.params.tickLower,
+      event.params.tickUpper
+    )
   );
   if (!position) return;
-  position.liquidity = position.liquidity.minus(event.params.amount);
-  position.amount0 = position.amount0.minus(event.params.amount0);
-  position.amount1 = position.amount1.minus(event.params.amount1);
+  position.cumulativeLiquidity = position.cumulativeLiquidity.minus(
+    event.params.amount
+  );
+  position.cumulativeAmount0 = position.cumulativeAmount0.minus(
+    event.params.amount0
+  );
+  position.cumulativeAmount1 = position.cumulativeAmount1.minus(
+    event.params.amount1
+  );
   position.save();
 
   let activity = Activity.load(event.transaction.hash.toHex());
@@ -306,17 +325,22 @@ export function handleLPDecreaseActivity(
     activity = initializeActivityEntity(event, controllerId);
   }
   activity.user = event.transaction.from;
+  activity.uniswapLiquidityPosition = position.id;
   activity.liquidityAdded = event.params.amount.times(BigInt.fromI32(-1));
   activity.liquidityAdded0 = event.params.amount0;
   activity.liquidityAdded1 = event.params.amount1;
-  activity.positionTickLower = event.params.tickLower;
-  activity.positionTickUpper = event.params.tickUpper;
   activity.sqrtPricePool = sqrtPricePool;
   activity.tickCurrent = tickCurrent;
 
-  activity.totalLiquidityAdded = position.liquidity.minus(event.params.amount);
-  activity.totalLiquidity0 = position.amount0.minus(event.params.amount0);
-  activity.totalLiquidity1 = position.amount1.minus(event.params.amount1);
+  activity.cumulativeLiquidityAdded = position.cumulativeLiquidity.minus(
+    event.params.amount
+  );
+  activity.cumulativeLiquidity0 = position.cumulativeAmount0.minus(
+    event.params.amount0
+  );
+  activity.cumulativeLiquidity1 = position.cumulativeAmount1.minus(
+    event.params.amount1
+  );
 
   activity.save();
 }
@@ -333,6 +357,14 @@ function initializeActivityEntity(
 
   activity.save();
   return activity;
+}
+
+function generatePositionId(
+  user: Address,
+  tickLower: i32,
+  tickUpper: i32
+): string {
+  return `${user.toHexString()}-${tickLower}-${tickUpper}`;
 }
 
 function generateActivityCollateralId(

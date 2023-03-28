@@ -171,14 +171,14 @@ type ActivityRemovedCollateral @entity {
   activity: Activity!
 }
 
-type Position @entity {
+type UniswapLiquidityPosition @entity {
   id: ID!
   user: Bytes!
   tickLower: Int!
   tickUpper: Int!
-  liquidity: BigInt!
-  amount0: BigInt!
-  amount1: BigInt!
+  cumulativeLiquidity: BigInt!
+  cumulativeAmount0: BigInt!
+  cumulativeAmount1: BigInt!
 }
 
 type Activity @entity {
@@ -202,13 +202,11 @@ type Activity @entity {
   auctionCollateral: ERC721Token
   auctionTokenId: BigInt
   auctionEndPrice: BigInt
-  position: Position
-  totalLiquidityAdded: BigInt
-  totalLiquidity0: BigInt
-  totalLiquidity1: BigInt
+  uniswapLiquidityPosition: UniswapLiquidityPosition
+  cumulativeLiquidityAdded: BigInt
+  cumulativeLiquidity0: BigInt
+  cumulativeLiquidity1: BigInt
   liquidityAdded: BigInt
   liquidityAdded0: BigInt
   liquidityAdded1: BigInt
-  positionTickUpper: Int
-  positionTickLower: Int
 }
