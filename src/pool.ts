@@ -1,6 +1,6 @@
-import { Address, dataSource } from "@graphprotocol/graph-ts";
+import { Address, dataSource, BigInt } from "@graphprotocol/graph-ts";
 
-import { TargetUpdate } from "../generated/schema";
+import { PaprController, TargetUpdate } from "../generated/schema";
 
 import {
   Swap as SwapEvent,
@@ -9,6 +9,7 @@ import {
 } from "../generated/templates/Pool/Pool";
 
 import { PaprController as PaprControllerABI } from "../generated/SlyFox/PaprController";
+import { Pool as PoolABI } from "../generated/templates/Pool/Pool";
 import {
   updateControllerTarget,
   updateTargetHourData,
@@ -18,6 +19,20 @@ import {
   handleLPIncreaseActivity,
   handleSwapActivity,
 } from "./activity";
+
+class SqrtPriceAndTick {
+  sqrtPrice: BigInt;
+  tickCurrent: i32;
+}
+
+function getSqrtPriceAndTickCurrentFromPool(
+  poolAddress: string
+): SqrtPriceAndTick | null {
+  const pool = PoolABI.bind(Address.fromString(poolAddress));
+  const slot0Result = pool.try_slot0();
+  if (slot0Result.reverted) return null;
+  return { sqrtPrice: pool.slot0().value0, tickCurrent: pool.slot0().value1 };
+}
 
 // Thought I'd separate this as it is kind of distinct from the
 // handlers for the papr controller events
@@ -64,7 +79,17 @@ export function handleIncreaseLiquidity(event: MintEvent): void {
   const controller = context.getString("controller");
   if (!controller) return;
 
-  handleLPIncreaseActivity(event, controller);
+  const sqrtPriceAndTickCurrent = getSqrtPriceAndTickCurrentFromPool(
+    context.getString("poolAddress")
+  );
+  if (!sqrtPriceAndTickCurrent) return;
+
+  handleLPIncreaseActivity(
+    event,
+    sqrtPriceAndTickCurrent.sqrtPrice,
+    sqrtPriceAndTickCurrent.tickCurrent,
+    controller
+  );
 }
 
 export function handleDecreaseLiquidity(event: BurnEvent): void {
@@ -72,5 +97,15 @@ export function handleDecreaseLiquidity(event: BurnEvent): void {
   const controller = context.getString("controller");
   if (!controller) return;
 
-  handleLPDecreaseActivity(event, controller);
+  const sqrtPriceAndTickCurrent = getSqrtPriceAndTickCurrentFromPool(
+    context.getString("poolAddress")
+  );
+  if (!sqrtPriceAndTickCurrent) return;
+
+  handleLPDecreaseActivity(
+    event,
+    sqrtPriceAndTickCurrent.sqrtPrice,
+    sqrtPriceAndTickCurrent.tickCurrent,
+    controller
+  );
 }

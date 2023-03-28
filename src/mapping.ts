@@ -248,6 +248,7 @@ export function handleTargetUpdate(event: UpdateTarget): void {
 
     let context = new DataSourceContext()
     context.setString('controller', controller.id)
+    context.setString('poolAddress', controller.poolAddress.toHexString())
     PoolTemplate.createWithContext(poolResult.value, context);
 
     const maxLTVResult = PaprControllerABI.bind(

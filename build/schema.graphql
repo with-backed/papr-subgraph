@@ -171,6 +171,16 @@ type ActivityRemovedCollateral @entity {
   activity: Activity!
 }
 
+type Position @entity {
+  id: ID!
+  user: Bytes!
+  tickLower: Int!
+  tickUpper: Int!
+  liquidity: BigInt!
+  amount0: BigInt!
+  amount1: BigInt!
+}
+
 type Activity @entity {
   id: ID! # tx hash of activity
   timestamp: Int!
@@ -178,6 +188,7 @@ type Activity @entity {
   user: Bytes!
   vault: Vault
   sqrtPricePool: BigInt
+  tickCurrent: Int
   amountBorrowed: BigInt
   amountRepaid: BigInt
   amountIn: BigInt
@@ -191,7 +202,11 @@ type Activity @entity {
   auctionCollateral: ERC721Token
   auctionTokenId: BigInt
   auctionEndPrice: BigInt
+  position: Position
   totalLiquidityAdded: BigInt
+  totalLiquidity0: BigInt
+  totalLiquidity1: BigInt
+  liquidityAdded: BigInt
   liquidityAdded0: BigInt
   liquidityAdded1: BigInt
   positionTickUpper: Int
