@@ -214,6 +214,7 @@ export function handleAuctionStartActivity(
   if (!activity) {
     activity = initializeActivityEntity(event, controllerId);
   }
+  activity.user = event.params.nftOwner;
   activity.vault = generateVaultId(
     event.params._event.address,
     event.params.nftOwner,
@@ -239,6 +240,7 @@ export function handleAuctionEndActivity(
   if (!activity) {
     activity = initializeActivityEntity(event, controllerId);
   }
+  activity.user = auction.nftOwner;
   activity.vault = auction.vault;
   activity.auctionCollateral = auctionStartActivity.auctionCollateral;
   activity.auctionTokenId = auctionStartActivity.auctionTokenId;
@@ -270,6 +272,18 @@ export function handleLPIncreaseActivity(
     position.save();
   }
 
+  position.cumulativeLiquidity = position.cumulativeLiquidity.plus(
+    event.params.amount
+  );
+  position.cumulativeAmount0 = position.cumulativeAmount0.plus(
+    event.params.amount0
+  );
+  position.cumulativeAmount1 = position.cumulativeAmount1.plus(
+    event.params.amount1
+  );
+
+  position.save();
+
   let activity = Activity.load(event.transaction.hash.toHex());
   if (!activity) {
     activity = initializeActivityEntity(event, controllerId);
@@ -282,15 +296,9 @@ export function handleLPIncreaseActivity(
   activity.sqrtPricePool = sqrtPricePool;
   activity.tickCurrent = tickCurrent;
 
-  activity.cumulativeLiquidity = position.cumulativeLiquidity.plus(
-    event.params.amount
-  );
-  activity.cumulativeToken0 = position.cumulativeAmount0.plus(
-    event.params.amount0
-  );
-  activity.cumulativeToken1 = position.cumulativeAmount1.plus(
-    event.params.amount1
-  );
+  activity.cumulativeLiquidity = position.cumulativeLiquidity;
+  activity.cumulativeToken0 = position.cumulativeAmount0;
+  activity.cumulativeToken1 = position.cumulativeAmount1;
 
   activity.save();
 }
@@ -332,15 +340,9 @@ export function handleLPDecreaseActivity(
   activity.sqrtPricePool = sqrtPricePool;
   activity.tickCurrent = tickCurrent;
 
-  activity.cumulativeLiquidity = position.cumulativeLiquidity.minus(
-    event.params.amount
-  );
-  activity.cumulativeToken0 = position.cumulativeAmount0.minus(
-    event.params.amount0
-  );
-  activity.cumulativeToken1 = position.cumulativeAmount1.minus(
-    event.params.amount1
-  );
+  activity.cumulativeLiquidity = position.cumulativeLiquidity;
+  activity.cumulativeToken0 = position.cumulativeAmount0;
+  activity.cumulativeToken1 = position.cumulativeAmount1;
 
   activity.save();
 }
