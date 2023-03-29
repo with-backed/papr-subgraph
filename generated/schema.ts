@@ -1596,6 +1596,105 @@ export class ActivityRemovedCollateral extends Entity {
   }
 }
 
+export class UniswapLiquidityPosition extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+
+    this.set("user", Value.fromBytes(Bytes.empty()));
+    this.set("tickLower", Value.fromI32(0));
+    this.set("tickUpper", Value.fromI32(0));
+    this.set("cumulativeLiquidity", Value.fromBigInt(BigInt.zero()));
+    this.set("cumulativeAmount0", Value.fromBigInt(BigInt.zero()));
+    this.set("cumulativeAmount1", Value.fromBigInt(BigInt.zero()));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(
+      id != null,
+      "Cannot save UniswapLiquidityPosition entity without an ID"
+    );
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        "Cannot save UniswapLiquidityPosition entity with non-string ID. " +
+          'Considering using .toHex() to convert the "id" to a string.'
+      );
+      store.set("UniswapLiquidityPosition", id.toString(), this);
+    }
+  }
+
+  static load(id: string): UniswapLiquidityPosition | null {
+    return changetype<UniswapLiquidityPosition | null>(
+      store.get("UniswapLiquidityPosition", id)
+    );
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get user(): Bytes {
+    let value = this.get("user");
+    return value!.toBytes();
+  }
+
+  set user(value: Bytes) {
+    this.set("user", Value.fromBytes(value));
+  }
+
+  get tickLower(): i32 {
+    let value = this.get("tickLower");
+    return value!.toI32();
+  }
+
+  set tickLower(value: i32) {
+    this.set("tickLower", Value.fromI32(value));
+  }
+
+  get tickUpper(): i32 {
+    let value = this.get("tickUpper");
+    return value!.toI32();
+  }
+
+  set tickUpper(value: i32) {
+    this.set("tickUpper", Value.fromI32(value));
+  }
+
+  get cumulativeLiquidity(): BigInt {
+    let value = this.get("cumulativeLiquidity");
+    return value!.toBigInt();
+  }
+
+  set cumulativeLiquidity(value: BigInt) {
+    this.set("cumulativeLiquidity", Value.fromBigInt(value));
+  }
+
+  get cumulativeAmount0(): BigInt {
+    let value = this.get("cumulativeAmount0");
+    return value!.toBigInt();
+  }
+
+  set cumulativeAmount0(value: BigInt) {
+    this.set("cumulativeAmount0", Value.fromBigInt(value));
+  }
+
+  get cumulativeAmount1(): BigInt {
+    let value = this.get("cumulativeAmount1");
+    return value!.toBigInt();
+  }
+
+  set cumulativeAmount1(value: BigInt) {
+    this.set("cumulativeAmount1", Value.fromBigInt(value));
+  }
+}
+
 export class Activity extends Entity {
   constructor(id: string) {
     super();
@@ -1604,6 +1703,7 @@ export class Activity extends Entity {
     this.set("timestamp", Value.fromI32(0));
     this.set("controller", Value.fromString(""));
     this.set("user", Value.fromBytes(Bytes.empty()));
+    this.set("tickCurrent", Value.fromI32(0));
   }
 
   save(): void {
@@ -1691,6 +1791,15 @@ export class Activity extends Entity {
     } else {
       this.set("sqrtPricePool", Value.fromBigInt(<BigInt>value));
     }
+  }
+
+  get tickCurrent(): i32 {
+    let value = this.get("tickCurrent");
+    return value!.toI32();
+  }
+
+  set tickCurrent(value: i32) {
+    this.set("tickCurrent", Value.fromI32(value));
   }
 
   get amountBorrowed(): BigInt | null {
@@ -1878,6 +1987,125 @@ export class Activity extends Entity {
       this.unset("auctionEndPrice");
     } else {
       this.set("auctionEndPrice", Value.fromBigInt(<BigInt>value));
+    }
+  }
+
+  get uniswapLiquidityPosition(): string | null {
+    let value = this.get("uniswapLiquidityPosition");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set uniswapLiquidityPosition(value: string | null) {
+    if (!value) {
+      this.unset("uniswapLiquidityPosition");
+    } else {
+      this.set("uniswapLiquidityPosition", Value.fromString(<string>value));
+    }
+  }
+
+  get cumulativeLiquidity(): BigInt | null {
+    let value = this.get("cumulativeLiquidity");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set cumulativeLiquidity(value: BigInt | null) {
+    if (!value) {
+      this.unset("cumulativeLiquidity");
+    } else {
+      this.set("cumulativeLiquidity", Value.fromBigInt(<BigInt>value));
+    }
+  }
+
+  get cumulativeToken0(): BigInt | null {
+    let value = this.get("cumulativeToken0");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set cumulativeToken0(value: BigInt | null) {
+    if (!value) {
+      this.unset("cumulativeToken0");
+    } else {
+      this.set("cumulativeToken0", Value.fromBigInt(<BigInt>value));
+    }
+  }
+
+  get cumulativeToken1(): BigInt | null {
+    let value = this.get("cumulativeToken1");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set cumulativeToken1(value: BigInt | null) {
+    if (!value) {
+      this.unset("cumulativeToken1");
+    } else {
+      this.set("cumulativeToken1", Value.fromBigInt(<BigInt>value));
+    }
+  }
+
+  get liquidityDelta(): BigInt | null {
+    let value = this.get("liquidityDelta");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set liquidityDelta(value: BigInt | null) {
+    if (!value) {
+      this.unset("liquidityDelta");
+    } else {
+      this.set("liquidityDelta", Value.fromBigInt(<BigInt>value));
+    }
+  }
+
+  get token0Delta(): BigInt | null {
+    let value = this.get("token0Delta");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set token0Delta(value: BigInt | null) {
+    if (!value) {
+      this.unset("token0Delta");
+    } else {
+      this.set("token0Delta", Value.fromBigInt(<BigInt>value));
+    }
+  }
+
+  get token1Delta(): BigInt | null {
+    let value = this.get("token1Delta");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set token1Delta(value: BigInt | null) {
+    if (!value) {
+      this.unset("token1Delta");
+    } else {
+      this.set("token1Delta", Value.fromBigInt(<BigInt>value));
     }
   }
 }

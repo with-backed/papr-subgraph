@@ -4,7 +4,9 @@ import {
   ActivityAddedCollateral,
   ActivityRemovedCollateral,
   Auction,
+  ERC20Token,
   PaprController,
+  UniswapLiquidityPosition,
 } from "../generated/schema";
 import {
   AddCollateral as AddCollateralEvent,
@@ -14,7 +16,11 @@ import {
   RemoveCollateral as RemoveCollateralEvent,
   StartAuction as StartAuctionEvent,
 } from "../generated/SlyFox/PaprController";
-import { Pool as PoolABI } from "../generated/templates/Pool/Pool";
+import {
+  Burn as BurnEvent,
+  Mint as MintEvent,
+  Pool as PoolABI,
+} from "../generated/templates/Pool/Pool";
 import { Swap as SwapEvent } from "../generated/templates/Pool/Pool";
 import {
   generateVaultId,
@@ -208,6 +214,7 @@ export function handleAuctionStartActivity(
   if (!activity) {
     activity = initializeActivityEntity(event, controllerId);
   }
+  activity.user = event.params.nftOwner;
   activity.vault = generateVaultId(
     event.params._event.address,
     event.params.nftOwner,
@@ -233,10 +240,109 @@ export function handleAuctionEndActivity(
   if (!activity) {
     activity = initializeActivityEntity(event, controllerId);
   }
+  activity.user = auction.nftOwner;
   activity.vault = auction.vault;
   activity.auctionCollateral = auctionStartActivity.auctionCollateral;
   activity.auctionTokenId = auctionStartActivity.auctionTokenId;
   activity.auctionEndPrice = event.params.price;
+
+  activity.save();
+}
+
+export function handleLPIncreaseActivity(
+  event: MintEvent,
+  sqrtPricePool: BigInt,
+  tickCurrent: i32,
+  controllerId: string
+): void {
+  const positionId = generatePositionId(
+    event.transaction.from,
+    event.params.tickLower,
+    event.params.tickUpper
+  );
+  let position = UniswapLiquidityPosition.load(positionId);
+  if (!position) {
+    position = new UniswapLiquidityPosition(positionId);
+    position.user = event.transaction.from;
+    position.tickLower = event.params.tickLower;
+    position.tickUpper = event.params.tickUpper;
+    position.cumulativeLiquidity = BigInt.fromI32(0);
+    position.cumulativeAmount0 = BigInt.fromI32(0);
+    position.cumulativeAmount1 = BigInt.fromI32(0);
+    position.save();
+  }
+
+  position.cumulativeLiquidity = position.cumulativeLiquidity.plus(
+    event.params.amount
+  );
+  position.cumulativeAmount0 = position.cumulativeAmount0.plus(
+    event.params.amount0
+  );
+  position.cumulativeAmount1 = position.cumulativeAmount1.plus(
+    event.params.amount1
+  );
+
+  position.save();
+
+  let activity = Activity.load(event.transaction.hash.toHex());
+  if (!activity) {
+    activity = initializeActivityEntity(event, controllerId);
+  }
+  activity.user = event.transaction.from;
+  activity.uniswapLiquidityPosition = position.id;
+  activity.liquidityDelta = event.params.amount;
+  activity.token0Delta = event.params.amount0;
+  activity.token1Delta = event.params.amount1;
+  activity.sqrtPricePool = sqrtPricePool;
+  activity.tickCurrent = tickCurrent;
+
+  activity.cumulativeLiquidity = position.cumulativeLiquidity;
+  activity.cumulativeToken0 = position.cumulativeAmount0;
+  activity.cumulativeToken1 = position.cumulativeAmount1;
+
+  activity.save();
+}
+
+export function handleLPDecreaseActivity(
+  event: BurnEvent,
+  sqrtPricePool: BigInt,
+  tickCurrent: i32,
+  controllerId: string
+): void {
+  const position = UniswapLiquidityPosition.load(
+    generatePositionId(
+      event.transaction.from,
+      event.params.tickLower,
+      event.params.tickUpper
+    )
+  );
+  if (!position) return;
+  position.cumulativeLiquidity = position.cumulativeLiquidity.minus(
+    event.params.amount
+  );
+  position.cumulativeAmount0 = position.cumulativeAmount0.minus(
+    event.params.amount0
+  );
+  position.cumulativeAmount1 = position.cumulativeAmount1.minus(
+    event.params.amount1
+  );
+  position.save();
+
+  let activity = Activity.load(event.transaction.hash.toHex());
+  if (!activity) {
+    activity = initializeActivityEntity(event, controllerId);
+  }
+  activity.user = event.transaction.from;
+  activity.uniswapLiquidityPosition = position.id;
+  activity.liquidityDelta = event.params.amount.times(BigInt.fromI32(-1));
+  activity.token0Delta = event.params.amount0;
+  activity.token1Delta = event.params.amount1;
+  activity.sqrtPricePool = sqrtPricePool;
+  activity.tickCurrent = tickCurrent;
+
+  activity.cumulativeLiquidity = position.cumulativeLiquidity;
+  activity.cumulativeToken0 = position.cumulativeAmount0;
+  activity.cumulativeToken1 = position.cumulativeAmount1;
 
   activity.save();
 }
@@ -246,11 +352,21 @@ function initializeActivityEntity(
   controllerId: string
 ): Activity {
   let activity = new Activity(event.transaction.hash.toHex());
+
   activity.timestamp = event.block.timestamp.toI32();
   activity.controller = controllerId;
   activity.user = event.transaction.from;
+
   activity.save();
   return activity;
+}
+
+function generatePositionId(
+  user: Address,
+  tickLower: i32,
+  tickUpper: i32
+): string {
+  return `${user.toHexString()}-${tickLower}-${tickUpper}`;
 }
 
 function generateActivityCollateralId(
