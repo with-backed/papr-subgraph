@@ -107,6 +107,7 @@ export function handleAddCollateralActivity(
     activity = new Activity(event.transaction.hash.toHex());
     activity = initializeActivityEntity(event, controllerId);
   }
+  activity.user = event.params.account;
   activity.vault = generateVaultId(
     event.params._event.address,
     event.params.account,
@@ -140,6 +141,7 @@ export function handleRemoveCollateralActivity(
     activity = new Activity(event.transaction.hash.toHex());
     activity = initializeActivityEntity(event, controllerId);
   }
+  activity.user = event.params.account;
   activity.vault = generateVaultId(
     event.params._event.address,
     event.params.account,
@@ -172,6 +174,7 @@ export function handleIncreaseDebtActivity(
   if (!activity) {
     activity = initializeActivityEntity(event, controllerId);
   }
+  activity.user = event.params.account;
   activity.vault = generateVaultId(
     event.params._event.address,
     event.params.account,
@@ -193,6 +196,7 @@ export function handleReduceDebtActivity(
   if (!activity) {
     activity = initializeActivityEntity(event, controllerId);
   }
+  activity.user = event.params.account;
   activity.vault = generateVaultId(
     event.params._event.address,
     event.params.account,
