@@ -22,6 +22,7 @@ import {
   Pool as PoolABI,
 } from "../generated/templates/Pool/Pool";
 import { Swap as SwapEvent } from "../generated/templates/Pool/Pool";
+import { getSqrtPriceAndTickCurrentFromPool } from "./pool";
 import {
   generateVaultId,
   loadOrCreateERC20Token,
@@ -360,6 +361,16 @@ function initializeActivityEntity(
   activity.timestamp = event.block.timestamp.toI32();
   activity.controller = controllerId;
   activity.user = event.transaction.from;
+
+  const controller = PaprController.load(controllerId);
+  if (!controller) return activity;
+
+  const sqrtPriceAndTick = getSqrtPriceAndTickCurrentFromPool(
+    controller.poolAddress.toHexString()
+  );
+  if (!sqrtPriceAndTick) return activity;
+  activity.sqrtPricePool = sqrtPriceAndTick.sqrtPrice;
+  activity.tickCurrent = sqrtPriceAndTick.tickCurrent;
 
   activity.save();
   return activity;

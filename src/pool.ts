@@ -25,7 +25,7 @@ class SqrtPriceAndTick {
   tickCurrent: i32;
 }
 
-function getSqrtPriceAndTickCurrentFromPool(
+export function getSqrtPriceAndTickCurrentFromPool(
   poolAddress: string
 ): SqrtPriceAndTick | null {
   const pool = PoolABI.bind(Address.fromString(poolAddress));
