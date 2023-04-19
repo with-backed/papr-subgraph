@@ -273,6 +273,15 @@ export class Vault extends Entity {
     this.set("collateral", Value.fromStringArray(value));
   }
 
+  get auctions(): Array<string> {
+    let value = this.get("auctions");
+    return value!.toStringArray();
+  }
+
+  set auctions(value: Array<string>) {
+    this.set("auctions", Value.fromStringArray(value));
+  }
+
   get collateralCount(): i32 {
     let value = this.get("collateralCount");
     return value!.toI32();
