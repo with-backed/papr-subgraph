@@ -190,6 +190,7 @@ export class Vault extends Entity {
     this.set("debtPerCollateral", Value.fromBigInt(BigInt.zero()));
     this.set("collateralCount", Value.fromI32(0));
     this.set("latestAuctionStartTime", Value.fromI32(0));
+    this.set("latestIncreaseDebt", Value.fromI32(0));
   }
 
   save(): void {
@@ -288,6 +289,15 @@ export class Vault extends Entity {
 
   set latestAuctionStartTime(value: i32) {
     this.set("latestAuctionStartTime", Value.fromI32(value));
+  }
+
+  get latestIncreaseDebt(): i32 {
+    let value = this.get("latestIncreaseDebt");
+    return value!.toI32();
+  }
+
+  set latestIncreaseDebt(value: i32) {
+    this.set("latestIncreaseDebt", Value.fromI32(value));
   }
 }
 

@@ -1,5 +1,5 @@
 import { Address, DataSourceContext, BigInt } from "@graphprotocol/graph-ts";
-import { BigInt as AsBigInt } from "as-bigint"
+import { BigInt as AsBigInt } from "as-bigint";
 
 import {
   IncreaseDebt,
@@ -12,7 +12,7 @@ import {
   EndAuction,
   SetFundingPeriod,
   IncreaseDebtAndSellCall,
-  BuyAndReduceDebtCall
+  BuyAndReduceDebtCall,
 } from "../generated/SlyFox/PaprController";
 
 import {
@@ -30,17 +30,32 @@ import {
   AuctionStartEvent,
   AuctionEndEvent,
   ERC20Token,
-  ERC721Token
+  ERC721Token,
 } from "../generated/schema";
 
-import { Pool as PoolTemplate } from '../generated/templates'
+import { Pool as PoolTemplate } from "../generated/templates";
 
 import { PaprController as PaprControllerABI } from "../generated/SlyFox/PaprController";
 import { ERC721 as ERC721ABI } from "../generated/SlyFox/ERC721";
 import { ERC20 as ERC20ABI } from "../generated/SlyFox/ERC20";
-import { updateControllerTarget, updateTargetHourData } from "./intervalUpdates";
-import { generateVaultId, loadOrCreateERC20Token, loadOrCreateERC721Token } from "./utils";
-import { addClientFeeToActivity, handleAddCollateralActivity, handleAuctionEndActivity, handleAuctionStartActivity, handleIncreaseDebtActivity, handleReduceDebtActivity, handleRemoveCollateralActivity } from "./activity";
+import {
+  updateControllerTarget,
+  updateTargetHourData,
+} from "./intervalUpdates";
+import {
+  generateVaultId,
+  loadOrCreateERC20Token,
+  loadOrCreateERC721Token,
+} from "./utils";
+import {
+  addClientFeeToActivity,
+  handleAddCollateralActivity,
+  handleAuctionEndActivity,
+  handleAuctionStartActivity,
+  handleIncreaseDebtActivity,
+  handleReduceDebtActivity,
+  handleRemoveCollateralActivity,
+} from "./activity";
 
 function generateCollateralId(addr: Address, tokenId: BigInt): string {
   return `${addr.toHexString()}-${tokenId.toString()}`;
@@ -62,21 +77,15 @@ function initVault(
 
 export function handleAddCollateral(event: AddCollateral): void {
   const token = loadOrCreateERC721Token(event.params.collateralAddress);
-  if (!token) {return};
+  if (!token) {
+    return;
+  }
 
   let vault: Vault | null = Vault.load(
-    generateVaultId(
-      event.params._event.address,
-      event.params.account,
-      token
-    )
+    generateVaultId(event.params._event.address, event.params.account, token)
   );
   if (!vault) {
-    vault = initVault(
-      event.params._event.address,
-      event.params.account,
-      token
-    );
+    vault = initVault(event.params._event.address, event.params.account, token);
   }
 
   const collateralAdded = new VaultCollateral(
@@ -112,14 +121,12 @@ export function handleAddCollateral(event: AddCollateral): void {
 
 export function handleRemoveCollateral(event: RemoveCollateral): void {
   const token = loadOrCreateERC721Token(event.params.collateralAddress);
-  if (!token) {return};
+  if (!token) {
+    return;
+  }
 
   const vault = Vault.load(
-    generateVaultId(
-      event.params._event.address,
-      event.params.account,
-      token
-    )
+    generateVaultId(event.params._event.address, event.params.account, token)
   );
   if (!vault) return;
 
@@ -155,23 +162,24 @@ export function handleRemoveCollateral(event: RemoveCollateral): void {
 
 export function handleIncreaseDebt(event: IncreaseDebt): void {
   const token = loadOrCreateERC721Token(event.params.collateralAddress);
-  if (!token) {return};
- 
+  if (!token) {
+    return;
+  }
+
   let vault = Vault.load(
-    generateVaultId(
-      event.params._event.address,
-      event.params.account,
-      token
-    )
+    generateVaultId(event.params._event.address, event.params.account, token)
   );
 
   // vault should exist because this cannot be called unless collateral is added
-  if (!vault) {return}
+  if (!vault) {
+    return;
+  }
 
   vault.debt = vault.debt.plus(event.params.amount);
   vault.debtPerCollateral = vault.debt.div(
     BigInt.fromI32(vault.collateralCount)
   );
+  vault.latestIncreaseDebt = event.block.timestamp.toI32();
   vault.save();
 
   const debtIncreasedEvent = new DebtIncreasedEvent(
@@ -188,14 +196,12 @@ export function handleIncreaseDebt(event: IncreaseDebt): void {
 
 export function handleReduceDebt(event: ReduceDebt): void {
   const token = loadOrCreateERC721Token(event.params.collateralAddress);
-  if (!token) {return};
+  if (!token) {
+    return;
+  }
 
   const vault = Vault.load(
-    generateVaultId(
-      event.params._event.address,
-      event.params.account,
-      token
-    )
+    generateVaultId(event.params._event.address, event.params.account, token)
   );
   if (!vault) {
     return;
@@ -226,11 +232,11 @@ export function handleReduceDebt(event: ReduceDebt): void {
 
 export function handleTargetUpdate(event: UpdateTarget): void {
   // check if target update event emitted in this tx already
-    // true if this was an increaseAndSwap call
+  // true if this was an increaseAndSwap call
   let targetUpdate = TargetUpdate.load(event.block.timestamp.toString());
 
   if (targetUpdate != null) return;
-  
+
   let controller = PaprController.load(
     event.params._event.address.toHexString()
   );
@@ -246,9 +252,9 @@ export function handleTargetUpdate(event: UpdateTarget): void {
 
     controller.poolAddress = poolResult.value;
 
-    let context = new DataSourceContext()
-    context.setString('controller', controller.id)
-    context.setString('poolAddress', controller.poolAddress.toHexString())
+    let context = new DataSourceContext();
+    context.setString("controller", controller.id);
+    context.setString("poolAddress", controller.poolAddress.toHexString());
     PoolTemplate.createWithContext(poolResult.value, context);
 
     const maxLTVResult = PaprControllerABI.bind(
@@ -258,7 +264,7 @@ export function handleTargetUpdate(event: UpdateTarget): void {
     controller.maxLTV = maxLTVResult.value;
     const fundingPeriodResult = PaprControllerABI.bind(
       event.params._event.address
-    ).try_fundingPeriod()
+    ).try_fundingPeriod();
     if (fundingPeriodResult.reverted) return;
     controller.fundingPeriod = fundingPeriodResult.value;
 
@@ -266,8 +272,8 @@ export function handleTargetUpdate(event: UpdateTarget): void {
       event.params._event.address
     ).try_underlying();
     if (underlyingResult.reverted) return;
-    const underlyingToken = loadOrCreateERC20Token(underlyingResult.value)
-    if (!underlyingToken) return
+    const underlyingToken = loadOrCreateERC20Token(underlyingResult.value);
+    if (!underlyingToken) return;
 
     controller.underlying = underlyingToken.id;
 
@@ -276,14 +282,16 @@ export function handleTargetUpdate(event: UpdateTarget): void {
     ).try_papr();
     if (paprTokenResult.reverted) return;
 
-    const paprToken = loadOrCreateERC20Token(paprTokenResult.value)
-    if (!paprToken) return
+    const paprToken = loadOrCreateERC20Token(paprTokenResult.value);
+    if (!paprToken) return;
 
     controller.paprToken = paprToken.id;
 
-    underlyingResult.value.toHex()
+    underlyingResult.value.toHex();
 
-    controller.token0IsUnderlying = AsBigInt.fromString(underlyingResult.value.toHexString()).lt(AsBigInt.fromString(paprTokenResult.value.toHexString()))
+    controller.token0IsUnderlying = AsBigInt.fromString(
+      underlyingResult.value.toHexString()
+    ).lt(AsBigInt.fromString(paprTokenResult.value.toHexString()));
   }
 
   targetUpdate = new TargetUpdate(event.block.timestamp.toString());
@@ -293,12 +301,20 @@ export function handleTargetUpdate(event: UpdateTarget): void {
   targetUpdate.newTarget = event.params.newTarget;
   targetUpdate.timestamp = event.block.timestamp.toI32();
 
-  updateControllerTarget(event.params._event.address.toHexString(), event.params.newTarget, event.block.timestamp)
+  updateControllerTarget(
+    event.params._event.address.toHexString(),
+    event.params.newTarget,
+    event.block.timestamp
+  );
 
   controller.save();
   targetUpdate.save();
 
-  updateTargetHourData(event.block.timestamp, controller.id, event.params.newTarget);
+  updateTargetHourData(
+    event.block.timestamp,
+    controller.id,
+    event.params.newTarget
+  );
 }
 
 export function handleFundingPeriodUpdated(event: SetFundingPeriod): void {
@@ -353,11 +369,7 @@ export function handleStartAuction(event: StartAuction): void {
   const nft = loadOrCreateERC721Token(event.params.auctionAssetContract);
   if (!nft) return;
   const vault = Vault.load(
-    generateVaultId(
-      event.params._event.address,
-      event.params.nftOwner,
-      nft
-    )
+    generateVaultId(event.params._event.address, event.params.nftOwner, nft)
   );
   if (!vault) {
     return;
@@ -371,12 +383,14 @@ export function handleStartAuction(event: StartAuction): void {
   auction.perPeriodDecayPercentWad = event.params.perPeriodDecayPercentWad;
   auction.secondsInPeriod = event.params.secondsInPeriod;
   const erc20 = loadOrCreateERC20Token(event.params.paymentAsset);
-  if (!erc20) {return};
+  if (!erc20) {
+    return;
+  }
 
   auction.paymentAsset = erc20.id;
   auction.vault = vault.id;
   auction.nftOwner = event.params.nftOwner;
-  auction.controller = controller.id
+  auction.controller = controller.id;
   auction.startedBy = event.transaction.from;
   const start = new AuctionStartEvent(event.transaction.hash.toHexString());
   start.timestamp = event.block.timestamp.toI32();
@@ -400,7 +414,7 @@ export function handleEndAuction(event: EndAuction): void {
     vault.latestAuctionStartTime = 0;
     vault.save();
   }
-  
+
   const end = new AuctionEndEvent(event.transaction.hash.toHexString());
   end.timestamp = event.block.timestamp.toI32();
   end.auction = auction.id;
@@ -415,9 +429,15 @@ export function handleEndAuction(event: EndAuction): void {
 }
 
 export function handleIncreaseDebtAndSell(call: IncreaseDebtAndSellCall): void {
-  addClientFeeToActivity(call.transaction.hash.toHexString(), call.inputs.params.swapFeeBips);
+  addClientFeeToActivity(
+    call.transaction.hash.toHexString(),
+    call.inputs.params.swapFeeBips
+  );
 }
 
 export function handleBuyAndReduceDebt(call: BuyAndReduceDebtCall): void {
-  addClientFeeToActivity(call.transaction.hash.toHexString(), call.inputs.params.swapFeeBips);
+  addClientFeeToActivity(
+    call.transaction.hash.toHexString(),
+    call.inputs.params.swapFeeBips
+  );
 }
